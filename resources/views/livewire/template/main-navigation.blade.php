@@ -9,7 +9,7 @@
                 $isCurrentL1 = request()->is(ltrim($level1['url'], '/') . '*');
             @endphp
             <li x-data="{ open: false }"
-                :class="{ 'open': open }"
+                :class="{ 'is-open': open }"
                 class="head-nav_item head-nav_item--level-1{{ $modifier ? ' head-nav_item--' . $modifier : '' }} has-childs head-nav_item--has-childs{{ $isCurrentL1 ? ' is-current-floor is-current' : '' }}"
                 wire:key="nav-l1-{{ $level1['SuperCategoryCode'] }}"
             >
@@ -45,7 +45,7 @@
                                 $isCurrentL2 = request()->is(ltrim($level2['url'], '/') . '*');
                             @endphp
                             <li x-data="{ open: false }"
-                                :class="{ 'open': open }"
+                                :class="{ 'is-open': open }"
                                 class="head-nav_item head-nav_item--level-2 has-childs head-nav_item--has-childs"
                                 wire:key="nav-l2-{{ $level2['SuperCategoryCode'] }}"
                             >
