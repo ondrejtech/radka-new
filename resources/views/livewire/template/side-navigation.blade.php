@@ -6,9 +6,9 @@
 
                 @foreach ($navigation as $l1)
                     @php
-                        $isCurrentL1 = request()->is(ltrim($l1['url'], '/') . '*');
+                        $isCurrentL1 = (int) $l1['SuperCategoryCode'] === $activeSuperCatCode;
                     @endphp
-                    <li x-data="{ open: false }"
+                    <li x-data="{ open: {{ $isCurrentL1 ? 'true' : 'false' }} }"
                         :class="{ 'is-open': open }"
                         class="aside-nav_item{{ $l1['hasCategories'] ? ' has-childs aside-nav_item--has-childs' : '' }}{{ $isCurrentL1 ? ' is-current' : '' }}"
                         wire:key="snav-l1-{{ $l1['SuperCategoryCode'] }}"
@@ -44,7 +44,7 @@
 
                                     @foreach ($l1['categories'] as $cat)
                                         @php
-                                            $isCurrentCat = request()->is(ltrim($cat['url'], '/') . '*');
+                                            $isCurrentCat = (int) $cat['CategoryCode'] === $activeCategoryCode;
                                         @endphp
                                         <li class="aside-nav_item{{ $isCurrentCat ? ' is-current' : '' }}"
                                             data-menu-pnc="{{ $cat['CategoryCode'] }}"

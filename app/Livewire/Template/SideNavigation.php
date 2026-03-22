@@ -12,40 +12,49 @@ class SideNavigation extends Component
 {
     public function render(): View
     {
+        [$parentCode, $activeSuperCatCode, $activeCategoryCode] = $this->parseUrlCodes();
+
         return view('livewire.template.side-navigation', [
-            'navigation' => $this->buildNavigation(),
+            'navigation' => $parentCode ? $this->loadNavigation($parentCode) : [],
+            'activeSuperCatCode' => $activeSuperCatCode,
+            'activeCategoryCode' => $activeCategoryCode,
         ]);
     }
 
-    /** @return array<int, array<string, mixed>> */
-    private function buildNavigation(): array
-    {
-        $parentCode = $this->parseParentCode();
-
-        if ($parentCode === null) {
-            return [];
-        }
-
-        return Cache::remember("side_navigation_{$parentCode}", 3600, fn (): array => $this->loadItems($parentCode));
-    }
-
-    private function parseParentCode(): ?int
+    /**
+     * Parse URL codes from n-{X},{Y},{Z} pattern.
+     *
+     * @return array{0: int|null, 1: int|null, 2: int|null}
+     */
+    private function parseUrlCodes(): array
     {
         if (! preg_match('/n-(\w+),(\d+),(\d+)/', request()->path(), $m)) {
-            return null;
+            return [null, null, null];
         }
 
-        $code = (int) $m[1];
+        $superCatCode = (int) $m[1];  // X — SuperCategoryCode of L1 item
+        $categoryCode = (int) $m[2];  // Y — CategoryCode (0 = none selected)
 
-        // If this code has direct children, use it as parent
+        $parentCode = $this->resolveParentCode($superCatCode);
+
+        return [$parentCode, $superCatCode, $categoryCode ?: null];
+    }
+
+    private function resolveParentCode(int $code): ?int
+    {
         if (ProductSuperCategory::where('ParentSuperCategoryCode', $code)->exists()) {
             return $code;
         }
 
-        // Otherwise walk up one level to find the root that has children
         $item = ProductSuperCategory::find($code);
 
         return $item?->ParentSuperCategoryCode ?? null;
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function loadNavigation(int $parentCode): array
+    {
+        return Cache::remember("side_navigation_{$parentCode}", 3600, fn (): array => $this->loadItems($parentCode));
     }
 
     /** @return array<int, array<string, mixed>> */
