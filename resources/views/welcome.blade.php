@@ -13,6 +13,8 @@
 
                     {{-- Hlavní obsah --}}
                     <div class="layout_main" role="main">
+                        {{-- Banner slider --}}
+                        <livewire:template.banner-slider />
                     </div>
                 </div>
             </div>
