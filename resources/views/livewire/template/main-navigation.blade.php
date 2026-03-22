@@ -53,7 +53,8 @@
                                     <a class="nav-link head-nav_link nav-link head-nav_link--level-2 head-nav_link--has-childs{{ $isCurrentL2 ? ' head-nav_link--is-current' : '' }}"
                                         href="{{ $level2['url'] }}"
                                     >
-                                        <img class="head-nav_link-media head-nav_link-media--img" src="" alt="{{ $level2['SuperCategoryName'] }}" />
+                                        {{-- <img class="head-nav_link-media head-nav_link-media--img" src="" alt="{{ $level2['SuperCategoryName'] }}" /> --}}
+                                        <img class="head-nav_link-media head-nav_link-media--img" src="" />
                                         <span class="head-nav_link-label">{{ $level2['SuperCategoryName'] }}</span>
                                     </a>
 
