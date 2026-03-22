@@ -1,0 +1,79 @@
+@if (count($navigation))
+<div class="layout_aside" role="complementary">
+    <div id="subCategoryMenu" class="aside-nav aside-main-menu">
+        <nav class="aside-nav_in" role="navigation" aria-label="Postranní navigace">
+            <ul class="level-1 aside-nav_group aside-nav_group--level-1">
+
+                @foreach ($navigation as $l1)
+                    @php
+                        $isCurrentL1 = request()->is(ltrim($l1['url'], '/') . '*');
+                    @endphp
+                    <li x-data="{ open: false }"
+                        :class="{ 'is-open': open }"
+                        class="aside-nav_item{{ $l1['hasCategories'] ? ' has-childs aside-nav_item--has-childs' : '' }}{{ $isCurrentL1 ? ' is-current' : '' }}"
+                        wire:key="snav-l1-{{ $l1['SuperCategoryCode'] }}"
+                        @mouseenter="open = true"
+                        @mouseleave="open = false"
+                    >
+                        <div class="nav-link-wrap aside-nav_link-wrap">
+                            <a class="nav-link aside-nav_link{{ $l1['hasCategories'] ? ' aside-nav_link--has-childs' : '' }}{{ $isCurrentL1 ? ' aside-nav_link--is-current' : '' }}"
+                                data-ga-category="1"
+                                data-ga-prefix="1"
+                                data-nav-id="{{ $l1['SuperCategoryCode'] }}"
+                                href="{{ $l1['url'] }}"
+                                @click="if(typeof GAAction !== 'undefined') GAAction($el.dataset.gaCategory, $el.dataset.gaPrefix, $($el))"
+                            >
+                                {{ $l1['SuperCategoryName'] }}
+                            </a>
+
+                            @if ($l1['hasCategories'])
+                                <div class="btn-toggle aside-nav_btn-toggle-subgroup" @click.stop="open = !open">
+                                    <i class="icon-arrow_right aside-nav_toggle-icon"></i>
+                                </div>
+                            @endif
+                        </div>
+
+                        @if ($l1['hasCategories'])
+                            <div class="sub-menu aside-nav_sub-menu{{ count($l1['categories']) > 15 ? ' col-size-2' : '' }}">
+                                <button type="button" class="btn btn-sub-menu-close aside-nav_sub-menu_btn-close" @click="open = false">
+                                    <i class="icon-arrow_left btn_icon"></i>
+                                    <span class="btn_label">Zpět: {{ $l1['SuperCategoryName'] }}</span>
+                                </button>
+
+                                <ul class="level-2 aside-nav_group aside-nav_group--level-2">
+
+                                    @foreach ($l1['categories'] as $cat)
+                                        @php
+                                            $isCurrentCat = request()->is(ltrim($cat['url'], '/') . '*');
+                                        @endphp
+                                        <li class="aside-nav_item{{ $isCurrentCat ? ' is-current' : '' }}"
+                                            data-menu-pnc="{{ $cat['CategoryCode'] }}"
+                                            data-menu-pnsub="{{ $l1['SuperCategoryCode'] }}"
+                                            wire:key="snav-cat-{{ $cat['CategoryCode'] }}"
+                                        >
+                                            <div class="nav-link-wrap aside-nav_link-wrap">
+                                                <a class="nav-link aside-nav_link{{ $isCurrentCat ? ' aside-nav_link--is-current' : '' }}"
+                                                    data-ga-category="1"
+                                                    data-ga-prefix="2"
+                                                    data-nav-id="{{ $cat['CategoryCode'] }}"
+                                                    href="{{ $cat['url'] }}"
+                                                    @click="if(typeof GAAction !== 'undefined') GAAction($el.dataset.gaCategory, $el.dataset.gaPrefix, $($el))"
+                                                >
+                                                    <span class="aside-nav_link-label">{{ $cat['CategoryName'] }}</span>
+                                                </a>
+                                            </div>
+                                        </li>
+                                    @endforeach
+
+                                </ul>
+                            </div>
+                        @endif
+
+                    </li>
+                @endforeach
+
+            </ul>
+        </nav>
+    </div>
+</div>
+@endif
