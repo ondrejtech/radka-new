@@ -35,7 +35,17 @@ class SideNavigation extends Component
             return null;
         }
 
-        return (int) $m[1];
+        $code = (int) $m[1];
+
+        // If this code has direct children, use it as parent
+        if (ProductSuperCategory::where('ParentSuperCategoryCode', $code)->exists()) {
+            return $code;
+        }
+
+        // Otherwise walk up one level to find the root that has children
+        $item = ProductSuperCategory::find($code);
+
+        return $item?->ParentSuperCategoryCode ?? null;
     }
 
     /** @return array<int, array<string, mixed>> */
