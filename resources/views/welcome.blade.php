@@ -15,6 +15,13 @@
                     <div class="layout_main" role="main">
                         {{-- Banner slider --}}
                         <livewire:template.banner-slider />
+
+                        <div class="promo-news-hp">
+                            <div class="box-tabs full-tab promo-tabs js-tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
+                                {{-- Karusely produktů --}}
+                                <livewire:template.homepage-carousels />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
