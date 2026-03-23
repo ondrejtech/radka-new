@@ -2,8 +2,8 @@
     <div class="login-pf-page">
 
         <a class="kc-background-link" target="_blank">
-            <img src="https://www.edecko.cz/wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg"
-                srcset="https://www.edecko.cz/wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg 1920w, https://www.edecko.cz/wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg 3840w"
+            <img src="{{ asset('wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg') }}"
+                srcset="{{ asset('wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg') }} 1920w, {{ asset('wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg') }} 3840w"
                 sizes="(min-width: 3840px) 3840px, 1920px" alt="Background image">
         </a>
 
