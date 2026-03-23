@@ -32,13 +32,12 @@ class HomepageCarousels extends Component
 
         $code = (int) $m[1];
 
-        if (ProductSuperCategory::where('ParentSuperCategoryCode', $code)->exists()) {
-            return $code;
+        // Only render on L1 pages — X must directly be a root code with PSC children
+        if (! ProductSuperCategory::where('ParentSuperCategoryCode', $code)->exists()) {
+            return null;
         }
 
-        $psc = ProductSuperCategory::find($code);
-
-        return $psc?->ParentSuperCategoryCode ? (int) $psc->ParentSuperCategoryCode : null;
+        return $code;
     }
 
     private function loadCarousels(int $l1Code): array
