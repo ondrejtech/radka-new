@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="login-pf-page">
 
-        <a href="https://www.edecko.cz/2026/01/01/copilot-pc-pro-maximalni-vykon-a-bezpecnost/" class="kc-background-link"
+        <a class="kc-background-link"
             target="_blank">
             <img src="https://www.edecko.cz/wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg"
                 srcset="https://www.edecko.cz/wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg 1920w, https://www.edecko.cz/wp-content/uploads/2026/02/login-page-banner-MS-4K-cz-1-2048x1152.jpg 3840w"

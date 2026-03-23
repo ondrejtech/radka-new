@@ -1,0 +1,567 @@
+﻿@font-face {
+	font-family: 'simple-line-icons';
+	src: url('fonts/simple-line-icons.eot?vc70ln');
+	src: url('fonts/simple-line-icons.eot?vc70ln#iefix') format('embedded-opentype'),
+		url('fonts/simple-line-icons.ttf?vc70ln') format('truetype'),
+		url('fonts/simple-line-icons.woff?vc70ln') format('woff'),
+		url('fonts/simple-line-icons.svg?vc70ln#simple-line-icons') format('svg');
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
+}
+
+[class^="icon-"],
+[class*=" icon-"] {
+	/* use !important to prevent issues with browser extensions that change fonts */
+	font-family: 'simple-line-icons' !important;
+	speak: never;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Enable Ligatures ================ */
+	letter-spacing: 0;
+	-webkit-font-feature-settings: "liga";
+	-moz-font-feature-settings: "liga=1";
+	-moz-font-feature-settings: "liga";
+	-ms-font-feature-settings: "liga"1;
+	font-feature-settings: "liga";
+	-webkit-font-variant-ligatures: discretionary-ligatures;
+	font-variant-ligatures: discretionary-ligatures;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-heart:before {
+	content: "\e90c";
+}
+
+.icon-filter-delete:before {
+	content: "\e90b";
+}
+
+.icon-filter-simple:before {
+	content: "\e90a";
+}
+
+.icon-star:before {
+	content: "\e09b";
+}
+
+.icon-basket-settings:before {
+	content: "\e904";
+}
+
+.icon-check3:before {
+	content: "\e901";
+}
+
+.icon-file-add2:before {
+	content: "\e902";
+}
+
+.icon-alert:before {
+	content: "\e903";
+}
+
+.icon-like:before {
+	content: "\e069";
+}
+
+.icon-home:before {
+	content: "\e602";
+}
+
+.icon-prod-attr-offer:before {
+	content: "\e682";
+}
+
+.icon-b2b-print:before {
+	content: "\e6aa";
+}
+
+.icon-comparsion2:before {
+	content: "\e6bb";
+}
+
+.icon-moneybag:before {
+	content: "\e6c8";
+}
+
+.icon-lowprice:before {
+	content: "\e6da";
+}
+
+.icon-collation:before {
+	content: "\e6e2";
+}
+
+.icon-close:before {
+	content: "\e771";
+}
+
+.icon-plus:before {
+	content: "\e772";
+}
+
+.icon-minus:before {
+	content: "\e773";
+}
+
+.icon-repeat:before {
+	content: "\e098";
+}
+
+.icon-long-arrow-bottm:before {
+	content: "\e764";
+}
+
+.icon-licence:before {
+	content: "\e822";
+}
+
+.icon-bazaar:before {
+	content: "\e82d";
+}
+
+.icon-prod-attr-new:before {
+	content: "\e84b";
+}
+
+.icon-field-click:before {
+	content: "\e852";
+}
+
+.icon-ordered:before {
+	content: "\e86d";
+}
+
+.icon-blocked:before {
+	content: "\e87c";
+}
+
+.icon-delivered:before {
+	content: "\e87f";
+}
+
+.icon-cancel:before {
+	content: "\e880";
+}
+
+.icon-filter1:before {
+	content: "\e88f";
+}
+
+.icon-select:before {
+	content: "\e89c";
+}
+
+.icon-news:before {
+	content: "\e013";
+}
+
+.icon-prod-attr-csale:before {
+	content: "\e018";
+}
+
+.icon-list2:before {
+	content: "\e068";
+}
+
+.icon-grid:before {
+	content: "\e06a";
+}
+
+.icon-3doid:before {
+	content: "\e099";
+}
+
+.icon-layers:before {
+	content: "\e034";
+}
+
+.icon-handbag:before {
+	content: "\e035";
+}
+
+.icon-invoice:before {
+	content: "\e060";
+}
+
+.icon-list:before {
+	content: "\e067";
+}
+
+.icon-orders:before {
+	content: "\e04c";
+}
+
+.icon-file-add:before {
+	content: "\e085";
+}
+
+.icon-docs:before {
+	content: "\e040";
+}
+
+.icon-plane:before {
+	content: "\e012";
+}
+
+.icon-move:before {
+	content: "\e023";
+}
+
+.icon-people:before {
+	content: "\e001";
+}
+
+.icon-folder:before {
+	content: "\e039";
+}
+
+.icon-bag:before {
+	content: "\e04f";
+}
+
+.icon-check:before {
+	content: "\e080";
+}
+
+.icon-menu:before {
+	content: "\e601";
+}
+
+.icon-set:before {
+	content: "\e5da";
+}
+
+.icon-arrow_bottom:before {
+	content: "\e317";
+}
+
+.icon-arrow_top:before {
+	content: "\e318";
+}
+
+.icon-arrow_left:before {
+	content: "\e316";
+}
+
+.icon-arrow_right:before {
+	content: "\e315";
+}
+
+.icon-ed-cupon:before {
+	content: "\e900";
+}
+
+.icon-facebook:before {
+	content: "\f09a";
+}
+
+.icon-linkedin:before {
+	content: "\f0e1";
+}
+
+.icon-add_box:before {
+	content: "\e146";
+}
+
+.icon-arrow_drop_down:before {
+	content: "\e5c5";
+}
+
+.icon-arrow_drop_up:before {
+	content: "\e5c7";
+}
+
+.icon-check2:before {
+	content: "\e5ca";
+}
+
+.icon-check_box:before {
+	content: "\e834";
+}
+
+.icon-check_box_blank:before {
+	content: "\e835";
+}
+
+.icon-minus_box:before {
+	content: "\e909";
+}
+
+.icon-user:before {
+	content: "\e005";
+}
+
+.icon-basket-loaded:before {
+	content: "\e04d";
+}
+
+.icon-basket:before {
+	content: "\e04e";
+}
+
+.icon-delete:before {
+	content: "\e054";
+}
+
+.icon-pricetag:before {
+	content: "\e055";
+}
+
+.icon-question:before {
+	content: "\e05d";
+}
+
+.icon-logout:before {
+	content: "\e065";
+}
+
+.icon-arrow-up-circle:before {
+	content: "\e078";
+}
+
+.icon-arrow-down-circle:before {
+	content: "\e07b";
+}
+
+.icon-info:before {
+	content: "\e08b";
+}
+
+.icon-search:before {
+	content: "\e090";
+}
+
+.icon-send:before {
+	content: "\e094";
+}
+
+.icon-settings:before {
+	content: "\e09a";
+}
+
+.icon-phone:before {
+	content: "\e600";
+}
+
+.icon-arrow-down:before {
+	content: "\e604";
+}
+
+.icon-arrow-left:before {
+	content: "\e608";
+}
+
+.icon-arrow-right:before {
+	content: "\e609";
+}
+
+.icon-arrow-up:before {
+	content: "\e607";
+}
+
+.icon-wallet:before {
+	content: "\e02a";
+}
+
+.icon-print:before {
+	content: "\e02e";
+}
+
+.icon-drawar:before {
+	content: "\e03f";
+}
+
+.icon-export-csv:before {
+	content: "\e05a";
+}
+
+.icon-share:before {
+	content: "\e05b";
+}
+
+.icon-folder2:before {
+	content: "\e089";
+}
+
+.icon-link:before {
+	content: "\e08d";
+}
+
+.icon-lightbulb_outline:before {
+	content: "\e90f";
+}
+
+.icon-prod-attr-used:before {
+	content: "\e90d";
+}
+
+.icon-prod-attr-repas:before {
+	content: "\e90e";
+}
+
+.icon-star-full:before {
+	content: "\e09c";
+}
+
+.icon-asterisk:before {
+	content: "\e09d";
+}
+
+.icon-hpe:before {
+	content: "\e08e";
+}
+
+.icon-form:before {
+	content: "\e08f";
+}
+
+.icon-key:before {
+	content: "\e006";
+}
+
+.icon-smart-phone:before {
+	content: "\e008";
+}
+
+.icon-bubble:before {
+	content: "\e009";
+}
+
+.icon-pay-confirm:before {
+	content: "\56";
+}
+
+.icon-pay-success:before {
+	content: "\e007";
+}
+
+.icon-pay-error:before {
+	content: "\e027";
+}
+
+.icon-pay-occur:before {
+	content: "\68";
+}
+
+.icon-pay-bank:before {
+	content: "\3e";
+}
+
+.icon-prod-attr-profi:before {
+	content: "\e908";
+}
+
+.icon-prod-attr-topseller:before {
+	content: "\e907";
+}
+
+.icon-stock-BRA:before {
+	content: "\e905";
+}
+
+.icon-stock-OVA:before {
+	content: "\e906";
+}
+
+.icon-stock-onway:before {
+	content: "\e941";
+}
+
+.icon-stock-supplier:before {
+	content: "\e94a";
+}
+
+.icon-stock-unavailable:before {
+	content: "\67";
+}
+
+.icon-stock-available-for:before {
+	content: "\78";
+}
+
+.icon-stock-question:before {
+	content: "\2c";
+}
+
+.icon-stock-download:before {
+	content: "\e003";
+}
+
+.icon-prod-attr-klikman:before {
+	content: "\e63c";
+}
+
+.icon-expiration:before {
+	content: "\e60a";
+}
+
+.icon-electronics:before {
+	content: "\e6ef";
+}
+
+.icon-body-care:before {
+	content: "\e745";
+}
+
+.icon-house-garden:before {
+	content: "\e67b";
+}
+
+.icon-large-appliances:before {
+	content: "\e743";
+}
+
+.icon-it-products:before {
+	content: "\e7ae";
+}
+
+.icon-small-appliances:before {
+	content: "\e7b6";
+}
+
+.icon-sport-outdoor:before {
+	content: "\e860";
+}
+
+.icon-lock:before {
+	content: "\e62d";
+}
+
+.icon-unlock:before {
+	content: "\e62e";
+}
+
+/* 
+	---------------------------------------------------------------------------------------
+	Custom re�en� pro nekter� ikony
+	---------------------------------------------------------------------------------------
+*/
+/*pridano navic - neni soucasti balicku icon moon - prebira se konfigurace ikony, ktera v icon moon balicku existuje*/
+.icon-service-HPCarepack {
+	background: white;
+}
+
+.icon-service-HPCarepack:before {
+	content: "\e08f";
+	color: black;
+	font-size: medium;
+}
+
+/*pridano navic - neni soucasti balicku icon moon - prebira se konfigurace ikony, ktera v icon moon balicku existuje */
+.icon-service-Avast:before {
+	content: "\e005";
+}
+
+/*pridano navic - neni soucasti balicku icon moon - prebira se konfigurace ikony, ktera v icon moon balicku existuje */
+.icon-stock-service:before {
+	content: "\e904";
+}
