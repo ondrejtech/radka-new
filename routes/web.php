@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CategoryController::class, 'home']);
@@ -11,3 +12,15 @@ Route::get('/', [CategoryController::class, 'home']);
 //   /info-other/notebooky/n-521,0,0   (level 2)
 //   /notebooky/notebooky/n-521,12345,0 (level 3)
 Route::get('/{seg1}/{seg2}/{nParam}', [CategoryController::class, 'index'])->where('nParam', 'n-[\w]+,\d+,\d+')->name('category.show');
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
