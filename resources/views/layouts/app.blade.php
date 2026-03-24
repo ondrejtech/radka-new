@@ -168,9 +168,13 @@ gtag('consent', 'update', {
 									<span class="btn_label btn-user-logout_label">Odhlásit</span>
 								</a>
 							@else
-								<a href="{{ route('login') }}" class="btn btn-user-login" title="Přihlásit" style="min-height:40px;">
-									<i class="icon-user btn_icon"></i>
-									<span class="btn_label">Přihlásit</span>
+								<a href="{{ route('register') }}" class="btn btn--other btn-user-login user-info" title="Registrace" style="min-height:40px;">
+									<i class="icon-invoice btn_icon btn-user-login_icon"></i>
+									<span class="btn_label btn-user-login_label">Registrace</span>
+								</a>
+								<a href="{{ route('login') }}" class="btn btn-user-login user-info" title="Přihlášení" style="min-height:40px;">
+									<i class="icon-user btn_icon btn-user-login_icon"></i>
+									<span class="btn_label btn-user-login_label">Přihlášení</span>
 								</a>
 							@endauth
 						</div>
