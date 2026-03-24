@@ -1,0 +1,59 @@
+.sms-verification-form {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem
+}
+
+.sms-verification-form:before,
+.sms-verification-form:after {
+    display: none
+}
+
+.sms-verification-form .form-base {
+    text-align: center
+}
+
+.sms-verification-form .form-label {
+    margin-top: 0
+}
+
+.sms-verification-form .form-base_item {
+    margin: 0
+}
+
+.sms-verification-form .buttons-area {
+    display: flex;
+    gap: 1rem
+}
+
+.sms-verification-form .buttons-area:before,
+.sms-verification-form .buttons-area:after {
+    display: none
+}
+
+.sms-verification-form .buttons-area>.btn {
+    margin: 0
+}
+
+.sms-verification-code {
+    gap: 1rem;
+    font-weight: bold
+}
+
+.sms-verification-code .form-group {
+    max-width: 80px
+}
+
+.sms-verification-code .form-control {
+    height: 50px;
+    font-size: large;
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0
+}
+
+.sms-verification-code .form-control.is-required:not(.error)+.form-control-validate-info {
+    display: none
+}
