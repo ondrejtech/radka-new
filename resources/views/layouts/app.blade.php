@@ -168,7 +168,7 @@ gtag('consent', 'update', {
 									<span class="btn_label btn-user-logout_label">Odhlásit</span>
 								</a>
 							@else
-								<a href="{{ route('login') }}" class="btn btn-user-login" title="Přihlásit" style="min-height:34px;">
+								<a href="{{ route('login') }}" class="btn btn-user-login" title="Přihlásit" style="min-height:40px;">
 									<i class="icon-user btn_icon"></i>
 									<span class="btn_label">Přihlásit</span>
 								</a>
