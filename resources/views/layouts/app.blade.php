@@ -73,6 +73,8 @@ gtag('consent', 'update', {
 </title>
 @livewireStyles
 @stack('styles')
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css"/>
 </head>
 <body class='@auth is-logged @endauth {{ $bodyClass ?? '' }}'>
 	<!-- Google Tag Manager -->
@@ -498,6 +500,13 @@ gtag('consent', 'update', {
 	    }
     </script>
 @livewireScripts
+<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+<script>
+    window.addEventListener('message', event => {
+        alertify.set('notifier', 'position', 'top-right');
+        alertify.notify(event.detail[0].text, event.detail[0].type);
+    });
+</script>
 @stack('scripts')
 </body>
 </html>

@@ -40,6 +40,11 @@ class HomepageCarousels extends Component
         );
 
         $this->dispatch('cart-updated');
+        $this->dispatch('message', [
+            'text' => 'Zboží bylo úspěšně přidáno do košíku',
+            'type' => 'success',
+            'status' => '200',
+        ]);
     }
 
     public function render(): View
