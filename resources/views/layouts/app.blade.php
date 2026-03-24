@@ -127,7 +127,7 @@ gtag('consent', 'update', {
 										<div class="dropdown-menu_in">
 											<ul class="dropdown-menu-group">
 												<li class="dropdown-item-wrap dropdown-item-wrap--user-logout visible-touch">
-													<form method="POST" action="{{ route('logout') }}">
+													<form method="POST" action="{{ route('logout') }}" style="display:contents">
 														@csrf
 														<button type="submit" class="dropdown-item dropdown-item--user-logout" title="Odhlásit">
 															<i class="icon-logout dropdown-item_icon"></i>
@@ -165,7 +165,7 @@ gtag('consent', 'update', {
 										</div>
 									</div>
 								</div>
-								<form method="POST" action="{{ route('logout') }}">
+								<form method="POST" action="{{ route('logout') }}" style="display:contents">
 									@csrf
 									<button type="submit" class="btn btn-user-logout" title="Odhlásit">
 										<i class="icon-logout btn_icon btn-user-logout_icon"></i>
