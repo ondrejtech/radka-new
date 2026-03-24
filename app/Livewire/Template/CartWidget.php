@@ -27,6 +27,12 @@ class CartWidget extends Component
         if ($cart) {
             $cart->items()->where('id', $cartItemId)->delete();
         }
+
+        $this->dispatch('message', [
+            'text' => 'Zboží bylo úspěšně odebráno z košíku',
+            'type' => 'success',
+            'status' => '200',
+        ]);
     }
 
     public function clearCart(): void
