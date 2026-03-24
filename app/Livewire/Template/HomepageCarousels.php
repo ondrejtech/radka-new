@@ -5,6 +5,7 @@ namespace App\Livewire\Template;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductSuperCategory;
+use App\Services\CartService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -14,10 +15,36 @@ class HomepageCarousels extends Component
 {
     private const PRODUCTS_PER_CAROUSEL = 30;
 
+    public ?int $l1Code = null;
+
+    public function mount(): void
+    {
+        $this->l1Code = $this->resolveL1Code();
+    }
+
+    public function addToCart(int $proId, int $quantity): void
+    {
+        $quantity = max(1, $quantity);
+
+        $product = Product::find($proId, ['ProId', 'Name', 'EndUserPrice']);
+
+        if (! $product) {
+            return;
+        }
+
+        app(CartService::class)->addItem(
+            $proId,
+            $product->Name,
+            (float) $product->EndUserPrice,
+            $quantity
+        );
+
+        $this->dispatch('cart-updated');
+    }
+
     public function render(): View
     {
-        $l1Code = $this->resolveL1Code();
-        $carousels = $l1Code ? $this->loadCarousels($l1Code) : [];
+        $carousels = $this->l1Code ? $this->loadCarousels($this->l1Code) : [];
 
         return view('livewire.template.homepage-carousels', [
             'carousels' => $carousels,

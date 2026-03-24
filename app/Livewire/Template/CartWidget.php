@@ -5,11 +5,15 @@ namespace App\Livewire\Template;
 use App\Models\Cart;
 use App\Models\CartItem;
 use Illuminate\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CartWidget extends Component
 {
     public bool $isOpen = false;
+
+    #[On('cart-updated')]
+    public function refresh(): void {}
 
     public function toggle(): void
     {
