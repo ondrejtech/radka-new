@@ -127,10 +127,13 @@ gtag('consent', 'update', {
 										<div class="dropdown-menu_in">
 											<ul class="dropdown-menu-group">
 												<li class="dropdown-item-wrap dropdown-item-wrap--user-logout visible-touch">
-													<a href="#" class="dropdown-item dropdown-item--user-logout" title="Odhlásit">
-														<i class="icon-logout dropdown-item_icon"></i>
-														<span class="dropdown-item_label">Odhlásit</span>
-													</a>
+													<form method="POST" action="{{ route('logout') }}">
+														@csrf
+														<button type="submit" class="dropdown-item dropdown-item--user-logout" title="Odhlásit">
+															<i class="icon-logout dropdown-item_icon"></i>
+															<span class="dropdown-item_label">Odhlásit</span>
+														</button>
+													</form>
 												</li>
 												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href="#"><span class="dropdown-item_label">Můj přehled</span></a></li>
 												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href="#"><span class="dropdown-item_label">Košíky a nabídky</span></a></li>
@@ -162,12 +165,15 @@ gtag('consent', 'update', {
 										</div>
 									</div>
 								</div>
-								<a href="#" class="btn btn-user-logout" title="Odhlásit">
-									<i class="icon-logout btn_icon btn-user-logout_icon"></i>
-									<span class="btn_label btn-user-logout_label">Odhlásit</span>
-								</a>
+								<form method="POST" action="{{ route('logout') }}">
+									@csrf
+									<button type="submit" class="btn btn-user-logout" title="Odhlásit">
+										<i class="icon-logout btn_icon btn-user-logout_icon"></i>
+										<span class="btn_label btn-user-logout_label">Odhlásit</span>
+									</button>
+								</form>
 							@else
-								<a href="#" class="btn btn-user-login" title="Přihlásit">
+								<a href="{{ route('login') }}" class="btn btn-user-login" title="Přihlásit">
 									<i class="icon-user btn_icon"></i>
 									<span class="btn_label">Přihlásit</span>
 								</a>
