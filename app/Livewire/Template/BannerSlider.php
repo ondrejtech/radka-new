@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Template;
 
-use App\Models\ProductSuperCategory;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -17,10 +16,7 @@ class BannerSlider extends Component
 
     private function isL1Page(): bool
     {
-        if (! preg_match('/n-(\w+),\d+,\d+/', request()->path(), $m)) {
-            return false;
-        }
-
-        return ProductSuperCategory::where('ParentSuperCategoryCode', (int) $m[1])->exists();
+        // Show banner on L1 and L2 pages — both have catCode=0 in URL (n-code,0,0)
+        return (bool) preg_match('/n-\w+,0,\d+/', request()->path());
     }
 }

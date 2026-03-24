@@ -3,6 +3,7 @@
 namespace App\Livewire\Template;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Models\ProductSuperCategory;
 use App\Services\CartService;
@@ -15,11 +16,13 @@ class HomepageCarousels extends Component
 {
     private const PRODUCTS_PER_CAROUSEL = 30;
 
-    public ?int $l1Code = null;
+    public ?int $pscCode = null;
+
+    public bool $isL1 = false;
 
     public function mount(): void
     {
-        $this->l1Code = $this->resolveL1Code();
+        [$this->pscCode, $this->isL1] = $this->resolveCode();
     }
 
     public function addToCart(int $proId, int $quantity): void
@@ -49,35 +52,49 @@ class HomepageCarousels extends Component
 
     public function render(): View
     {
-        $carousels = $this->l1Code ? $this->loadCarousels($this->l1Code) : [];
+        $carousels = $this->pscCode ? $this->loadCarousels($this->pscCode, $this->isL1) : [];
 
         return view('livewire.template.homepage-carousels', [
             'carousels' => $carousels,
         ]);
     }
 
-    private function resolveL1Code(): ?int
+    /**
+     * @return array{0: ?int, 1: bool}
+     */
+    private function resolveCode(): array
     {
         if (! preg_match('/n-(\w+),(\d+),(\d+)/', request()->path(), $m)) {
-            return null;
+            return [null, false];
+        }
+
+        // Only render on L1/L2 pages — catCode must be 0
+        if ((int) $m[2] !== 0) {
+            return [null, false];
         }
 
         $code = (int) $m[1];
+        $isL1 = ProductSuperCategory::where('ParentSuperCategoryCode', $code)->exists();
 
-        // Only render on L1 pages — X must directly be a root code with PSC children
-        if (! ProductSuperCategory::where('ParentSuperCategoryCode', $code)->exists()) {
-            return null;
+        // L2 must be a known PSC code
+        if (! $isL1 && ! ProductSuperCategory::where('SuperCategoryCode', $code)->exists()) {
+            return [null, false];
         }
 
-        return $code;
+        return [$code, $isL1];
     }
 
-    private function loadCarousels(int $l1Code): array
+    private function loadCarousels(int $code, bool $isL1): array
     {
-        return Cache::remember("homepage_carousels_{$l1Code}", 3600, fn (): array => $this->buildCarousels($l1Code));
+        $key = $isL1 ? "homepage_carousels_l1_{$code}" : "homepage_carousels_l2_{$code}";
+
+        return Cache::remember($key, 3600, fn (): array => $isL1
+            ? $this->buildL1Carousels($code)
+            : $this->buildL2Carousels($code)
+        );
     }
 
-    private function buildCarousels(int $l1Code): array
+    private function buildL1Carousels(int $l1Code): array
     {
         $l2Children = ProductSuperCategory::where('ParentSuperCategoryCode', $l1Code)
             ->orderBy('SuperCategoryCode')
@@ -92,42 +109,73 @@ class HomepageCarousels extends Component
                 continue;
             }
 
-            $products = Product::whereIn('CategoryCode', $categoryCodes)
-                ->orderByDesc('IsTop')
-                ->orderByDesc('OnStock')
-                ->limit(self::PRODUCTS_PER_CAROUSEL)
-                ->get(['ProId', 'Name', 'EndUserPrice', 'OnStock', 'Status', 'DescriptionShort']);
+            $carousel = $this->buildCarouselFromCategoryCodes($categoryCodes, $l2->SuperCategoryName);
 
-            $productIds = $products->pluck('ProId')->toArray();
-
-            $images = ProductImage::whereIn('ProId', $productIds)
-                ->get(['ProId', 'URL'])
-                ->groupBy('ProId')
-                ->map(fn ($imgs) => $imgs->first()->URL);
-
-            $products = $products
-                ->map(fn (Product $p): array => [
-                    'ProId' => $p->ProId,
-                    'Name' => $p->Name,
-                    'slug' => Str::slug($p->Name),
-                    'EndUserPrice' => $p->EndUserPrice,
-                    'OnStock' => (bool) $p->OnStock,
-                    'Status' => $p->Status,
-                    'DescriptionShort' => $p->DescriptionShort,
-                    'imageUrl' => $images[$p->ProId] ?? '',
-                ])
-                ->toArray();
-
-            if (empty($products)) {
-                continue;
+            if ($carousel) {
+                $carousels[] = $carousel;
             }
-
-            $carousels[] = [
-                'title' => $l2->SuperCategoryName,
-                'products' => $products,
-            ];
         }
 
         return $carousels;
+    }
+
+    private function buildL2Carousels(int $l2Code): array
+    {
+        $categories = ProductCategory::where('SuperCategoryCode', $l2Code)
+            ->orderBy('CategoryCode')
+            ->get();
+
+        $carousels = [];
+
+        foreach ($categories as $category) {
+            $carousel = $this->buildCarouselFromCategoryCodes(
+                [$category->CategoryCode],
+                $category->CategoryName
+            );
+
+            if ($carousel) {
+                $carousels[] = $carousel;
+            }
+        }
+
+        return $carousels;
+    }
+
+    private function buildCarouselFromCategoryCodes(array $categoryCodes, string $title): ?array
+    {
+        $products = Product::whereIn('CategoryCode', $categoryCodes)
+            ->orderByDesc('IsTop')
+            ->orderByDesc('OnStock')
+            ->limit(self::PRODUCTS_PER_CAROUSEL)
+            ->get(['ProId', 'Name', 'EndUserPrice', 'OnStock', 'Status', 'DescriptionShort']);
+
+        if ($products->isEmpty()) {
+            return null;
+        }
+
+        $productIds = $products->pluck('ProId')->toArray();
+
+        $images = ProductImage::whereIn('ProId', $productIds)
+            ->get(['ProId', 'URL'])
+            ->groupBy('ProId')
+            ->map(fn ($imgs) => $imgs->first()->URL);
+
+        $products = $products
+            ->map(fn (Product $p): array => [
+                'ProId' => $p->ProId,
+                'Name' => $p->Name,
+                'slug' => Str::slug($p->Name),
+                'EndUserPrice' => $p->EndUserPrice,
+                'OnStock' => (bool) $p->OnStock,
+                'Status' => $p->Status,
+                'DescriptionShort' => $p->DescriptionShort,
+                'imageUrl' => $images[$p->ProId] ?? '',
+            ])
+            ->toArray();
+
+        return [
+            'title' => $title,
+            'products' => $products,
+        ];
     }
 }
