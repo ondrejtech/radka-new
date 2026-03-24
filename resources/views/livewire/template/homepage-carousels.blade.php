@@ -5,7 +5,7 @@
                 <h2>{{ $carousel['title'] }}</h2>
                 <div>
                     <div class="products-recommended">
-                        <div class="data-product-items owl-carousel">
+                        <div class="data-product-items owl-carousel" wire:ignore>
                             @foreach ($carousel['products'] as $product)
                                 <article id="product_{{ $product['ProId'] }}" class="product-item pro-tile" x-data="{ qty: 1 }">
                                     <div class="pro-tile_in">
