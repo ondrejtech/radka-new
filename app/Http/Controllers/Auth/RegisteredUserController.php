@@ -15,31 +15,55 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
     /**
-     * Handle an incoming registration request.
-     *
      * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
+        // Honeypot check
+        if ($request->filled('website')) {
+            return redirect()->route('register');
+        }
+
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:20'],
+            'last_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'phone' => ['required', 'string', 'max:20'],
+            'company_name' => ['required', 'string', 'max:100'],
+            'company_ic' => ['required', 'string', 'max:20'],
+            'company_dic' => ['nullable', 'string', 'max:20'],
+            'street' => ['required', 'string', 'max:100'],
+            'city' => ['required', 'string', 'max:100'],
+            'zip' => ['required', 'string', 'max:7'],
+            'country' => ['required', 'string', 'max:100'],
+            'note' => ['nullable', 'string'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'terms_accepted' => ['accepted'],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'name' => $request->first_name.' '.$request->last_name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
+            'phone' => $request->phone,
+            'company_name' => $request->company_name,
+            'company_ic' => $request->company_ic,
+            'company_dic' => $request->company_dic,
+            'street' => $request->street,
+            'city' => $request->city,
+            'zip' => $request->zip,
+            'country' => $request->country,
+            'note' => $request->note,
             'password' => Hash::make($request->password),
+            'terms_accepted' => true,
+            'newsletter' => $request->boolean('newsletter'),
         ]);
 
         event(new Registered($user));
