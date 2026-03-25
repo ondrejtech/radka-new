@@ -21,6 +21,14 @@
                     <div class="layout_aside" role="complementary">
                         <livewire:template.side-product-filter :catCode="$catCode" />
                     </div>
+
+                    <div class="layout_main" role="main">
+                        <div id="dataContainer">
+                            <div id="filterSettingsContainer" class="panel pro-filter pro-filter-settings-view">
+                                <livewire:template.product-layout />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
