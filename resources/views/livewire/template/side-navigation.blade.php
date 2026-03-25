@@ -8,12 +8,8 @@
                     @php
                         $isCurrentL1 = (int) $l1['SuperCategoryCode'] === $activeSuperCatCode;
                     @endphp
-                    <li x-data="{ open: {{ $isCurrentL1 ? 'true' : 'false' }} }"
-                        :class="{ 'is-open': open }"
-                        class="aside-nav_item{{ $l1['hasCategories'] ? ' has-childs aside-nav_item--has-childs' : '' }}{{ $isCurrentL1 ? ' is-current' : '' }}"
+                    <li class="aside-nav_item{{ $l1['hasCategories'] ? ' has-childs aside-nav_item--has-childs' : '' }}{{ $isCurrentL1 ? ' is-current is-open' : '' }}"
                         wire:key="snav-l1-{{ $l1['SuperCategoryCode'] }}"
-                        @mouseenter="open = true"
-                        @mouseleave="open = false"
                     >
                         <div class="nav-link-wrap aside-nav_link-wrap">
                             <a class="nav-link aside-nav_link{{ $l1['hasCategories'] ? ' aside-nav_link--has-childs' : '' }}{{ $isCurrentL1 ? ' aside-nav_link--is-current' : '' }}"
@@ -21,13 +17,13 @@
                                 data-ga-prefix="1"
                                 data-nav-id="{{ $l1['SuperCategoryCode'] }}"
                                 href="{{ $l1['url'] }}"
-                                @click="if(typeof GAAction !== 'undefined') GAAction($el.dataset.gaCategory, $el.dataset.gaPrefix, $($el))"
+                                onclick="if(typeof GAAction !== 'undefined') GAAction(this.dataset.gaCategory, this.dataset.gaPrefix, $(this))"
                             >
                                 {{ $l1['SuperCategoryName'] }}
                             </a>
 
                             @if ($l1['hasCategories'])
-                                <div class="btn-toggle aside-nav_btn-toggle-subgroup" @click.stop="open = !open">
+                                <div class="btn-toggle aside-nav_btn-toggle-subgroup" onclick="$(this).closest('li').toggleClass('is-open'); return false;">
                                     <i class="icon-arrow_right aside-nav_toggle-icon"></i>
                                 </div>
                             @endif
@@ -35,7 +31,7 @@
 
                         @if ($l1['hasCategories'])
                             <div class="sub-menu aside-nav_sub-menu{{ count($l1['categories']) > 15 ? ' col-size-2' : '' }}">
-                                <button type="button" class="btn btn-sub-menu-close aside-nav_sub-menu_btn-close" @click="open = false">
+                                <button type="button" class="btn btn-sub-menu-close aside-nav_sub-menu_btn-close" onclick="$(this).closest('li').removeClass('is-open');">
                                     <i class="icon-arrow_left btn_icon"></i>
                                     <span class="btn_label">Zpět: {{ $l1['SuperCategoryName'] }}</span>
                                 </button>
@@ -57,7 +53,7 @@
                                                     data-ga-prefix="2"
                                                     data-nav-id="{{ $cat['CategoryCode'] }}"
                                                     href="{{ $cat['url'] }}"
-                                                    @click="if(typeof GAAction !== 'undefined') GAAction($el.dataset.gaCategory, $el.dataset.gaPrefix, $($el))"
+                                                    onclick="if(typeof GAAction !== 'undefined') GAAction(this.dataset.gaCategory, this.dataset.gaPrefix, $(this))"
                                                 >
                                                     <span class="aside-nav_link-label">{{ $cat['CategoryName'] }}</span>
                                                 </a>
