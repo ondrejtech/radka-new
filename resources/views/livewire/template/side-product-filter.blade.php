@@ -131,6 +131,39 @@
                 </div>
             </div>
             @endif
+            <div class="panel pro-filter-aside_panel pro-filter-aside_panel--price" data-is-collapsed="false" x-data="{ open: true }">
+                <div class="panel-heading">
+                    <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_price" @click="open = !open" :class="{ 'collapsed': !open }">Cena</button>
+                </div>
+                <div id="panelCollapse_price" class="panel-body collapse in" x-show="open" x-transition>
+                    <div class="range-price pro-filter-aside_item pro-filter-aside_range-price">
+                        <input type="hidden" id="priceRange" value="{{ $priceMin }};{{ $priceMax }}" data-min="{{ $priceMin }}" data-max="{{ $priceMax }}" data-from="{{ $priceMin }}" data-to="{{ $priceMax }}" data-step="50" class="irs-hidden-input" readonly="">
+
+                        <div class="form-base form-base--range">
+                            <div class="form-base_row">
+                                <div class="form-base_item">
+                                    <div class="pro-filter-aside_range-price_inp pro-filter-aside_range-price_inp--min">
+                                        <input type="text" class="form-control" id="minP" name="minP" value="{{ $priceMin }}" data-rule-myrange="[{{ $priceMin }},{{ $priceMax }}]" onkeyup="ProFilter.sendRangeValues(event, this)">
+                                    </div>
+                                </div>
+                                <div class="form-base_item">-</div>
+                                <div class="form-base_item">
+                                    <div class="pro-filter-aside_range-price_inp pro-filter-aside_range-price_inp--max">
+                                        <input type="text" class="form-control" id="maxP" name="maxP" value="{{ $priceMax }}" data-rule-myrange="[{{ $priceMin }},{{ $priceMax }}]" onkeyup="ProFilter.sendRangeValues(event, this)">
+                                    </div>
+                                </div>
+                                <div class="form-base_item">Kč</div>
+                            </div>
+                        </div>
+
+                        <input id="tmpMinP" type="hidden" value="{{ $priceMin }}">
+                        <input id="tmpMaxP" type="hidden" value="{{ $priceMax }}">
+                        <input id="tmpMinPf" type="hidden" value="{{ $priceMin }}">
+                        <input id="tmpMaxPf" type="hidden" value="{{ $priceMax }}">
+                        <input id="tmpGuid" type="hidden" value="">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

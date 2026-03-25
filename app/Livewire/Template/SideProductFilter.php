@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Template;
 
+use App\Models\Product;
 use App\Models\ProductInformation;
 use App\Models\ProductProducer;
 use Illuminate\Support\Collection;
@@ -14,9 +15,13 @@ class SideProductFilter extends Component
     {
         $catCode = $this->parseCategoryCode();
 
+        [$priceMin, $priceMax] = $catCode ? $this->loadPriceRange($catCode) : [0, 0];
+
         return view('livewire.template.side-product-filter', [
             'vendors' => $catCode ? $this->loadVendors($catCode) : collect(),
             'flags' => $catCode ? $this->loadFlags($catCode) : collect(),
+            'priceMin' => $priceMin,
+            'priceMax' => $priceMax,
         ]);
     }
 
@@ -29,6 +34,20 @@ class SideProductFilter extends Component
         $code = (int) $m[1];
 
         return $code > 0 ? $code : null;
+    }
+
+    /**
+     * @return array{0: int, 1: int}
+     */
+    private function loadPriceRange(int $catCode): array
+    {
+        $result = Product::query()
+            ->where('CategoryCode', $catCode)
+            ->whereNotNull('EndUserPrice')
+            ->selectRaw('FLOOR(MIN(EndUserPrice)) as price_min, CEIL(MAX(EndUserPrice)) as price_max')
+            ->first();
+
+        return [(int) ($result->price_min ?? 0), (int) ($result->price_max ?? 0)];
     }
 
     /** @return Collection<int, ProductInformation> */
