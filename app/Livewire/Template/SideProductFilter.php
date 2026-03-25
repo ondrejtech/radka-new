@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Template;
 
+use App\Models\ProductInformation;
 use App\Models\ProductProducer;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -15,6 +16,7 @@ class SideProductFilter extends Component
 
         return view('livewire.template.side-product-filter', [
             'vendors' => $catCode ? $this->loadVendors($catCode) : collect(),
+            'flags' => $catCode ? $this->loadFlags($catCode) : collect(),
         ]);
     }
 
@@ -27,6 +29,19 @@ class SideProductFilter extends Component
         $code = (int) $m[1];
 
         return $code > 0 ? $code : null;
+    }
+
+    /** @return Collection<int, ProductInformation> */
+    private function loadFlags(int $catCode): Collection
+    {
+        return ProductInformation::query()
+            ->join('Product', 'ProductInformation.InfoCode', '=', 'Product.InfoCode')
+            ->where('Product.CategoryCode', $catCode)
+            ->where('ProductInformation.InfoCode', '!=', '0')
+            ->selectRaw('ProductInformation.InfoCode, TRIM(ProductInformation.InfoName) as InfoName, COUNT(*) as product_count')
+            ->groupBy('ProductInformation.InfoCode', 'ProductInformation.InfoName')
+            ->orderByDesc('product_count')
+            ->get();
     }
 
     /** @return Collection<int, ProductProducer> */

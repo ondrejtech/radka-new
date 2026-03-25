@@ -99,6 +99,38 @@
                 </div>
             </div>
             @endif
+            @if ($flags->isNotEmpty())
+            <div id="fltFlagList" class="panel pro-filter-aside_panel" data-is-collapsed="false" x-data="{ open: true, showAll: false }">
+                <div class="panel-heading">
+                    <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_flags"
+                        @click="open = !open" :class="{ 'collapsed': !open }">
+                        Výhodná nabídka
+                    </button>
+                </div>
+                <div id="panelCollapse_flags" class="panel-body collapse in" x-show="open" x-transition>
+                    <ul class="pro-filter-aside_values-groups" id="filterIncludeFlags">
+                        @foreach ($flags as $index => $flag)
+                        <li class="pro-filter-aside_values-item"
+                            @if ($index >= 5) x-show="showAll" x-cloak @endif>
+                            <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
+                                <input type="checkbox" id="chb_info_{{ $flag->InfoCode }}" onclick="GAAction(9, 0, $(this));">
+                                <label for="chb_info_{{ $flag->InfoCode }}">
+                                    <span class="value_label pro-filter-aside_value_label">{{ $flag->InfoName }}<span class="value_counter pro-filter-aside_value_counter">({{ $flag->product_count }})</span></span>
+                                </label>
+                            </div>
+                        </li>
+                        @endforeach
+                    </ul>
+                    @if ($flags->count() > 5)
+                    <button type="button" class="btn btn--link pro-filter-aside_values-btn-toggle"
+                        :class="{ 'collapsed': !showAll }"
+                        @click="showAll = !showAll">
+                        <span class="btn_label" x-text="showAll ? 'skrýt další' : 'zobrazit další'"></span>
+                    </button>
+                    @endif
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>
