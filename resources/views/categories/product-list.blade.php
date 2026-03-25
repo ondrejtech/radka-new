@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    <script src="{{ asset('assets/bundles/js/productlist.js') }}"></script>
+@endpush
+
 @section('content')
     <div class="page-contend" role="main" aria-label="Hlavní obsah">
         <form  id="ctl00" action="" method="post">
