@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{asset('Styles/icons/fonts/simple-line-icons.ttf') }}">
 
 	<link href="{{ asset('assets/bundles/css/main.css') }}" rel="stylesheet"/>
+    <style>[x-cloak] { display: none !important; }</style>
     <link rel="stylesheet" href="{{ asset('assets/bundles/css/product.css')}}">
 
 	<script src="{{ asset('assets/bundles/js/main.js') }}"></script>
