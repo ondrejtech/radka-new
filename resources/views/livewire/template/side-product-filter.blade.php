@@ -164,6 +164,50 @@
                     </div>
                 </div>
             </div>
+            <div id="fltExcludeFlagsList" class="panel pro-filter-aside_panel" x-data="{ open: true }">
+                <div class="panel-heading">
+                    <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_excludeFlags" @click="open = !open" :class="{ 'collapsed': !open }">Vyloučit položky ze seznamu</button>
+                </div>
+                <div id="panelCollapse_excludeFlags" class="panel-body collapse in" x-show="open" x-transition>
+                    <ul class="pro-filter-aside_values-groups" id="filterExcludeFlags">
+                        <li class="pro-filter-aside_values-item">
+                            <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
+                                <input type="checkbox" id="chb_without_sale">
+                                <label for="chb_without_sale">
+                                    <span class="value_label pro-filter-aside_value_label">Doprodej</span>
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            @if ($filterAttributes->isNotEmpty())
+            <div id="fltAttr" class="pro-filter-aside_panel-group">
+                @foreach ($filterAttributes as $attr)
+                <div id="NavAtrFrm_{{ $attr->AttributeCode }}" class="panel pro-filter-aside_panel" data-panel-title="{{ $attr->AttributeName }}" data-pna="{{ $attr->AttributeCode }}" data-ui-input-style="4" x-data="{ open: false }">
+                    <div class="panel-heading">
+                        <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_attr_{{ $attr->AttributeCode }}" @click="open = !open" :class="{ 'collapsed': !open }">
+                            {{ $attr->AttributeName }}
+                        </button>
+                    </div>
+                    <div id="panelCollapse_attr_{{ $attr->AttributeCode }}" class="panel-body collapse in" x-show="open" x-transition>
+                        <ul class="pro-filter-aside_values-groups">
+                            @foreach ($attr->values as $value)
+                            <li class="pro-filter-aside_values-item ">
+                                <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
+                                    <input type="checkbox" id="flt_pnati_{{ $attr->AttributeCode }}_{{ $value->ValueCode }}" onclick="startLoading(event)" data-pna="{{ $attr->AttributeCode }}" data-pnati="{{ $value->ValueCode }}">
+                                    <label for="flt_pnati_{{ $attr->AttributeCode }}_{{ $value->ValueCode }}">
+                                        <span class="value_label pro-filter-aside_value_label">{{ $value->Value }}<span class="value_counter pro-filter-aside_value_counter">({{ $value->product_count }})</span></span>
+                                    </label>
+                                </div>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            @endif
         </div>
     </div>
 </div>

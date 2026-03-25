@@ -3,37 +3,36 @@
 namespace App\Livewire\Template;
 
 use App\Models\Product;
+use App\Models\ProductCategoryAttribute;
 use App\Models\ProductInformation;
 use App\Models\ProductProducer;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class SideProductFilter extends Component
 {
-    public function render(): View
+    #[Locked]
+    public int $catCode;
+
+    public function mount(int $catCode): void
     {
-        $catCode = $this->parseCategoryCode();
-
-        [$priceMin, $priceMax] = $catCode ? $this->loadPriceRange($catCode) : [0, 0];
-
-        return view('livewire.template.side-product-filter', [
-            'vendors' => $catCode ? $this->loadVendors($catCode) : collect(),
-            'flags' => $catCode ? $this->loadFlags($catCode) : collect(),
-            'priceMin' => $priceMin,
-            'priceMax' => $priceMax,
-        ]);
+        $this->catCode = $catCode;
     }
 
-    private function parseCategoryCode(): ?int
+    public function render(): View
     {
-        if (! preg_match('/n-\w+,(\d+),\d+/', request()->path(), $m)) {
-            return null;
-        }
+        [$priceMin, $priceMax] = $this->loadPriceRange($this->catCode);
 
-        $code = (int) $m[1];
-
-        return $code > 0 ? $code : null;
+        return view('livewire.template.side-product-filter', [
+            'vendors' => $this->loadVendors($this->catCode),
+            'flags' => $this->loadFlags($this->catCode),
+            'priceMin' => $priceMin,
+            'priceMax' => $priceMax,
+            'filterAttributes' => $this->loadAttributes($this->catCode),
+        ]);
     }
 
     /**
@@ -48,6 +47,34 @@ class SideProductFilter extends Component
             ->first();
 
         return [(int) ($result->price_min ?? 0), (int) ($result->price_max ?? 0)];
+    }
+
+    /** @return Collection<int, ProductCategoryAttribute> */
+    private function loadAttributes(int $catCode): Collection
+    {
+        $attributes = ProductCategoryAttribute::query()
+            ->where('CategoryCode', $catCode)
+            ->orderBy('AttributeCode')
+            ->get();
+
+        $valueCounts = DB::table('ProductCategoryAttributeValue')
+            ->join('ProductNavigatorData', function ($join) {
+                $join->on('ProductCategoryAttributeValue.AttributeCode', '=', 'ProductNavigatorData.AttributeCode')
+                    ->on('ProductCategoryAttributeValue.ValueCode', '=', 'ProductNavigatorData.ValueCode');
+            })
+            ->join('Product', 'ProductNavigatorData.ProId', '=', 'Product.ProId')
+            ->where('Product.CategoryCode', $catCode)
+            ->whereIn('ProductCategoryAttributeValue.AttributeCode', $attributes->pluck('AttributeCode'))
+            ->selectRaw('ProductCategoryAttributeValue.AttributeCode, ProductCategoryAttributeValue.ValueCode, ProductCategoryAttributeValue.Value, ProductCategoryAttributeValue.ValueSort, COUNT(Product.ProId) as product_count')
+            ->groupBy('ProductCategoryAttributeValue.AttributeCode', 'ProductCategoryAttributeValue.ValueCode', 'ProductCategoryAttributeValue.Value', 'ProductCategoryAttributeValue.ValueSort')
+            ->having('product_count', '>', 0)
+            ->orderByDesc('product_count')
+            ->get()
+            ->groupBy('AttributeCode');
+
+        return $attributes->each(function (ProductCategoryAttribute $attr) use ($valueCounts): void {
+            $attr->values = $valueCounts->get($attr->AttributeCode, collect());
+        })->filter(fn (ProductCategoryAttribute $attr) => $attr->values->isNotEmpty());
     }
 
     /** @return Collection<int, ProductInformation> */
