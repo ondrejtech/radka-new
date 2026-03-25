@@ -15,7 +15,7 @@
             <div class="container layout--aside layout--aside-left">
                 <div class="layout_wrap">
                     <div class="layout_aside" role="complementary">
-                        
+                        <livewire:template.side-product-filter />
                     </div>
                 </div>
             </div>

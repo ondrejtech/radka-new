@@ -1,4 +1,5 @@
 <div class="layout_aside" role="complementary">
+
 @if (count($navigation))
     <div id="subCategoryMenu" class="aside-nav aside-main-menu">
         <nav class="aside-nav_in" role="navigation" aria-label="Postranní navigace">
