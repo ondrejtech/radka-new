@@ -26,6 +26,8 @@
 
 	<script>
 	    var g_cur_ID = 8;
+	    // Disable session check AJAX - the original endpoint does not exist in this app
+	    App.use_checkAuthentication = false;
 	</script>
 
 	<script>
@@ -503,6 +505,7 @@ gtag('consent', 'update', {
 <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
 <script>
     window.addEventListener('message', event => {
+        if (!event.detail || !event.detail[0] || !event.detail[0].text) return;
         alertify.set('notifier', 'position', 'top-right');
         alertify.notify(event.detail[0].text, event.detail[0].type);
     });
