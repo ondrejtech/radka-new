@@ -34,3 +34,7 @@
         </form>
     </div>
 @endsection
+
+@section('compare-bar')
+<livewire:template.compare-bar />
+@endsection

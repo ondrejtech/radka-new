@@ -191,7 +191,7 @@
                                         </button>
                                         <div class="dropdown-menu dropdown-menu--right dropdown-menu--dropup">
                                             <button type="button" class="dropdown-item"
-                                                onclick="compareBar.addToCompare({{ $product->ProId }}, {{ $catCode }});">
+                                                wire:click="addToCompare({{ $product->ProId }}, {{ $catCode }})">
                                                 <i class="icon-collation dropdown-item_icon"></i>
                                                 <span class="dropdown-item_label">Porovnat</span>
                                             </button>
@@ -344,7 +344,7 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu--right dropdown-menu--dropup">
                                 <button type="button" class="dropdown-item"
-                                    onclick="compareBar.addToCompare({{ $product->ProId }}, {{ $catCode }});">
+                                    wire:click="addToCompare({{ $product->ProId }}, {{ $catCode }})">
                                     <i class="icon-collation dropdown-item_icon"></i>
                                     <span class="dropdown-item_label">Porovnat</span>
                                 </button>
@@ -480,7 +480,7 @@
                                 </button>
                                 <div class="dropdown-menu dropdown-menu--right">
                                     <button type="button" class="dropdown-item"
-                                        onclick="compareBar.addToCompare({{ $product->ProId }}, {{ $catCode }});">
+                                        wire:click="addToCompare({{ $product->ProId }}, {{ $catCode }})">
                                         <i class="icon-collation dropdown-item_icon"></i>
                                         <span class="dropdown-item_label">Porovnat</span>
                                     </button>

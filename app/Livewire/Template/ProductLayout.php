@@ -43,6 +43,12 @@ class ProductLayout extends Component
     }
 
     #[Renderless]
+    public function addToCompare(int $proId, int $catCode): void
+    {
+        $this->dispatch('add-to-compare', proId: $proId, catCode: $catCode)->to('template.compare-bar');
+    }
+
+    #[Renderless]
     public function addToCart(int $proId, int $quantity): void
     {
         $quantity = max(1, $quantity);

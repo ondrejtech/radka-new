@@ -445,6 +445,7 @@ gtag('consent', 'update', {
 	</div>
 
 	<div id="siteTools" class="site-tools site-tools--bottom page-footer_container"></div>
+    @yield('compare-bar')
 	<script>
 
 
