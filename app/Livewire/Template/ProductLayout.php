@@ -8,9 +8,12 @@ use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Renderless;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ProductLayout extends Component
 {
+    use WithPagination;
+
     #[Locked]
     public int $catCode;
 
@@ -28,6 +31,11 @@ class ProductLayout extends Component
         '16_asc' => [['column' => 'OnStockCount',  'direction' => 'asc']],
         '16_desc' => [['column' => 'OnStockCount',  'direction' => 'desc']],
     ];
+
+    public function updatedSort(): void
+    {
+        $this->resetPage();
+    }
 
     public function mount(int $catCode): void
     {
