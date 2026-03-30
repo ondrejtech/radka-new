@@ -24,7 +24,7 @@
             <div class="pro-filter_item pro-filter_number-records">
                 <span class="pro-filter_number-records_label">Počet záznamů:</span>
                 <strong class="pro-filter_number-records_value" id="totalRecordCount"
-                    data-defaultvalue="1117">773</strong>
+                    data-defaultvalue="{{ $products->total() }}">{{ $products->total() }}</strong>
             </div>
             <div class="pro-filter_item pro-filter_choose-view">
                 <a href="#" onclick="GAAction(9,0,$(this));" id="btnView_img"
@@ -63,47 +63,6 @@
                         1
                     </span>
 
-
-
-
-
-                    <a id="pag_top_2" data-page="2" href="#" class="pager_item">
-                        2
-                    </a>
-
-
-
-
-                    <a id="pag_top_3" data-page="3" href="#" class="pager_item">
-                        3
-                    </a>
-
-
-
-
-                    <a id="pag_top_4" data-page="4" href="#" class="pager_item">
-                        4
-                    </a>
-
-
-
-
-                    <a id="pag_top_5" data-page="5" href="#" class="pager_item last">
-                        5
-                    </a>
-
-
-
-                    <span class="pager_item pager_split">...</span>
-                    <a id="pag_top_59" data-page="59" href="#" class="pager_item last">59</a>
-
-
-                    <span class="pager_item pager_separate"></span>
-                    <a id="pag_top_next" data-page="2" class="pager_item pager_next" href="#">
-                        <span class="pager_item_label">Další</span>
-                        <span class="pager_item_icon"><i class="icon-arrow-right"></i></span>
-                    </a>
-
                 </div>
             </div>
 
@@ -115,5 +74,132 @@
 
         </div>
     </div>
+    <div class="dataContainerShort">
+        <section class="products-catalog">
+            <div class="grid-wrapper data-product-items">
+                @foreach ($products as $product)
+                @php
+                    $productUrl = '/' . \Illuminate\Support\Str::slug($product->Name) . '/product-' . $product->ProId;
+                @endphp
+                <article id="product_{{ $product->ProId }}" class="product-item pro-tile">
+                    <div class="pro-tile_in">
 
+                        <h2 class="pro-tile_name">
+                            <a class="js-html5-storage" href="{{ $productUrl }}">
+                                {{ $product->Name }}
+                            </a>
+                        </h2>
+
+                        <figure class="pro-tile_img">
+                            <a class="js-html5-storage" href="{{ $productUrl }}">
+                                @if ($product->product_images->isNotEmpty())
+                                <img class="pro-img b-lazy"
+                                    alt="{{ $product->Name }}"
+                                    data-src="{{ $product->product_images->first()->URL }}">
+                                @else
+                                <img class="pro-img"
+                                    alt="{{ $product->Name }}"
+                                    src="{{ asset('IMGCACHE/no_image/no_image_7.jpg') }}">
+                                @endif
+
+                            </a>
+                        </figure>
+
+
+                        <div class="pro-tile_hover-box">
+                            <div class="pro-tile_desc product-desc">
+                                <div class="pro-tile_desc_in">
+                                    {{ $product->DescriptionShort }}
+                                </div>
+                            </div>
+                            @if ($product->EndUserPrice)
+                            <div class="pro-tile_prices">
+                                <div class="pro-tile_price">
+
+                                    <span class="pro-tile_price-text pro-tile_price-text--prepend">Vaše cena:</span>
+                                    <strong class="pro-tile_price-value">{{ number_format($product->EndUserPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
+                                    <span class="pro-tile_price-text pro-tile_price-text--append">bez DPH</span>
+
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="pro-tile_attributes">
+                        </div>
+
+                        @if ($product->EndUserPrice)
+                        <div class="pro-tile_prices">
+                            <div class="pro-tile_price">
+
+                                <span class="pro-tile_price-text pro-tile_price-text--prepend">Vaše cena:</span>
+                                <strong class="pro-tile_price-value">{{ number_format($product->EndUserPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
+                                <span class="pro-tile_price-text pro-tile_price-text--append">bez DPH</span>
+
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="pro-tile_footer">
+
+                            <div class="pro-tile_footer-in">
+                                <div class="pro-tile_stock">
+
+
+                                    <div class="pro-stock {{ $product->OnStock ? 'pro-stock--available' : 'pro-stock--unavailable' }}">
+                                        <span class="pro-stock_text pro-stock_text--prepend">Dostupnost:</span>
+
+                                        <a href="javascript:void(null)" class="pro-stock_text pro-stock_text--append"
+                                            onclick="openDialogStock({{ $product->ProId }},0);">{{ $product->OnStockText }}</a>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="pro-tile_order-box">
+                                    <div class="pro-tile_quantity">
+                                        <label class="pro-tile_quantity-text pro-tile_quantity-text--prepend"
+                                            for="txtQty_{{ $product->ProId }}">Množství:</label>
+                                        <input id="txtQty_{{ $product->ProId }}"
+                                            class="form-control form-control--qty pro-tile_quantity-inp"
+                                            type="text" value="1" maxlength="5">
+                                        <span class="pro-tile_quantity-text pro-tile_quantity-text--append">ks</span>
+                                    </div>
+                                    <div class="btn-group">
+                                        <a class="btn btn-add-basket pro-tile_btn-add-basket"
+                                            data-title="tip_add_basket" aria-label="Vložit do košíku"
+                                            onclick="addToBasketFromListExternal({{ $product->ProId }},listBasketSuccess);return false;"
+                                            href="#"><span
+                                                class="btn_icon"></span><span class="btn_label">Vložit do
+                                                košíku</span></a>
+                                        <button type="button"
+                                            class="btn pro-tile_dropdown-toggle dropdown-toggle dropdown-toggle--primary dropdown-toggle-split"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="dropdown-caret"></span>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu--right dropdown-menu--dropup">
+                                            <button type="button" class="dropdown-item"
+                                                onclick="compareBar.addToCompare({{ $product->ProId }}, {{ $catCode }});">
+                                                <i class="icon-collation dropdown-item_icon"></i>
+                                                <span class="dropdown-item_label">Porovnat</span>
+                                            </button>
+                                            <a class="dropdown-item" title="Vytisknout produktovou nabídku"
+                                                onclick="openPrintProductOfferDialog({{ $product->ProId }});"
+                                                href="javascript:void(null);">
+                                                <i class="icon-print dropdown-item_icon"></i>
+                                                <span class="dropdown-item_label">Tisk produktové nabídky</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </article>
+                @endforeach
+            </div>
+        </section>
+    </div>
 </div>

@@ -25,7 +25,7 @@
                     <div class="layout_main" role="main">
                         <div id="dataContainer">
                             <div id="filterSettingsContainer" class="panel pro-filter pro-filter-settings-view">
-                                <livewire:template.product-layout />
+                                <livewire:template.product-layout :catCode="$catCode" />
                             </div>
                         </div>
                     </div>
