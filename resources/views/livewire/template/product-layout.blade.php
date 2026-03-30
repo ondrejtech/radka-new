@@ -59,17 +59,7 @@
             </div>
 
 
-            <div id="pagingTop" class="pager pro-pager pro-pager--top">
-                <div class="pager_in">
-
-
-
-                    <span class="pager_item pager_item--current first">
-                        1
-                    </span>
-
-                </div>
-            </div>
+            @include('livewire.template.partials.pager', ['paginator' => $products, 'class' => 'pager pro-pager pro-pager--top'])
 
         </div>
 
@@ -79,7 +69,23 @@
 
         </div>
     </div>
-    <div class="dataContainerShort">
+    <div class="dataContainerShort" style="position:relative;">
+        <div wire:loading.flex style="position:absolute;inset:0;background:rgba(255,255,255,0.6);z-index:10;align-items:center;justify-content:center;">
+            <div class="preloader" style="width:100px;height:100px;">
+                <div class="preloader_el preloader_el-1"></div>
+                <div class="preloader_el preloader_el-2"></div>
+                <div class="preloader_el preloader_el-3"></div>
+                <div class="preloader_el preloader_el-4"></div>
+                <div class="preloader_el preloader_el-5"></div>
+                <div class="preloader_el preloader_el-6"></div>
+                <div class="preloader_el preloader_el-7"></div>
+                <div class="preloader_el preloader_el-8"></div>
+                <div class="preloader_el preloader_el-9"></div>
+                <div class="preloader_el preloader_el-10"></div>
+                <div class="preloader_el preloader_el-11"></div>
+                <div class="preloader_el preloader_el-12"></div>
+            </div>
+        </div>
         <section class="products-catalog" x-show="view === 'img'">
             <div class="grid-wrapper data-product-items">
                 @foreach ($products as $product)
@@ -356,18 +362,7 @@
             </article>
             @endforeach
 
-            <div id="paging" class="pager pro-pager pro-pager--bottom">
-                <div class="pager_in">
-                    <span class="pager_item pager_item--current first">
-                        {{ $products->currentPage() }}
-                    </span>
-                    @if ($products->hasMorePages())
-                    <a class="pager_item pag_next_add" href="#">
-                        <span>Další</span>
-                    </a>
-                    @endif
-                </div>
-            </div>
+            @include('livewire.template.partials.pager', ['paginator' => $products, 'class' => 'pager pro-pager pro-pager--bottom'])
         </div>
 
         <div class="products-list-table products-list-table--default-view" x-show="view === 'table_img'" x-cloak>
@@ -503,18 +498,7 @@
                 </article>
                 @endforeach
 
-                <div id="paging_table" class="pager pro-pager pro-pager--bottom">
-                    <div class="pager_in">
-                        <span class="pager_item pager_item--current first">
-                            {{ $products->currentPage() }}
-                        </span>
-                        @if ($products->hasMorePages())
-                        <a class="pager_item pag_next_add" href="#">
-                            <span>Další</span>
-                        </a>
-                        @endif
-                    </div>
-                </div>
+                @include('livewire.template.partials.pager', ['paginator' => $products, 'class' => 'pager pro-pager pro-pager--bottom'])
 
             </div>
         </div>
