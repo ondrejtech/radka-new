@@ -81,7 +81,7 @@
                 @php
                     $productUrl = '/' . \Illuminate\Support\Str::slug($product->Name) . '/product-' . $product->ProId;
                 @endphp
-                <article id="product_{{ $product->ProId }}" class="product-item pro-tile">
+                <article id="product_{{ $product->ProId }}" class="product-item pro-tile" x-data="{ qty: 1 }">
                     <div class="pro-tile_in">
 
                         <h2 class="pro-tile_name">
@@ -162,14 +162,14 @@
                                             for="txtQty_{{ $product->ProId }}">Množství:</label>
                                         <input id="txtQty_{{ $product->ProId }}"
                                             class="form-control form-control--qty pro-tile_quantity-inp"
-                                            type="text" value="1" maxlength="5">
+                                            type="text" x-model.number="qty" value="1" maxlength="5">
                                         <span class="pro-tile_quantity-text pro-tile_quantity-text--append">ks</span>
                                     </div>
                                     <div class="btn-group">
                                         <a class="btn btn-add-basket pro-tile_btn-add-basket"
                                             data-title="tip_add_basket" aria-label="Vložit do košíku"
-                                            onclick="addToBasketFromListExternal({{ $product->ProId }},listBasketSuccess);return false;"
-                                            href="#"><span
+                                            href="#"
+                                            @click.prevent="$wire.addToCart({{ $product->ProId }}, qty)"><span
                                                 class="btn_icon"></span><span class="btn_label">Vložit do
                                                 košíku</span></a>
                                         <button type="button"
