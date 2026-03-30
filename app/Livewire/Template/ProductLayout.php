@@ -46,7 +46,7 @@ class ProductLayout extends Component
     public function render(): View
     {
         $products = Product::query()
-            ->with('product_images')
+            ->with(['product_images', 'product_ext_info_codes.product_information'])
             ->where('CategoryCode', $this->catCode)
             ->orderByDesc('IsTop')
             ->orderByDesc('EndUserPrice')
