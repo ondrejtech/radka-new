@@ -6,7 +6,7 @@
                     <label for="sortParam">Řazení:</label>
                     <div class="ux-combo">
                         <select id="sortParam" class="form-control ux-combo_field" data-label="Řadit dle"
-                            onchange="GAAction(9,0,$(this));">
+                            wire:model.live="sort">
                             <option value="8_desc">výhodná nabídka</option>
                             <option value="13_asc">od nejlevnějších</option>
                             <option value="13_desc">od nejdražších</option>
@@ -16,7 +16,6 @@
                             <option value="14_desc">název Z-A</option>
                             <option value="16_asc">skladem vzestupně</option>
                             <option value="16_desc">skladem sestupně</option>
-
                         </select>
                     </div>
                 </div>
