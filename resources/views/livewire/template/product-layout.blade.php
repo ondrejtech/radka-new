@@ -203,3 +203,13 @@
         </section>
     </div>
 </div>
+
+@script
+<script>
+    Livewire.hook('morph.updated', ({ el }) => {
+        if (typeof lazyImage !== 'undefined') {
+            lazyImage('reload');
+        }
+    });
+</script>
+@endscript
