@@ -503,6 +503,22 @@ gtag('consent', 'update', {
 		eval(gaString);
 	    }
     </script>
+<div wire:loading style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;pointer-events:none;">
+    <div class="preloader" style="width:100px;height:100px;">
+        <div class="preloader_el preloader_el-1"></div>
+        <div class="preloader_el preloader_el-2"></div>
+        <div class="preloader_el preloader_el-3"></div>
+        <div class="preloader_el preloader_el-4"></div>
+        <div class="preloader_el preloader_el-5"></div>
+        <div class="preloader_el preloader_el-6"></div>
+        <div class="preloader_el preloader_el-7"></div>
+        <div class="preloader_el preloader_el-8"></div>
+        <div class="preloader_el preloader_el-9"></div>
+        <div class="preloader_el preloader_el-10"></div>
+        <div class="preloader_el preloader_el-11"></div>
+        <div class="preloader_el preloader_el-12"></div>
+    </div>
+</div>
 @livewireScripts
 <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
 <script>
