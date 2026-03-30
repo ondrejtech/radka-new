@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Renderless;
 use Livewire\Component;
 
 class ProductLayout extends Component
@@ -33,6 +34,7 @@ class ProductLayout extends Component
         $this->catCode = $catCode;
     }
 
+    #[Renderless]
     public function addToCart(int $proId, int $quantity): void
     {
         $quantity = max(1, $quantity);
@@ -50,7 +52,7 @@ class ProductLayout extends Component
             $quantity
         );
 
-        $this->dispatch('cart-updated');
+        $this->dispatch('cart-updated')->to('template.cart-widget');
         $this->dispatch('message', [
             'text' => 'Zboží bylo úspěšně přidáno do košíku',
             'type' => 'success',
