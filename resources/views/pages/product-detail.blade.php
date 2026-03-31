@@ -10,6 +10,8 @@
             </div>
         </div>
 
+        <div class="page-content_in" ></div>
+
         <div class="container">
             <livewire:template.product-detail :proId="$proId" />
         </div>
