@@ -4,20 +4,22 @@ namespace App\Livewire\Template;
 
 use App\Models\Product;
 use App\Services\CartService;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Renderless;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class ProductLayout extends Component
 {
-    use WithPagination;
-
     #[Locked]
     public int $catCode;
 
     public string $sort = '8_desc';
+
+    public int $page = 1;
+
+    private const PER_PAGE = 25;
 
     /** @var array<string, array{column: string, direction: string}[]> */
     private const SORT_MAP = [
@@ -34,12 +36,22 @@ class ProductLayout extends Component
 
     public function updatedSort(): void
     {
-        $this->resetPage();
+        $this->page = 1;
     }
 
     public function mount(int $catCode): void
     {
         $this->catCode = $catCode;
+    }
+
+    public function loadMore(): void
+    {
+        $this->page++;
+    }
+
+    public function setPage(int $page): void
+    {
+        $this->page = max(1, $page);
     }
 
     #[Renderless]
@@ -86,10 +98,29 @@ class ProductLayout extends Component
             $query->orderBy($order['column'], $order['direction']);
         }
 
-        $products = $query->paginate(25);
+        $total = Product::query()->where('CategoryCode', $this->catCode)->count();
+
+        $take = self::PER_PAGE * $this->page;
+        $products = $query->take($take + 1)->get();
+        $hasMore = $products->count() > $take;
+
+        if ($hasMore) {
+            $products = $products->take($take);
+        }
+
+        $paginator = new LengthAwarePaginator(
+            $products,
+            $total,
+            self::PER_PAGE,
+            $this->page,
+            ['path' => request()->url()]
+        );
 
         return view('livewire.template.product-layout', [
             'products' => $products,
+            'paginator' => $paginator,
+            'total' => $total,
+            'hasMore' => $hasMore,
         ]);
     }
 }
