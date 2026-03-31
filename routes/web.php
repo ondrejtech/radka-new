@@ -10,6 +10,10 @@ Route::get('/', [CategoryController::class, 'home']);
 
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 
+Route::get('/{slug}/product-{proId}', [PagesController::class, 'productDetail'])
+    ->where('proId', '\d+')
+    ->name('product.detail');
+
 // Category pages – URL pattern: /{seg1}/{seg2}/n-{superCatCode},{catCode},{extra}
 // Examples:
 //   /info/it/n-52,0,0            (level 1)

@@ -7,6 +7,13 @@ use Illuminate\View\View;
 
 class PagesController extends Controller
 {
+    public function productDetail(string $slug, int $proId): View
+    {
+        return view('pages.product-detail', [
+            'proId' => $proId,
+        ]);
+    }
+
     public function productCompare(Request $request): View
     {
         $catCode = (int) $request->query('pnc_id', 0);
