@@ -17,9 +17,51 @@ class SideProductFilter extends Component
     #[Locked]
     public int $catCode;
 
+    public string $filterFulltext = '';
+
+    public bool $filterOnStock = false;
+
+    public int $filterOnStockQty = 1;
+
+    /** @var string[] */
+    public array $filterVendors = [];
+
+    /** @var string[] */
+    public array $filterFlags = [];
+
+    public int $filterPriceFrom = 0;
+
+    public int $filterPriceTo = 0;
+
+    public bool $filterExcludeSale = false;
+
+    /** @var string[] e.g. ['AttrCode|ValueCode', ...] */
+    public array $selectedAttributes = [];
+
     public function mount(int $catCode): void
     {
         $this->catCode = $catCode;
+    }
+
+    public function updated(string $property): void
+    {
+        $this->dispatch('filters-updated', filters: $this->activeFilters());
+    }
+
+    /** @return array<string, mixed> */
+    private function activeFilters(): array
+    {
+        return [
+            'fulltext' => $this->filterFulltext,
+            'onStock' => $this->filterOnStock,
+            'onStockQty' => $this->filterOnStockQty,
+            'vendors' => $this->filterVendors,
+            'flags' => $this->filterFlags,
+            'priceFrom' => $this->filterPriceFrom,
+            'priceTo' => $this->filterPriceTo,
+            'excludeSale' => $this->filterExcludeSale,
+            'attributes' => $this->selectedAttributes,
+        ];
     }
 
     public function render(): View

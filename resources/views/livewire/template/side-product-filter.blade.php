@@ -2,6 +2,8 @@
 <div id="proFilter" class="pro-filter-aside">
     <div id="proFilterContent" class="pro-filter-aside_content collapse in">
         <div class="pro-filter-aside_in">
+
+            {{-- Fulltext --}}
             <div id="fltFulltextAdd" class="panel pro-filter-aside_panel pro-filter-aside_panel--fulltext"
                 data-is-collapsed="false" x-data="{ open: true }">
                 <div class="panel-heading">
@@ -13,17 +15,15 @@
                         <div class="form-base_row">
                             <div class="form-base_item">
                                 <div class="form-group">
-                                    <input type="search" value="" name="fulltext" id="fulltextadd_inp"
+                                    <input type="search" wire:model.live.debounce.400ms="filterFulltext"
+                                        name="fulltext" id="fulltextadd_inp"
                                         class="form-control" placeholder="Hledaný výraz"
-                                        data-msg-required="Zadejte prosím nejméně 2 znaky."
-                                        data-msg-minlength="Zadejte prosím nejméně 2 znaky." data-rule-minlength="2"
                                         autocomplete="off">
                                 </div>
                             </div>
                             <div class="form-base_item">
-
-                                <button onclick="GAAction(8,0,$(this));" type="button" class="btn"
-                                    title="Dofiltrovat výsledky" aria-label="Hledat" id="fulltextadd">
+                                <button type="button" class="btn" title="Dofiltrovat výsledky"
+                                    aria-label="Hledat" id="fulltextadd">
                                     <i class="btn_icon icon-search"></i>
                                 </button>
                             </div>
@@ -31,8 +31,10 @@
                     </div>
                 </div>
             </div>
-            <div id="fltStockList" class="panel pro-filter-aside_panel  pro-filter-aside_panel--onstock"
-                data-is-collapsed="false" x-data="{ open: true }">
+
+            {{-- Sklad --}}
+            <div id="fltStockList" class="panel pro-filter-aside_panel pro-filter-aside_panel--onstock"
+                data-is-collapsed="false" x-data="{ open: true, showQty: @entangle('filterOnStock') }">
                 <div class="panel-heading">
                     <button type="button" class="panel-title js-collapse"
                         data-target="#panelCollapse_stock" @click="open = !open" :class="{ 'collapsed': !open }">Sklad</button>
@@ -45,20 +47,19 @@
                                     <div class="form-base_item form-base_item-onstock">
                                         <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
                                             <input type="checkbox" id="chb_Stock"
-                                                onclick="GAAction(9, 0, $(this));">
+                                                wire:model.live="filterOnStock"
+                                                x-on:change="showQty = $event.target.checked">
                                             <label for="chb_Stock">
-                                                <span
-                                                    class="value_label pro-filter-aside_value_label">Skladem</span>
+                                                <span class="value_label pro-filter-aside_value_label">Skladem</span>
                                             </label>
                                         </div>
                                     </div>
-                                    <div id="minStockValuePanel_Stock" class="form-base_item hide-i">
+                                    <div id="minStockValuePanel_Stock" class="form-base_item" x-show="showQty" x-cloak>
                                         <div class="form-group form-group--inline">
                                             <label for="onstockqty">od:</label>
                                             <input id="onstockqty" type="number" class="form-control"
-                                                value="1"
-                                                onkeypress="ProFilter.sendOnStockMinValue(event, this)"
-                                                placeholder="ks" max="99">
+                                                wire:model.live.debounce.400ms="filterOnStockQty"
+                                                placeholder="ks" min="1" max="99">
                                         </div>
                                     </div>
                                 </div>
@@ -67,6 +68,8 @@
                     </ul>
                 </div>
             </div>
+
+            {{-- Značka --}}
             @if ($vendors->isNotEmpty())
             <div id="fltVendorList" class="panel pro-filter-aside_panel" data-is-collapsed="false" x-data="{ open: true, showAll: false }">
                 <div class="panel-heading">
@@ -78,10 +81,13 @@
                 <div id="panelCollapse_vendor" class="panel-body collapse in" x-show="open" x-transition>
                     <ul class="pro-filter-aside_values-groups">
                         @foreach ($vendors as $index => $vendor)
-                        <li class="pro-filter-aside_values-item"
+                        <li wire:key="vendor-{{ $vendor->ProducerCode }}" class="pro-filter-aside_values-item"
                             @if ($index >= 5) x-show="showAll" x-cloak @endif>
                             <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
-                                <input type="checkbox" id="chkVendor_{{ $vendor->ProducerId }}" data-pnp="{{ $vendor->ProducerId }}" value="{{ $vendor->ProducerId }}" onclick="startLoading(event)">
+                                <input type="checkbox"
+                                    id="chkVendor_{{ $vendor->ProducerId }}"
+                                    wire:model.live="filterVendors"
+                                    value="{{ $vendor->ProducerCode }}">
                                 <label for="chkVendor_{{ $vendor->ProducerId }}">
                                     <span class="value_label pro-filter-aside_value_label">{{ $vendor->ProducerName }}<span class="value_counter pro-filter-aside_value_counter">({{ $vendor->product_count }})</span></span>
                                 </label>
@@ -99,6 +105,8 @@
                 </div>
             </div>
             @endif
+
+            {{-- Výhodná nabídka --}}
             @if ($flags->isNotEmpty())
             <div id="fltFlagList" class="panel pro-filter-aside_panel" data-is-collapsed="false" x-data="{ open: true, showAll: false }">
                 <div class="panel-heading">
@@ -110,10 +118,13 @@
                 <div id="panelCollapse_flags" class="panel-body collapse in" x-show="open" x-transition>
                     <ul class="pro-filter-aside_values-groups" id="filterIncludeFlags">
                         @foreach ($flags as $index => $flag)
-                        <li class="pro-filter-aside_values-item"
+                        <li wire:key="flag-{{ $flag->InfoCode }}" class="pro-filter-aside_values-item"
                             @if ($index >= 5) x-show="showAll" x-cloak @endif>
                             <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
-                                <input type="checkbox" id="chb_info_{{ $flag->InfoCode }}" onclick="GAAction(9, 0, $(this));">
+                                <input type="checkbox"
+                                    id="chb_info_{{ $flag->InfoCode }}"
+                                    wire:model.live="filterFlags"
+                                    value="{{ $flag->InfoCode }}">
                                 <label for="chb_info_{{ $flag->InfoCode }}">
                                     <span class="value_label pro-filter-aside_value_label">{{ $flag->InfoName }}<span class="value_counter pro-filter-aside_value_counter">({{ $flag->product_count }})</span></span>
                                 </label>
@@ -131,25 +142,37 @@
                 </div>
             </div>
             @endif
+
+            {{-- Cena --}}
             <div class="panel pro-filter-aside_panel pro-filter-aside_panel--price" data-is-collapsed="false" x-data="{ open: true }">
                 <div class="panel-heading">
                     <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_price" @click="open = !open" :class="{ 'collapsed': !open }">Cena</button>
                 </div>
                 <div id="panelCollapse_price" class="panel-body collapse in" x-show="open" x-transition>
                     <div class="range-price pro-filter-aside_item pro-filter-aside_range-price">
-                        <input type="hidden" id="priceRange" value="{{ $priceMin }};{{ $priceMax }}" data-min="{{ $priceMin }}" data-max="{{ $priceMax }}" data-from="{{ $priceMin }}" data-to="{{ $priceMax }}" data-step="50" class="irs-hidden-input" readonly="">
+                        <input type="hidden" id="priceRange"
+                            value="{{ $priceMin }};{{ $priceMax }}"
+                            data-min="{{ $priceMin }}" data-max="{{ $priceMax }}"
+                            data-from="{{ $priceMin }}" data-to="{{ $priceMax }}"
+                            data-step="50" class="irs-hidden-input" readonly="">
 
                         <div class="form-base form-base--range">
                             <div class="form-base_row">
                                 <div class="form-base_item">
                                     <div class="pro-filter-aside_range-price_inp pro-filter-aside_range-price_inp--min">
-                                        <input type="text" class="form-control" id="minP" name="minP" value="{{ $priceMin }}" data-rule-myrange="[{{ $priceMin }},{{ $priceMax }}]" onkeyup="ProFilter.sendRangeValues(event, this)">
+                                        <input type="text" class="form-control" id="minP" name="minP"
+                                            value="{{ $priceMin }}"
+                                            wire:model.live.debounce.600ms="filterPriceFrom"
+                                            data-rule-myrange="[{{ $priceMin }},{{ $priceMax }}]">
                                     </div>
                                 </div>
                                 <div class="form-base_item">-</div>
                                 <div class="form-base_item">
                                     <div class="pro-filter-aside_range-price_inp pro-filter-aside_range-price_inp--max">
-                                        <input type="text" class="form-control" id="maxP" name="maxP" value="{{ $priceMax }}" data-rule-myrange="[{{ $priceMin }},{{ $priceMax }}]" onkeyup="ProFilter.sendRangeValues(event, this)">
+                                        <input type="text" class="form-control" id="maxP" name="maxP"
+                                            value="{{ $priceMax }}"
+                                            wire:model.live.debounce.600ms="filterPriceTo"
+                                            data-rule-myrange="[{{ $priceMin }},{{ $priceMax }}]">
                                     </div>
                                 </div>
                                 <div class="form-base_item">Kč</div>
@@ -164,6 +187,8 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Vyloučit Doprodej --}}
             <div id="fltExcludeFlagsList" class="panel pro-filter-aside_panel" x-data="{ open: true }">
                 <div class="panel-heading">
                     <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_excludeFlags" @click="open = !open" :class="{ 'collapsed': !open }">Vyloučit položky ze seznamu</button>
@@ -172,7 +197,8 @@
                     <ul class="pro-filter-aside_values-groups" id="filterExcludeFlags">
                         <li class="pro-filter-aside_values-item">
                             <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
-                                <input type="checkbox" id="chb_without_sale">
+                                <input type="checkbox" id="chb_without_sale"
+                                    wire:model.live="filterExcludeSale">
                                 <label for="chb_without_sale">
                                     <span class="value_label pro-filter-aside_value_label">Doprodej</span>
                                 </label>
@@ -181,21 +207,32 @@
                     </ul>
                 </div>
             </div>
+
+            {{-- Atributy --}}
             @if ($filterAttributes->isNotEmpty())
             <div id="fltAttr" class="pro-filter-aside_panel-group">
                 @foreach ($filterAttributes as $attr)
-                <div id="NavAtrFrm_{{ $attr->AttributeCode }}" class="panel pro-filter-aside_panel" data-panel-title="{{ $attr->AttributeName }}" data-pna="{{ $attr->AttributeCode }}" data-ui-input-style="4" x-data="{ open: false }">
+                <div wire:key="attr-panel-{{ $attr->AttributeCode }}" id="NavAtrFrm_{{ $attr->AttributeCode }}" class="panel pro-filter-aside_panel"
+                    data-panel-title="{{ $attr->AttributeName }}"
+                    data-pna="{{ $attr->AttributeCode }}"
+                    data-ui-input-style="4"
+                    x-data="{ open: false }">
                     <div class="panel-heading">
-                        <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_attr_{{ $attr->AttributeCode }}" @click="open = !open" :class="{ 'collapsed': !open }">
+                        <button type="button" class="panel-title js-collapse"
+                            data-target="#panelCollapse_attr_{{ $attr->AttributeCode }}"
+                            @click="open = !open" :class="{ 'collapsed': !open }">
                             {{ $attr->AttributeName }}
                         </button>
                     </div>
                     <div id="panelCollapse_attr_{{ $attr->AttributeCode }}" class="panel-body collapse in" x-show="open" x-transition>
                         <ul class="pro-filter-aside_values-groups">
                             @foreach ($attr->values as $value)
-                            <li class="pro-filter-aside_values-item ">
+                            <li wire:key="attr-{{ $attr->AttributeCode }}-{{ $value->ValueCode }}" class="pro-filter-aside_values-item">
                                 <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
-                                    <input type="checkbox" id="flt_pnati_{{ $attr->AttributeCode }}_{{ $value->ValueCode }}" onclick="startLoading(event)" data-pna="{{ $attr->AttributeCode }}" data-pnati="{{ $value->ValueCode }}">
+                                    <input type="checkbox"
+                                        id="flt_pnati_{{ $attr->AttributeCode }}_{{ $value->ValueCode }}"
+                                        wire:model.live="selectedAttributes"
+                                        value="{{ $attr->AttributeCode }}|{{ $value->ValueCode }}">
                                     <label for="flt_pnati_{{ $attr->AttributeCode }}_{{ $value->ValueCode }}">
                                         <span class="value_label pro-filter-aside_value_label">{{ $value->Value }}<span class="value_counter pro-filter-aside_value_counter">({{ $value->product_count }})</span></span>
                                     </label>
@@ -208,6 +245,7 @@
                 @endforeach
             </div>
             @endif
+
         </div>
     </div>
 </div>
