@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="{{ asset('assets/bundles/css/productcompare.css') }}">
 
 	<script src="{{ asset('assets/bundles/js/main.js') }}"></script>
+    <script src="{{ asset('assets/bundles/js/product.js')}}"></script>
     {{-- <script src="{{ asset('assets/bundles/js/productcompare.js') }}"></script> --}}
 
 	<script>

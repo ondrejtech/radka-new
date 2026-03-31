@@ -38,14 +38,14 @@
 
         
         @if (count($dropdownCategories))
-            <div class="dropdown">
+            <div class="dropdown" x-data="{ isOpen: false }">
                 <button class="btn dropdown-toggle js-tooltip" type="button"
-                    onclick="showBreadCrumbsSelect(this,{{ $dropdownPscCode }},0,0);"
+                    @click.stop="isOpen = !isOpen"
                     data-title="tip_show_categories"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    aria-haspopup="true" :aria-expanded="isOpen">
                     <i class="dropdown-caret"></i>
                 </button>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" x-show="isOpen" @click.outside="isOpen = false" style="display:none">
                     @foreach ($dropdownCategories as $cat)
                         <li class="dropdown-item-wrap">
                             <a class="dropdown-item" href="{{ $cat['url'] }}">
