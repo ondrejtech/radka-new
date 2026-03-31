@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="page-content" role="main" aria-label="Hlavní obsah">
+    <div class="page-contend" role="main" aria-label="Hlavní obsah">
         <livewire:template.breadcrumbs :proId="$proId" />
+
+        <div class="page-content_in pro-list-page">
+            <div class="container sub-category-menu-wrap">
+                <livewire:template.side-navigation />
+            </div>
+        </div>
 
         <div class="container">
             <livewire:template.product-detail :proId="$proId" />

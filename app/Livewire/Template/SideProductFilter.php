@@ -21,7 +21,7 @@ class SideProductFilter extends Component
 
     public bool $filterOnStock = false;
 
-    public int $filterOnStockQty = 1;
+    public ?int $filterOnStockQty = 1;
 
     /** @var string[] */
     public array $filterVendors = [];
@@ -29,9 +29,9 @@ class SideProductFilter extends Component
     /** @var string[] */
     public array $filterFlags = [];
 
-    public int $filterPriceFrom = 0;
+    public ?int $filterPriceFrom = 0;
 
-    public int $filterPriceTo = 0;
+    public ?int $filterPriceTo = 0;
 
     public bool $filterExcludeSale = false;
 
@@ -54,11 +54,11 @@ class SideProductFilter extends Component
         return [
             'fulltext' => $this->filterFulltext,
             'onStock' => $this->filterOnStock,
-            'onStockQty' => $this->filterOnStockQty,
+            'onStockQty' => $this->filterOnStockQty ?? 1,
             'vendors' => $this->filterVendors,
             'flags' => $this->filterFlags,
-            'priceFrom' => $this->filterPriceFrom,
-            'priceTo' => $this->filterPriceTo,
+            'priceFrom' => $this->filterPriceFrom ?? 0,
+            'priceTo' => $this->filterPriceTo ?? 0,
             'excludeSale' => $this->filterExcludeSale,
             'attributes' => $this->selectedAttributes,
         ];
