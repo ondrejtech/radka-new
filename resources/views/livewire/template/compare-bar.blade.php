@@ -54,7 +54,7 @@
             </div>
 
             <div class="compare-bar_aside">
-                <a href="/pages/productcompare.aspx?pnc_id={{ $activeCatCode }}" class="btn btn--secondary">
+                <a href="{{ route('pages.product-compare', ['pnc_id' => $activeCatCode]) }}" class="btn btn--secondary">
                     <i class="icon-collation btn_icon"></i>
                     <span class="btn_label">Porovnat</span>
                 </a>
