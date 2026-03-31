@@ -1,4 +1,6 @@
-<div class="panel-body" x-data="{ view: 'img' }">
+<div class="panel-body"
+     x-data="{ view: 'img', scrollTopVisible: false }"
+     x-on:scroll.window="scrollTopVisible = window.scrollY > 300">
     <div class="pro-filter-footer">
         <div class="pro-filter_row">
             <div class="pro-filter_item pro-filter_sort-view">
@@ -23,7 +25,7 @@
             <div class="pro-filter_item pro-filter_number-records">
                 <span class="pro-filter_number-records_label">Počet záznamů:</span>
                 <strong class="pro-filter_number-records_value" id="totalRecordCount"
-                    data-defaultvalue="{{ $products->total() }}">{{ $products->total() }}</strong>
+                    data-defaultvalue="{{ $total }}">{{ $total }}</strong>
             </div>
             <div class="pro-filter_item pro-filter_choose-view">
                 <a href="#" id="btnView_img"
@@ -59,7 +61,7 @@
             </div>
 
 
-            @include('livewire.template.partials.pager', ['paginator' => $products, 'class' => 'pager pro-pager pro-pager--top'])
+            @include('livewire.template.partials.pager', ['paginator' => $paginator, 'class' => 'pager pro-pager pro-pager--top'])
 
         </div>
 
@@ -362,7 +364,7 @@
             </article>
             @endforeach
 
-            @include('livewire.template.partials.pager', ['paginator' => $products, 'class' => 'pager pro-pager pro-pager--bottom'])
+            {{-- infinite scroll: bottom pager removed --}}
         </div>
 
         <div class="products-list-table products-list-table--default-view" x-show="view === 'table_img'" x-cloak>
@@ -399,7 +401,7 @@
                 @php
                     $productUrl = '/' . \Illuminate\Support\Str::slug($product->Name) . '/product-' . $product->ProId;
                     $rowClass = ($index % 2 === 0) ? 'licha' : 'suda';
-                    $rowNumber = ($products->currentPage() - 1) * $products->perPage() + $index + 1;
+                    $rowNumber = $index + 1;
                 @endphp
                 <article id="table_product_{{ $product->ProId }}" class="product-item pro-list {{ $rowClass }}" x-data="{ qty: 1 }">
 
@@ -498,19 +500,80 @@
                 </article>
                 @endforeach
 
-                @include('livewire.template.partials.pager', ['paginator' => $products, 'class' => 'pager pro-pager pro-pager--bottom'])
+                {{-- infinite scroll: bottom pager removed --}}
 
             </div>
         </div>
     </div>
+
+    @if ($hasMore)
+    <div id="loadMoreSentinel" style="height:1px;"></div>
+    @endif
+    <div wire:loading.block wire:target="loadMore" style="text-align:center;padding:20px 0;">
+        <div class="preloader" style="width:50px;height:50px;display:inline-block;">
+            <div class="preloader_el preloader_el-1"></div>
+            <div class="preloader_el preloader_el-2"></div>
+            <div class="preloader_el preloader_el-3"></div>
+            <div class="preloader_el preloader_el-4"></div>
+            <div class="preloader_el preloader_el-5"></div>
+            <div class="preloader_el preloader_el-6"></div>
+            <div class="preloader_el preloader_el-7"></div>
+            <div class="preloader_el preloader_el-8"></div>
+            <div class="preloader_el preloader_el-9"></div>
+            <div class="preloader_el preloader_el-10"></div>
+            <div class="preloader_el preloader_el-11"></div>
+            <div class="preloader_el preloader_el-12"></div>
+        </div>
+    </div>
+
+    <button id="btnPageScrollTop"
+            class="btn btn-page-scroll-top"
+            x-show="scrollTopVisible"
+            x-cloak
+            x-on:click="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <i class="icon-arrow_top"></i>
+    </button>
 </div>
 
 @script
 <script>
-    Livewire.hook('morph.updated', ({ el }) => {
-        if (typeof lazyImage !== 'undefined') {
-            lazyImage('reload');
+    let scrollObserver = null;
+    let loadingMore = false;
+
+    function initScrollObserver() {
+        if (scrollObserver) {
+            scrollObserver.disconnect();
+            scrollObserver = null;
         }
+        const sentinel = document.getElementById('loadMoreSentinel');
+        if (!sentinel) {
+            return;
+        }
+        scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !loadingMore) {
+                    loadingMore = true;
+                    $wire.loadMore().then(() => {
+                        loadingMore = false;
+                    });
+                }
+            });
+        }, { rootMargin: '200px' });
+        scrollObserver.observe(sentinel);
+    }
+
+    initScrollObserver();
+
+    Livewire.hook('commit', ({ succeed }) => {
+        succeed(() => {
+            queueMicrotask(() => {
+                if (typeof lazyImage !== 'undefined') {
+                    lazyImage('reload');
+                }
+                loadingMore = false;
+                initScrollObserver();
+            });
+        });
     });
 </script>
 @endscript
