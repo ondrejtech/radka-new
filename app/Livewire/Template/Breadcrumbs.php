@@ -35,7 +35,7 @@ class Breadcrumbs extends Component
     private function buildBreadcrumbs(NavigationService $navigationService): array
     {
         if ($this->proId !== null) {
-            return [$this->buildForProduct($this->proId, $navigationService), [], null];
+            return $this->buildForProduct($this->proId, $navigationService);
         }
 
         return $this->buildFromUrl(request()->path(), $navigationService);
@@ -101,7 +101,13 @@ class Breadcrumbs extends Component
         return [[], [], null];
     }
 
-    /** @return array<int, array{label: string, url: string|null, icon: bool}> */
+    /**
+     * @return array{
+     *   0: array<int, array{label: string, url: string|null, icon: bool}>,
+     *   1: array<int, array{CategoryCode: int, CategoryName: string, url: string}>,
+     *   2: int|null
+     * }
+     */
     private function buildForProduct(int $proId, NavigationService $navigationService): array
     {
         $product = Product::query()
@@ -109,7 +115,7 @@ class Breadcrumbs extends Component
             ->first(['ProId', 'Name', 'CategoryCode']);
 
         if (! $product) {
-            return [];
+            return [[], [], null];
         }
 
         $navigation = $navigationService->getNavigation();
@@ -121,16 +127,17 @@ class Breadcrumbs extends Component
                         continue;
                     }
 
-                    return [
+                    $items = [
                         ['label' => $level1['SuperCategoryName'], 'url' => $level1['url'], 'icon' => true],
                         ['label' => $level2['SuperCategoryName'], 'url' => $level2['url'], 'icon' => false],
                         ['label' => $category['CategoryName'], 'url' => $category['url'], 'icon' => false],
-                        ['label' => $product->Name, 'url' => null, 'icon' => false],
                     ];
+
+                    return [$items, $level2['categories'], (int) $level2['SuperCategoryCode']];
                 }
             }
         }
 
-        return [];
+        return [[], [], null];
     }
 }

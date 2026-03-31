@@ -18,7 +18,7 @@
                 <i class="f-icon breadcrumbs_separate"></i>
             @endunless
 
-            @if ($isLast)
+            @if ($isLast && $item['url'] === null)
                 <strong class="breadcrumbs_item{{ $isFirst ? ' breadcrumbs_item--sup-cat' : '' }} breadcrumbs_item--curent">
                     @if ($item['icon'])
                         <i class="icon-home breadcrumbs_item_icon"></i>
@@ -26,7 +26,7 @@
                     <span class="breadcrumbs_item_label">{{ $item['label'] }}</span>
                 </strong>
             @else
-                <a href="{{ $item['url'] }}" class="breadcrumbs_item{{ $isFirst ? ' breadcrumbs_item--sup-cat' : '' }}">
+                <a href="{{ $item['url'] }}" class="breadcrumbs_item{{ $isFirst ? ' breadcrumbs_item--sup-cat' : '' }}{{ $isLast && count($dropdownCategories) ? ' breadcrumbs_item--cat' : '' }}">
                     @if ($item['icon'])
                         <i class="icon-home breadcrumbs_item_icon"></i>
                     @endif
