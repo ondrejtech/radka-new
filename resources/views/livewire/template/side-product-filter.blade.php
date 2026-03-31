@@ -5,12 +5,12 @@
 
             {{-- Fulltext --}}
             <div id="fltFulltextAdd" class="panel pro-filter-aside_panel pro-filter-aside_panel--fulltext"
-                data-is-collapsed="false" x-data="{ open: true }">
+                data-is-collapsed="false" x-data="{ isOpen: true }">
                 <div class="panel-heading">
                     <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_fulltext"
-                        @click="open = !open" :class="{ 'collapsed': !open }">Vyhledat v kategorii</button>
+                        @click="isOpen = !isOpen" :class="{ 'collapsed': !isOpen }">Vyhledat v kategorii</button>
                 </div>
-                <div id="panelCollapse_fulltext" class="panel-body collapse in" x-show="open" x-transition>
+                <div id="panelCollapse_fulltext" class="panel-body collapse in" x-show="isOpen" x-transition>
                     <div class="form-base">
                         <div class="form-base_row">
                             <div class="form-base_item">
@@ -34,12 +34,12 @@
 
             {{-- Sklad --}}
             <div id="fltStockList" class="panel pro-filter-aside_panel pro-filter-aside_panel--onstock"
-                data-is-collapsed="false" x-data="{ open: true, showQty: @entangle('filterOnStock') }">
+                data-is-collapsed="false" x-data="{ isOpen: true, showQty: {{ $filterOnStock ? 'true' : 'false' }} }">
                 <div class="panel-heading">
                     <button type="button" class="panel-title js-collapse"
-                        data-target="#panelCollapse_stock" @click="open = !open" :class="{ 'collapsed': !open }">Sklad</button>
+                        data-target="#panelCollapse_stock" @click="isOpen = !isOpen" :class="{ 'collapsed': !isOpen }">Sklad</button>
                 </div>
-                <div id="panelCollapse_stock" class="panel-body collapse in no-padding-bottom" x-show="open" x-transition>
+                <div id="panelCollapse_stock" class="panel-body collapse in no-padding-bottom" x-show="isOpen" x-transition>
                     <ul class="pro-filter-aside_values-groups">
                         <li class="pro-filter-aside_values-item">
                             <div class="form-base">
@@ -71,14 +71,14 @@
 
             {{-- Značka --}}
             @if ($vendors->isNotEmpty())
-            <div id="fltVendorList" class="panel pro-filter-aside_panel" data-is-collapsed="false" x-data="{ open: true, showAll: false }">
+            <div id="fltVendorList" class="panel pro-filter-aside_panel" data-is-collapsed="false" x-data="{ isOpen: true, showAll: false }">
                 <div class="panel-heading">
                     <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_vendor"
-                        @click="open = !open" :class="{ 'collapsed': !open }">
+                        @click="isOpen = !isOpen" :class="{ 'collapsed': !isOpen }">
                         Značka
                     </button>
                 </div>
-                <div id="panelCollapse_vendor" class="panel-body collapse in" x-show="open" x-transition>
+                <div id="panelCollapse_vendor" class="panel-body collapse in" x-show="isOpen" x-transition>
                     <ul class="pro-filter-aside_values-groups">
                         @foreach ($vendors as $index => $vendor)
                         <li wire:key="vendor-{{ $vendor->ProducerCode }}" class="pro-filter-aside_values-item"
@@ -108,14 +108,14 @@
 
             {{-- Výhodná nabídka --}}
             @if ($flags->isNotEmpty())
-            <div id="fltFlagList" class="panel pro-filter-aside_panel" data-is-collapsed="false" x-data="{ open: true, showAll: false }">
+            <div id="fltFlagList" class="panel pro-filter-aside_panel" data-is-collapsed="false" x-data="{ isOpen: true, showAll: false }">
                 <div class="panel-heading">
                     <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_flags"
-                        @click="open = !open" :class="{ 'collapsed': !open }">
+                        @click="isOpen = !isOpen" :class="{ 'collapsed': !isOpen }">
                         Výhodná nabídka
                     </button>
                 </div>
-                <div id="panelCollapse_flags" class="panel-body collapse in" x-show="open" x-transition>
+                <div id="panelCollapse_flags" class="panel-body collapse in" x-show="isOpen" x-transition>
                     <ul class="pro-filter-aside_values-groups" id="filterIncludeFlags">
                         @foreach ($flags as $index => $flag)
                         <li wire:key="flag-{{ $flag->InfoCode }}" class="pro-filter-aside_values-item"
@@ -144,11 +144,11 @@
             @endif
 
             {{-- Cena --}}
-            <div class="panel pro-filter-aside_panel pro-filter-aside_panel--price" data-is-collapsed="false" x-data="{ open: true }">
+            <div class="panel pro-filter-aside_panel pro-filter-aside_panel--price" data-is-collapsed="false" x-data="{ isOpen: true }">
                 <div class="panel-heading">
-                    <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_price" @click="open = !open" :class="{ 'collapsed': !open }">Cena</button>
+                    <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_price" @click="isOpen = !isOpen" :class="{ 'collapsed': !isOpen }">Cena</button>
                 </div>
-                <div id="panelCollapse_price" class="panel-body collapse in" x-show="open" x-transition>
+                <div id="panelCollapse_price" class="panel-body collapse in" x-show="isOpen" x-transition>
                     <div class="range-price pro-filter-aside_item pro-filter-aside_range-price">
                         <input type="hidden" id="priceRange"
                             value="{{ $priceMin }};{{ $priceMax }}"
@@ -189,11 +189,11 @@
             </div>
 
             {{-- Vyloučit Doprodej --}}
-            <div id="fltExcludeFlagsList" class="panel pro-filter-aside_panel" x-data="{ open: true }">
+            <div id="fltExcludeFlagsList" class="panel pro-filter-aside_panel" x-data="{ isOpen: true }">
                 <div class="panel-heading">
-                    <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_excludeFlags" @click="open = !open" :class="{ 'collapsed': !open }">Vyloučit položky ze seznamu</button>
+                    <button type="button" class="panel-title js-collapse" data-target="#panelCollapse_excludeFlags" @click="isOpen = !isOpen" :class="{ 'collapsed': !isOpen }">Vyloučit položky ze seznamu</button>
                 </div>
-                <div id="panelCollapse_excludeFlags" class="panel-body collapse in" x-show="open" x-transition>
+                <div id="panelCollapse_excludeFlags" class="panel-body collapse in" x-show="isOpen" x-transition>
                     <ul class="pro-filter-aside_values-groups" id="filterExcludeFlags">
                         <li class="pro-filter-aside_values-item">
                             <div class="checkbox pro-filter-aside_value pro-filter-aside_value_cbx">
@@ -216,15 +216,15 @@
                     data-panel-title="{{ $attr->AttributeName }}"
                     data-pna="{{ $attr->AttributeCode }}"
                     data-ui-input-style="4"
-                    x-data="{ open: false }">
+                    x-data="{ isOpen: false }">
                     <div class="panel-heading">
                         <button type="button" class="panel-title js-collapse"
                             data-target="#panelCollapse_attr_{{ $attr->AttributeCode }}"
-                            @click="open = !open" :class="{ 'collapsed': !open }">
+                            @click="isOpen = !isOpen" :class="{ 'collapsed': !isOpen }">
                             {{ $attr->AttributeName }}
                         </button>
                     </div>
-                    <div id="panelCollapse_attr_{{ $attr->AttributeCode }}" class="panel-body collapse in" x-show="open" x-transition>
+                    <div id="panelCollapse_attr_{{ $attr->AttributeCode }}" class="panel-body collapse in" x-show="isOpen" x-transition>
                         <ul class="pro-filter-aside_values-groups">
                             @foreach ($attr->values as $value)
                             <li wire:key="attr-{{ $attr->AttributeCode }}-{{ $value->ValueCode }}" class="pro-filter-aside_values-item">
