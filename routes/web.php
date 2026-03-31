@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\AresController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PagesController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CategoryController::class, 'home']);
+
+Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 
 // Category pages – URL pattern: /{seg1}/{seg2}/n-{superCatCode},{catCode},{extra}
 // Examples:
