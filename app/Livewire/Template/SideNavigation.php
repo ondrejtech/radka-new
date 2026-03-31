@@ -2,23 +2,66 @@
 
 namespace App\Livewire\Template;
 
+use App\Models\Product;
 use App\Models\ProductSuperCategory;
+use App\Services\NavigationService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class SideNavigation extends Component
 {
-    public function render(): View
+    /** Set when rendered on a product detail page */
+    #[Locked]
+    public ?int $proId = null;
+
+    public function render(NavigationService $navigationService): View
     {
-        [$parentCode, $activeSuperCatCode, $activeCategoryCode] = $this->parseUrlCodes();
+        if ($this->proId !== null) {
+            [$parentCode, $activeSuperCatCode, $activeCategoryCode] = $this->resolveFromProduct($this->proId, $navigationService);
+        } else {
+            [$parentCode, $activeSuperCatCode, $activeCategoryCode] = $this->parseUrlCodes();
+        }
 
         return view('livewire.template.side-navigation', [
             'navigation' => $parentCode ? $this->loadNavigation($parentCode) : [],
             'activeSuperCatCode' => $activeSuperCatCode,
             'activeCategoryCode' => $activeCategoryCode,
         ]);
+    }
+
+    /**
+     * Resolve navigation codes from a product's category via NavigationService.
+     *
+     * @return array{0: int|null, 1: int|null, 2: int|null}
+     */
+    private function resolveFromProduct(int $proId, NavigationService $navigationService): array
+    {
+        $product = Product::query()->where('ProId', $proId)->first(['CategoryCode']);
+
+        if (! $product) {
+            return [null, null, null];
+        }
+
+        $catCode = (int) $product->CategoryCode;
+
+        foreach ($navigationService->getNavigation() as $level1) {
+            foreach ($level1['children'] as $level2) {
+                foreach ($level2['categories'] as $category) {
+                    if ((int) $category['CategoryCode'] === $catCode) {
+                        return [
+                            (int) $level1['SuperCategoryCode'],
+                            (int) $level2['SuperCategoryCode'],
+                            $catCode,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return [null, null, null];
     }
 
     /**

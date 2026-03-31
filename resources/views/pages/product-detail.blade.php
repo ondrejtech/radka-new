@@ -6,7 +6,7 @@
 
         <div class="page-content_in pro-list-page">
             <div class="container sub-category-menu-wrap">
-                <livewire:template.side-navigation />
+                <livewire:template.side-navigation :proId="$proId" />
             </div>
         </div>
 
