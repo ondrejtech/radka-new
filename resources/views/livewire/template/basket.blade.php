@@ -114,7 +114,7 @@
                     </div>
                     @endif
                 </div>
-                <table class="table cart-tbl cart-tbl-items tbl-sorting">
+                <table class="table cart-tbl cart-tbl-items tbl-sorting" wire:sort="handleSort">
                     <thead>
                         <tr>
                             <th class="table-head-cell table-col_control table-col_control--prepend">
@@ -148,7 +148,6 @@
                             <th class="table-head-cell table-col_control table-col_control--append"></th>
                         </tr>
                     </thead>
-                    <tbody class="ui-sortable" wire:sort="handleSort">
                         @foreach ($items as $index => $item)
                             @php
                                 $product = $item->product;
@@ -156,15 +155,16 @@
                                 $productUrl = $product ? '/' . \Illuminate\Support\Str::slug($product->Name) . '/product-' . $product->ProId : '#';
                                 $total = $item->price * $item->quantity;
                             @endphp
+                            <tbody class="ui-sortable"
+                                x-data="{ qty: {{ $item->quantity }}, showInfo: false }"
+                                @basket-recalculate-all.window="$wire.updateQuantity({{ $item->id }}, qty)"
+                                wire:key="{{ $item->id }}"
+                                wire:sort:item="{{ $item->id }}">
                             <tr id="pro_{{ $item->pro_id }}"
                                 class="cart-tbl-items_item cart-tbl-items_item-Product item-{{ $index * 100 }} cart-tbl-items_item-group {{ $rowClass }}"
                                 data-proid="{{ $item->pro_id }}"
                                 data-parentid="0"
-                                data-baiid="{{ $item->id }}"
-                                x-data="{ qty: {{ $item->quantity }} }"
-                                @basket-recalculate-all.window="$wire.updateQuantity({{ $item->id }}, qty)"
-                                wire:key="{{ $item->id }}"
-                                wire:sort:item="{{ $item->id }}">
+                                data-baiid="{{ $item->id }}">
                                 <td class="table-col_control table-col_control--prepend">
                                     <div class="table-cell_in">
                                         <div class="checkbox cbx-select-row" wire:sort:ignore>
@@ -279,7 +279,8 @@
                                 <td class="table-col_control table-col_control--append">
                                     <div class="table-cell_in">
                                         <div class="table-cell_value">
-                                            <button type="button" class="btn btn--icon cart-tbl-items_btn-more_info js-tooltip" data-title="tip_basket_more-info">
+                                            <button type="button" class="btn btn--icon cart-tbl-items_btn-more_info js-tooltip" data-title="tip_basket_more-info"
+                                                @click="showInfo = !showInfo" :class="{ 'active': showInfo }">
                                                 <i class="icon-arrow-down btn_icon"></i>
                                             </button>
                                             <button type="button" class="btn btn--icon btn-icon--delete cart-tbl-items_btn-delete js-tooltip"
@@ -290,7 +291,44 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr id="{{ $item->pro_id }}_0_{{ $item->id }}"
+                                data-parentid="{{ $item->pro_id }}"
+                                class="table-row table-row--more-info"
+                                x-show="showInfo"
+                                style="display:none;">
+                                <td class="cart-custom-text" colspan="9">
+                                    @if ($product?->DescriptionShort)
+                                        <h2>Popis</h2>
+                                        <p>{{ $product->DescriptionShort }}</p>
+                                    @endif
+                                    <div class="panel-bottom-tools">
+                                        <div class="info-bar">
+                                            @if ($product?->WarrantyTerm && $product?->WarrantyUnit)
+                                                <div class="info-bar_item">
+                                                    <span class="info-bar_item_label">Záruka:</span>
+                                                    <strong class="info-bar_item_value">{{ $product->WarrantyTerm }}&nbsp;{{ $product->WarrantyUnit }}</strong>
+                                                </div>
+                                            @endif
+                                            <div class="info-bar_item">
+                                                <span class="info-bar_item_label">Vložil:</span>
+                                                <strong class="info-bar_item_value">{{ auth()->user()?->name }}</strong>
+                                            </div>
+                                        </div>
+                                        @if(auth()->check() && auth()->user()->id === config('app.admin_id'))
+                                        <div class="buttons-area">
+                                            <button type="button" class="btn btn--outline" data-title="tip_note_add">
+                                                <i class="btn_icon icon-invoice"></i>
+                                                <span class="badge badge--primary">0</span>
+                                                <span class="btn_label">Poznámky</span>
+                                            </button>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
                         @endforeach
+                        <tbody>
                         <tr id="pro_0"
                             class="cart-tbl-items_item cart-tbl-items_item-Empty cart-tbl-items_item-custom {{ $items->count() % 2 === 0 ? 'licha' : 'suda' }}"
                             data-proid="0" data-parentid="0" data-baiid="0"
