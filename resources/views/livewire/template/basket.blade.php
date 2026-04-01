@@ -148,7 +148,7 @@
                             <th class="table-head-cell table-col_control table-col_control--append"></th>
                         </tr>
                     </thead>
-                    <tbody class="ui-sortable">
+                    <tbody class="ui-sortable" wire:sort="handleSort">
                         @foreach ($items as $index => $item)
                             @php
                                 $product = $item->product;
@@ -162,14 +162,16 @@
                                 data-parentid="0"
                                 data-baiid="{{ $item->id }}"
                                 x-data="{ qty: {{ $item->quantity }} }"
-                                @basket-recalculate-all.window="$wire.updateQuantity({{ $item->id }}, qty)">
+                                @basket-recalculate-all.window="$wire.updateQuantity({{ $item->id }}, qty)"
+                                wire:key="{{ $item->id }}"
+                                wire:sort:item="{{ $item->id }}">
                                 <td class="table-col_control table-col_control--prepend">
                                     <div class="table-cell_in">
-                                        <div class="checkbox cbx-select-row">
+                                        <div class="checkbox cbx-select-row" wire:sort:ignore>
                                             <input id="chkAction_{{ $item->pro_id }}_{{ $item->id }}" type="checkbox" class="toggle-cbx" name="chkAction" data-title="tip_select" value="{{ $item->id }}">
                                             <label for="chkAction_{{ $item->pro_id }}_{{ $item->id }}"></label>
                                         </div>
-                                        <button type="button" class="table-row_handle-el cart-tbl-items_handle-el js-tooltip el-handle" data-title="msg_change_order">
+                                        <button type="button" class="table-row_handle-el cart-tbl-items_handle-el js-tooltip el-handle" data-title="msg_change_order" wire:sort:handle>
                                             <i class="icon-move btn_icon"></i>
                                         </button>
                                     </div>
