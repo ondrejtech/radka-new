@@ -700,20 +700,41 @@
                             <div class="panel-body">
                                 <h3 class="panel-title">Dodací adresa </h3>
                                 @if (auth()->check())
+                                @php
+                                    $addressData = collect([
+                                        (string) auth()->user()->id => [
+                                            'name'   => auth()->user()->first_name . ' ' . auth()->user()->last_name,
+                                            'street' => auth()->user()->street ?? '',
+                                            'city'   => auth()->user()->city ?? '',
+                                            'zip'    => auth()->user()->zip ?? '',
+                                            'phone'  => auth()->user()->phone ?? '',
+                                            'email'  => auth()->user()->email ?? '',
+                                        ],
+                                    ])->merge(
+                                        $users->flatMap->deliveryAddresses->mapWithKeys(fn ($a) => [
+                                            (string) $a->id => [
+                                                'name'   => $a->first_name . ' ' . $a->last_name,
+                                                'street' => $a->street ?? '',
+                                                'city'   => $a->city ?? '',
+                                                'zip'    => $a->zip ?? '',
+                                                'phone'  => $a->phone ?? '',
+                                                'email'  => $a->email ?? '',
+                                            ],
+                                        ])
+                                    );
+                                @endphp
                                 <div class="form-base">
                                     <div class="form-base_item">
                                         <div class="form-group">
                                             <label for="ddlShipAddresses" class="hide">Adresát</label>
                                             <select name="ctl00$MainContent$ddlShipAddresses"
-                                                onchange="javascript:setTimeout('__doPostBack(\'ctl00$MainContent$ddlShipAddresses\',\'\')', 0)"
                                                 id="ddlShipAddresses"
                                                 title="Vyberte dodací adresu ze seznamu Vašich adres"
                                                 class="form-control js-combo select2-hidden-accessible"
                                                 data-container-css-class="cart-address-choose" tabindex="-1"
                                                 aria-hidden="true">
-                                                <option selected="selected" value="0">Ruční zadání dodací adresy
-                                                </option>
-                                                <option value="{{ auth()->user()->id }}">
+                                                <option value="0">Ruční zadání dodací adresy</option>
+                                                <option value="{{ auth()->user()->id }}" selected="selected">
                                                     {{ auth()->user()->first_name . ', ' . auth()->user()->last_name . ', ' . auth()->user()->street . ', ' . auth()->user()->city . ', ' . auth()->user()->zip }}
                                                 </option>
                                                 @foreach($users as $user)
@@ -732,6 +753,7 @@
                                             <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
                                             <input name="ctl00$MainContent$txtShipAddrName" type="text"
                                                 value="{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}"
+                                                readonly
                                                 maxlength="35" id="txtShipAddrName"
                                                 class="form-control is-required" data-rule-required="true"><span
                                                 class="form-control-validate-info"></span>
@@ -749,9 +771,10 @@
                                             <div class="form-group">
                                                 <label for="txtShipAddrStreet">Ulice</label>
                                                 <input name="ctl00$MainContent$txtShipAddrStreet" type="text"
-                                                    value="{{ auth()->user()->street }}" maxlength="35"
-                                                    id="txtShipAddrStreet" class="form-control is-required"
-                                                    data-rule-required="true"><span
+                                                    value="{{ auth()->user()->street }}"
+                                                    readonly
+                                                    maxlength="35" id="txtShipAddrStreet"
+                                                    class="form-control is-required" data-rule-required="true"><span
                                                     class="form-control-validate-info"></span>
                                             </div>
                                         </div>
@@ -759,9 +782,10 @@
                                             <div class="form-group">
                                                 <label for="txtShipAddrCity">Město</label>
                                                 <input name="ctl00$MainContent$txtShipAddrCity" type="text"
-                                                    value="{{ auth()->user()->city }}" maxlength="35"
-                                                    id="txtShipAddrCity" class="form-control is-required"
-                                                    data-rule-required="true"><span
+                                                    value="{{ auth()->user()->city }}"
+                                                    readonly
+                                                    maxlength="35" id="txtShipAddrCity"
+                                                    class="form-control is-required" data-rule-required="true"><span
                                                     class="form-control-validate-info"></span>
                                             </div>
                                         </div>
@@ -771,9 +795,10 @@
                                             <div class="form-group">
                                                 <label for="txtShipAddrZIP">PSČ</label>
                                                 <input name="ctl00$MainContent$txtShipAddrZIP" type="text"
-                                                    value="{{ auth()->user()->zip }}" maxlength="6"
-                                                    id="txtShipAddrZIP" class="form-control is-required"
-                                                    data-rule-required="true"><span
+                                                    value="{{ auth()->user()->zip }}"
+                                                    readonly
+                                                    maxlength="6" id="txtShipAddrZIP"
+                                                    class="form-control is-required" data-rule-required="true"><span
                                                     class="form-control-validate-info"></span>
                                             </div>
                                         </div>
@@ -783,9 +808,9 @@
                                                 <div class="ux-combo">
                                                     <select name="ctl00$MainContent$ddlShipCountry"
                                                         id="ddlShipCountry" class="form-control ux-combo_field"
+                                                        disabled
                                                         appenddatabounditem="false">
-                                                        <option selected="selected" value="52">Česká republika
-                                                        </option>
+                                                        <option selected="selected" value="52">Česká republika</option>
                                                         <option value="199">Slovenská republika</option>
                                                     </select>
                                                 </div>
@@ -797,24 +822,27 @@
                                             <div class="form-group">
                                                 <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
                                                 <input name="ctl00$MainContent$txtShipPhone" type="text"
-                                                    value="{{ auth()->user()->phone }}" maxlength="20"
-                                                    id="txtShipPhone" class="form-control" data-rule-phone="true">
+                                                    value="{{ auth()->user()->phone }}"
+                                                    readonly
+                                                    maxlength="20" id="txtShipPhone"
+                                                    class="form-control" data-rule-phone="true">
                                             </div>
                                         </div>
                                         <div class="form-base_item">
                                             <div class="form-group">
                                                 <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
                                                 <input name="ctl00$MainContent$txtShipEmail" type="text"
-                                                    value="{{ auth()->user()->email }}" maxlength="50"
-                                                    id="txtShipEmail" class="form-control" data-rule-email="true">
+                                                    value="{{ auth()->user()->email }}"
+                                                    readonly
+                                                    maxlength="50" id="txtShipEmail"
+                                                    class="form-control" data-rule-email="true">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-base_row">
+                                    <div class="form-base_row" id="shipAddrSaveRow" style="display:none">
                                         <div class="form-base_item">
                                             <div class="buttons-area">
-                                                <button class="btn cart-address_btn-save" type="button"
-                                                    onclick="GAAction(11,0,$(this));saveDelAdrress(23117714);">
+                                                <button class="btn cart-address_btn-save" type="button">
                                                     <span class="btn_label">Uložit novou dodací adresu</span>
                                                 </button>
                                             </div>
@@ -843,3 +871,48 @@
         </div>
     </div>
 </form>
+
+@script
+<script>
+    var shipAddresses = @json($addressData);
+
+    function applyShipAddress(val) {
+        var editable = val === '0';
+        var addr = editable ? {} : (shipAddresses[val] || {});
+
+        $('#txtShipAddrName').val(addr.name || '').prop('readonly', !editable);
+        $('#txtShipAddrStreet').val(addr.street || '').prop('readonly', !editable);
+        $('#txtShipAddrCity').val(addr.city || '').prop('readonly', !editable);
+        $('#txtShipAddrZIP').val(addr.zip || '').prop('readonly', !editable);
+        $('#txtShipPhone').val(addr.phone || '').prop('readonly', !editable);
+        $('#txtShipEmail').val(addr.email || '').prop('readonly', !editable);
+        $('#ddlShipCountry').prop('disabled', !editable);
+        $('#shipAddrSaveRow').toggle(editable);
+    }
+
+    $('#ddlShipAddresses').on('select2:select', function (e) {
+        applyShipAddress(String(e.params.data.id));
+    });
+
+    $('.cart-address_btn-save').on('click', function () {
+        $wire.saveDeliveryAddress(
+            $('#txtShipAddrName').val(),
+            $('#txtShipAddrStreet').val(),
+            $('#txtShipAddrCity').val(),
+            $('#txtShipAddrZIP').val(),
+            $('#txtShipPhone').val(),
+            $('#txtShipEmail').val()
+        );
+    });
+
+    $wire.on('address-saved', function (data) {
+        var a = data[0];
+        shipAddresses[String(a.id)] = { name: a.name, street: a.street, city: a.city, zip: a.zip, phone: a.phone, email: a.email };
+
+        var newOption = new Option(a.label, a.id, true, true);
+        $('#ddlShipAddresses').append(newOption).trigger('change');
+
+        applyShipAddress(String(a.id));
+    });
+</script>
+@endscript
