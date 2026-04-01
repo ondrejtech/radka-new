@@ -62,8 +62,7 @@
                         </button>
                     </div>
                     <div class="dropdown-buttons_btn-item">
-                        <a href="#"
-                            {{-- TODO: route('cart.index') --}}
+                        <a href="{{ route('pages.basket.index') }}"
                             class="btn dropdown-buttons_btn basket-info_btn basket-info_btn--show"
                             wire:click.prevent="goToCart"
                         >

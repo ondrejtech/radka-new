@@ -48,7 +48,7 @@ class CartWidget extends Component
 
     public function goToCart(): mixed
     {
-        return $this->redirect(route('cart.index'));
+        return $this->redirect(route('pages.basket.index'));
     }
 
     public function render(): View
