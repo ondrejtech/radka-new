@@ -3,6 +3,7 @@
 namespace App\Livewire\Template;
 
 use App\Models\Product;
+use App\Models\User;
 use App\Services\CartService;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -76,10 +77,12 @@ class Basket extends Component
     {
         $cart = app(CartService::class)->resolveCart();
         $items = $cart->items()->with('product')->orderBy('position')->get();
+        $users = User::with('deliveryAddresses')->get();
 
         return view('livewire.template.basket', [
             'cart' => $cart,
             'items' => $items,
+            'users' => $users
         ]);
     }
 }
