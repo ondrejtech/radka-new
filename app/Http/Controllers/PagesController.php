@@ -22,4 +22,9 @@ class PagesController extends Controller
             'catCode' => $catCode,
         ]);
     }
+
+    public function basket()
+    {
+        return view('pages.cart.index');
+    }
 }
