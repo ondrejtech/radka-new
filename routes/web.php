@@ -12,7 +12,7 @@ Route::get('/', [CategoryController::class, 'home']);
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');
 Route::get('/pages/documents/orderlist', [DocumentController::class, 'order'])->name('pages.documents.orderlist');
-
+Route::get('/pages/documents/order-{orderId}', [DocumentController::class, 'orderItem'])->name('pages.documents.order');
 
 Route::get('/{slug}/product-{proId}', [PagesController::class, 'productDetail'])
     ->where('proId', '\d+')

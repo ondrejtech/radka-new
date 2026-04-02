@@ -8,4 +8,9 @@ class DocumentController extends Controller
     {
         return view('pages.document.orderlist');
     }
+
+    public function orderItem(int $orderId)
+    {
+        return view('pages.document.order', ['orderId' => $orderId]);
+    }
 }
