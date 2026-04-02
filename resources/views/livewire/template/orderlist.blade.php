@@ -215,7 +215,7 @@
                                 <td data-th="Číslo" data-touchtable-el="true"
                                     class="table-col_sym {{ $statusClass }}">
                                     <div class="table-cell_in">
-                                        <a href="#">{{ $order->id }}@if ($order->is_open)
+                                        <a href="#">{{ $order->created_at->format('Y') }}{{ $order->id }}@if ($order->is_open)
                                                 - otevřená
                                             @endif
                                         </a>
