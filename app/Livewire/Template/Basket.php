@@ -251,11 +251,8 @@ class Basket extends Component
         $cart->items()->delete();
 
         $this->dispatch('cart-updated')->to('template.cart-widget');
-        $this->dispatch('message', [
-            'text' => $isOpen ? 'Otevřená objednávka byla vytvořena.' : 'Objednávka byla úspěšně odeslána.',
-            'type' => 'success',
-            'status' => '200',
-        ]);
+
+        $this->redirectRoute('pages.documents.order');
     }
 
     public function render(): View
