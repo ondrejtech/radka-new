@@ -700,162 +700,229 @@
                             <div class="panel-body">
                                 <h3 class="panel-title">Dodací adresa </h3>
                                 @if (auth()->check())
-                                @php
-                                    $addressData = collect([
-                                        (string) auth()->user()->id => [
-                                            'name'   => auth()->user()->first_name . ' ' . auth()->user()->last_name,
-                                            'street' => auth()->user()->street ?? '',
-                                            'city'   => auth()->user()->city ?? '',
-                                            'zip'    => auth()->user()->zip ?? '',
-                                            'phone'  => auth()->user()->phone ?? '',
-                                            'email'  => auth()->user()->email ?? '',
-                                        ],
-                                    ])->merge(
-                                        $users->flatMap->deliveryAddresses->mapWithKeys(fn ($a) => [
-                                            (string) $a->id => [
-                                                'name'   => $a->first_name . ' ' . $a->last_name,
-                                                'street' => $a->street ?? '',
-                                                'city'   => $a->city ?? '',
-                                                'zip'    => $a->zip ?? '',
-                                                'phone'  => $a->phone ?? '',
-                                                'email'  => $a->email ?? '',
+                                    @php
+                                        $addressData = collect([
+                                            (string) auth()->user()->id => [
+                                                'name' => auth()->user()->first_name . ' ' . auth()->user()->last_name,
+                                                'street' => auth()->user()->street ?? '',
+                                                'city' => auth()->user()->city ?? '',
+                                                'zip' => auth()->user()->zip ?? '',
+                                                'phone' => auth()->user()->phone ?? '',
+                                                'email' => auth()->user()->email ?? '',
                                             ],
-                                        ])
-                                    );
-                                @endphp
-                                <div class="form-base">
-                                    <div class="form-base_item">
-                                        <div class="form-group">
-                                            <label for="ddlShipAddresses" class="hide">Adresát</label>
-                                            <select name="ctl00$MainContent$ddlShipAddresses"
-                                                id="ddlShipAddresses"
-                                                title="Vyberte dodací adresu ze seznamu Vašich adres"
-                                                class="form-control js-combo select2-hidden-accessible"
-                                                data-container-css-class="cart-address-choose" tabindex="-1"
-                                                aria-hidden="true">
-                                                <option value="0">Ruční zadání dodací adresy</option>
-                                                <option value="{{ auth()->user()->id }}" selected="selected">
-                                                    {{ auth()->user()->first_name . ', ' . auth()->user()->last_name . ', ' . auth()->user()->street . ', ' . auth()->user()->city . ', ' . auth()->user()->zip }}
-                                                </option>
-                                                @foreach($users as $user)
-                                                    @foreach($user->deliveryAddresses as $address)
-                                                        <option value="{{ $address->id }}">
-                                                            {{ $address->first_name . ' ' . $address->last_name . ', ' . $address->street . ', ' . $address->city . ', ' . $address->zip }}
-                                                        </option>
+                                        ])->merge(
+                                            $users->flatMap->deliveryAddresses->mapWithKeys(
+                                                fn($a) => [
+                                                    (string) $a->id => [
+                                                        'name' => $a->first_name . ' ' . $a->last_name,
+                                                        'street' => $a->street ?? '',
+                                                        'city' => $a->city ?? '',
+                                                        'zip' => $a->zip ?? '',
+                                                        'phone' => $a->phone ?? '',
+                                                        'email' => $a->email ?? '',
+                                                    ],
+                                                ],
+                                            ),
+                                        );
+                                    @endphp
+                                    <div class="form-base">
+                                        <div class="form-base_item">
+                                            <div class="form-group">
+                                                <label for="ddlShipAddresses" class="hide">Adresát</label>
+                                                <select name="ctl00$MainContent$ddlShipAddresses"
+                                                    id="ddlShipAddresses"
+                                                    title="Vyberte dodací adresu ze seznamu Vašich adres"
+                                                    class="form-control js-combo select2-hidden-accessible"
+                                                    data-container-css-class="cart-address-choose" tabindex="-1"
+                                                    aria-hidden="true">
+                                                    <option value="0">Ruční zadání dodací adresy</option>
+                                                    <option value="{{ auth()->user()->id }}" selected="selected">
+                                                        {{ auth()->user()->first_name . ', ' . auth()->user()->last_name . ', ' . auth()->user()->street . ', ' . auth()->user()->city . ', ' . auth()->user()->zip }}
+                                                    </option>
+                                                    @foreach ($users as $user)
+                                                        @foreach ($user->deliveryAddresses as $address)
+                                                            <option value="{{ $address->id }}">
+                                                                {{ $address->first_name . ' ' . $address->last_name . ', ' . $address->street . ', ' . $address->city . ', ' . $address->zip }}
+                                                            </option>
+                                                        @endforeach
                                                     @endforeach
-                                                @endforeach
-                                            </select>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="form-base_item">
-                                        <div class="form-group">
-                                            <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
-                                            <input name="ctl00$MainContent$txtShipAddrName" type="text"
-                                                value="{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}"
-                                                readonly
-                                                maxlength="35" id="txtShipAddrName"
-                                                class="form-control is-required" data-rule-required="true"><span
-                                                class="form-control-validate-info"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-base_item">
-                                        <div class="form-group">
-                                            <label for="txtShipAddrName2">Dovětek názvu</label>
-                                            <input name="ctl00$MainContent$txtShipAddrName2" type="text"
-                                                maxlength="50" id="txtShipAddrName2" class="form-control">
-                                        </div>
-                                    </div>
-                                    <div class="form-base_row">
                                         <div class="form-base_item">
                                             <div class="form-group">
-                                                <label for="txtShipAddrStreet">Ulice</label>
-                                                <input name="ctl00$MainContent$txtShipAddrStreet" type="text"
-                                                    value="{{ auth()->user()->street }}"
-                                                    readonly
-                                                    maxlength="35" id="txtShipAddrStreet"
+                                                <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
+                                                <input name="ctl00$MainContent$txtShipAddrName" type="text"
+                                                    value="{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}"
+                                                    readonly maxlength="35" id="txtShipAddrName"
                                                     class="form-control is-required" data-rule-required="true"><span
                                                     class="form-control-validate-info"></span>
                                             </div>
                                         </div>
                                         <div class="form-base_item">
                                             <div class="form-group">
-                                                <label for="txtShipAddrCity">Město</label>
-                                                <input name="ctl00$MainContent$txtShipAddrCity" type="text"
-                                                    value="{{ auth()->user()->city }}"
-                                                    readonly
-                                                    maxlength="35" id="txtShipAddrCity"
-                                                    class="form-control is-required" data-rule-required="true"><span
-                                                    class="form-control-validate-info"></span>
+                                                <label for="txtShipAddrName2">Dovětek názvu</label>
+                                                <input name="ctl00$MainContent$txtShipAddrName2" type="text"
+                                                    maxlength="50" id="txtShipAddrName2" class="form-control">
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="form-base_row">
-                                        <div class="form-base_item">
-                                            <div class="form-group">
-                                                <label for="txtShipAddrZIP">PSČ</label>
-                                                <input name="ctl00$MainContent$txtShipAddrZIP" type="text"
-                                                    value="{{ auth()->user()->zip }}"
-                                                    readonly
-                                                    maxlength="6" id="txtShipAddrZIP"
-                                                    class="form-control is-required" data-rule-required="true"><span
-                                                    class="form-control-validate-info"></span>
+                                        <div class="form-base_row">
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipAddrStreet">Ulice</label>
+                                                    <input name="ctl00$MainContent$txtShipAddrStreet" type="text"
+                                                        value="{{ auth()->user()->street }}" readonly maxlength="35"
+                                                        id="txtShipAddrStreet" class="form-control is-required"
+                                                        data-rule-required="true"><span
+                                                        class="form-control-validate-info"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipAddrCity">Město</label>
+                                                    <input name="ctl00$MainContent$txtShipAddrCity" type="text"
+                                                        value="{{ auth()->user()->city }}" readonly maxlength="35"
+                                                        id="txtShipAddrCity" class="form-control is-required"
+                                                        data-rule-required="true"><span
+                                                        class="form-control-validate-info"></span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="form-base_item">
-                                            <div class="form-group">
-                                                <label for="ddlShipCountry">Stát</label>
-                                                <div class="ux-combo">
-                                                    <select name="ctl00$MainContent$ddlShipCountry"
-                                                        id="ddlShipCountry" class="form-control ux-combo_field"
-                                                        disabled
-                                                        appenddatabounditem="false">
-                                                        <option selected="selected" value="52">Česká republika</option>
-                                                        <option value="199">Slovenská republika</option>
-                                                    </select>
+                                        <div class="form-base_row">
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipAddrZIP">PSČ</label>
+                                                    <input name="ctl00$MainContent$txtShipAddrZIP" type="text"
+                                                        value="{{ auth()->user()->zip }}" readonly maxlength="6"
+                                                        id="txtShipAddrZIP" class="form-control is-required"
+                                                        data-rule-required="true"><span
+                                                        class="form-control-validate-info"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="ddlShipCountry">Stát</label>
+                                                    <div class="ux-combo">
+                                                        <select name="ctl00$MainContent$ddlShipCountry"
+                                                            id="ddlShipCountry" class="form-control ux-combo_field"
+                                                            disabled appenddatabounditem="false">
+                                                            <option selected="selected" value="52">Česká republika
+                                                            </option>
+                                                            <option value="199">Slovenská republika</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-base_row">
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
+                                                    <input name="ctl00$MainContent$txtShipPhone" type="text"
+                                                        value="{{ auth()->user()->phone }}" readonly maxlength="20"
+                                                        id="txtShipPhone" class="form-control"
+                                                        data-rule-phone="true">
+                                                </div>
+                                            </div>
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
+                                                    <input name="ctl00$MainContent$txtShipEmail" type="text"
+                                                        value="{{ auth()->user()->email }}" readonly maxlength="50"
+                                                        id="txtShipEmail" class="form-control"
+                                                        data-rule-email="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-base_row" id="shipAddrSaveRow" style="display:none">
+                                            <div class="form-base_item">
+                                                <div class="buttons-area">
+                                                    <button class="btn cart-address_btn-save" type="button">
+                                                        <span class="btn_label">Uložit novou dodací adresu</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-base_row">
-                                        <div class="form-base_item">
-                                            <div class="form-group">
-                                                <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
-                                                <input name="ctl00$MainContent$txtShipPhone" type="text"
-                                                    value="{{ auth()->user()->phone }}"
-                                                    readonly
-                                                    maxlength="20" id="txtShipPhone"
-                                                    class="form-control" data-rule-phone="true">
-                                            </div>
-                                        </div>
-                                        <div class="form-base_item">
-                                            <div class="form-group">
-                                                <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
-                                                <input name="ctl00$MainContent$txtShipEmail" type="text"
-                                                    value="{{ auth()->user()->email }}"
-                                                    readonly
-                                                    maxlength="50" id="txtShipEmail"
-                                                    class="form-control" data-rule-email="true">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-base_row" id="shipAddrSaveRow" style="display:none">
-                                        <div class="form-base_item">
-                                            <div class="buttons-area">
-                                                <button class="btn cart-address_btn-save" type="button">
-                                                    <span class="btn_label">Uložit novou dodací adresu</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="alert alert-info">
+                <p><strong>Objednávku budete moci zaplatit online na detailu objednávky:</strong></p>
+
+                <img src="{{ asset('staticcontent/images/platby/visa.png') }}" alt="Visa"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <img src="{{ asset('staticcontent/images/platby/master_card.png') }}" alt="MasterCard"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <br>
+                <br>
+
+                <img src="{{ asset('staticcontent/images/platby/csas.png') }}" alt="Česká spořitelna"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <img src="{{ asset('staticcontent/images/platby/csob.png') }}" alt="ČSOB"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <img src="{{ asset('staticcontent/images/platby/kb.png') }}" alt="Komerční banka"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                {{-- <img src="{{ asset('staticcontent/images/platby/equa.png') }}" alt="Equa bank" style="border: 1px solid silver; margin: 5px; padding: 3px"> --}}
+
+                <img src="{{ asset('staticcontent/images/platby/fio.png') }}" alt="Fio"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <img src="{{ asset('staticcontent/images/platby/era.png') }}" alt="era"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <img src="{{ asset('staticcontent/images/platby/mbank.png') }}" alt="mBank"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <img src="{{ asset('staticcontent/images/platby/moneta.png') }}" alt="MONETA"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <img src="{{ asset('staticcontent/images/platby/rb.png') }}" alt="Raiffeisen BANK"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+
+                <img src="{{ asset('staticcontent/images/platby/unicredit.png') }}" alt="UniCredit"
+                    style="border: 1px solid silver; margin: 5px; padding: 3px">
+
+                <br>
+                <br>
+
+                <p style="color: red"><strong>K celkové částce k úhradě mohou být připočteny poplatky, jako je dopravné
+                        a balné.</strong></p>
+
+            </div>
+            <div class="alert alert-info">
+                
+                <p><strong>Pokud do poznámky v košíku nedoplníte speciální přání / požadavek (například: jen kompletní
+                        dodávka), budou blokované produkty v objednávce ihned předány k expedici.</strong> Díky tomu
+                    budeme schopni vaši objednávku doručit ještě rychleji, než doposud. Při využití poznámky musí
+                    objednávku před expedicí ručně potvrdit náš obchodník.
+                </p>
+                <p>V určitých případech může být expedice odložena i bez uvedení poznámky, například z důvodu potřeby
+                    interního schválení u specifických produktů.
+                </p>
+            </div>
+            <div class="buttons-area cart-send-area">
+                <button onclick="GAAction(11,0,$(this));if(clickValidate(this)) __doPostBack('ctl00$MainContent$ctl05','')" class="btn" type="button" data-open-order="true">
+                        <span class="btn_label">Vytvořit otevřenou objednávku</span>
+                    </button><button onclick="if(testRelPiaMfaConfirm(this)) __doPostBack('ctl00$MainContent$send_order','')" id="send_order" class="btn btn--primary" type="button" title="">
+
+                            <span class="btn_label">Odeslat objednávku</span>
+                    </button>
+            </div>
         </div>
+
+
+
         <div x-show="switchOfferModal" x-transition
             style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.5);"
             @click.self="switchOfferModal = false">
@@ -873,46 +940,53 @@
 </form>
 
 @script
-<script>
-    var shipAddresses = @json($addressData);
+    <script>
+        var shipAddresses = @json($addressData);
 
-    function applyShipAddress(val) {
-        var editable = val === '0';
-        var addr = editable ? {} : (shipAddresses[val] || {});
+        function applyShipAddress(val) {
+            var editable = val === '0';
+            var addr = editable ? {} : (shipAddresses[val] || {});
 
-        $('#txtShipAddrName').val(addr.name || '').prop('readonly', !editable);
-        $('#txtShipAddrStreet').val(addr.street || '').prop('readonly', !editable);
-        $('#txtShipAddrCity').val(addr.city || '').prop('readonly', !editable);
-        $('#txtShipAddrZIP').val(addr.zip || '').prop('readonly', !editable);
-        $('#txtShipPhone').val(addr.phone || '').prop('readonly', !editable);
-        $('#txtShipEmail').val(addr.email || '').prop('readonly', !editable);
-        $('#ddlShipCountry').prop('disabled', !editable);
-        $('#shipAddrSaveRow').toggle(editable);
-    }
+            $('#txtShipAddrName').val(addr.name || '').prop('readonly', !editable);
+            $('#txtShipAddrStreet').val(addr.street || '').prop('readonly', !editable);
+            $('#txtShipAddrCity').val(addr.city || '').prop('readonly', !editable);
+            $('#txtShipAddrZIP').val(addr.zip || '').prop('readonly', !editable);
+            $('#txtShipPhone').val(addr.phone || '').prop('readonly', !editable);
+            $('#txtShipEmail').val(addr.email || '').prop('readonly', !editable);
+            $('#ddlShipCountry').prop('disabled', !editable);
+            $('#shipAddrSaveRow').toggle(editable);
+        }
 
-    $('#ddlShipAddresses').on('select2:select', function (e) {
-        applyShipAddress(String(e.params.data.id));
-    });
+        $('#ddlShipAddresses').on('select2:select', function(e) {
+            applyShipAddress(String(e.params.data.id));
+        });
 
-    $('.cart-address_btn-save').on('click', function () {
-        $wire.saveDeliveryAddress(
-            $('#txtShipAddrName').val(),
-            $('#txtShipAddrStreet').val(),
-            $('#txtShipAddrCity').val(),
-            $('#txtShipAddrZIP').val(),
-            $('#txtShipPhone').val(),
-            $('#txtShipEmail').val()
-        );
-    });
+        $('.cart-address_btn-save').on('click', function() {
+            $wire.saveDeliveryAddress(
+                $('#txtShipAddrName').val(),
+                $('#txtShipAddrStreet').val(),
+                $('#txtShipAddrCity').val(),
+                $('#txtShipAddrZIP').val(),
+                $('#txtShipPhone').val(),
+                $('#txtShipEmail').val()
+            );
+        });
 
-    $wire.on('address-saved', function (data) {
-        var a = data[0];
-        shipAddresses[String(a.id)] = { name: a.name, street: a.street, city: a.city, zip: a.zip, phone: a.phone, email: a.email };
+        $wire.on('address-saved', function(data) {
+            var a = data[0];
+            shipAddresses[String(a.id)] = {
+                name: a.name,
+                street: a.street,
+                city: a.city,
+                zip: a.zip,
+                phone: a.phone,
+                email: a.email
+            };
 
-        var newOption = new Option(a.label, a.id, true, true);
-        $('#ddlShipAddresses').append(newOption).trigger('change');
+            var newOption = new Option(a.label, a.id, true, true);
+            $('#ddlShipAddresses').append(newOption).trigger('change');
 
-        applyShipAddress(String(a.id));
-    });
-</script>
+            applyShipAddress(String(a.id));
+        });
+    </script>
 @endscript
