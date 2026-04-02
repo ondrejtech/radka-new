@@ -648,6 +648,7 @@
                                         <div class="form-group">
                                             <label for="txtBahExtNo">Vaše označení objednávky</label>
                                             <input name="ctl00$MainContent$txtBahExtNo" type="text" maxlength="36"
+                                                wire:model="reference"
                                                 id="txtBahExtNo" class="form-control">
                                         </div>
                                     </div>
@@ -657,7 +658,9 @@
                                     <div class="form-base_item">
                                         <div class="form-group">
                                             <label for="txtBahNote">Poznámka</label>
-                                            <textarea name="ctl00$MainContent$txtBahNote" rows="5" cols="20" id="txtBahNote" class="form-control"></textarea>
+                                            <textarea name="ctl00$MainContent$txtBahNote" rows="5" cols="20"
+                                                wire:model="note"
+                                                id="txtBahNote" class="form-control"></textarea>
                                         </div>
                                     </div>
 
@@ -671,8 +674,7 @@
                                                 <label for="txtDelivDate">Termín dodání</label>
                                                 <input name="ctl00$MainContent$txtDelivDate" type="text"
                                                     maxlength="20"
-                                                    onchange="javascript:setTimeout('__doPostBack(\'ctl00$MainContent$txtDelivDate\',\'\')', 0)"
-                                                    onkeypress="if (WebForm_TextBoxKeyHandler(event) == false) return false;"
+                                                    wire:model="deliveryDate"
                                                     id="txtDelivDate" class="form-control js-datepicker hasDatepicker"
                                                     data-datepicker-validdays="['2026-04-02','2026-04-03','2026-04-06']">
                                                 <i class="icon-question js-tooltip form-control_tooltip-help"
@@ -700,33 +702,8 @@
                             <div class="panel-body">
                                 <h3 class="panel-title">Dodací adresa </h3>
                                 @if (auth()->check())
-                                    @php
-                                        $addressData = collect([
-                                            (string) auth()->user()->id => [
-                                                'name' => auth()->user()->first_name . ' ' . auth()->user()->last_name,
-                                                'street' => auth()->user()->street ?? '',
-                                                'city' => auth()->user()->city ?? '',
-                                                'zip' => auth()->user()->zip ?? '',
-                                                'phone' => auth()->user()->phone ?? '',
-                                                'email' => auth()->user()->email ?? '',
-                                            ],
-                                        ])->merge(
-                                            $users->flatMap->deliveryAddresses->mapWithKeys(
-                                                fn($a) => [
-                                                    (string) $a->id => [
-                                                        'name' => $a->first_name . ' ' . $a->last_name,
-                                                        'street' => $a->street ?? '',
-                                                        'city' => $a->city ?? '',
-                                                        'zip' => $a->zip ?? '',
-                                                        'phone' => $a->phone ?? '',
-                                                        'email' => $a->email ?? '',
-                                                    ],
-                                                ],
-                                            ),
-                                        );
-                                    @endphp
                                     <div class="form-base">
-                                        <div class="form-base_item">
+                                        <div class="form-base_item" wire:ignore>
                                             <div class="form-group">
                                                 <label for="ddlShipAddresses" class="hide">Adresát</label>
                                                 <select name="ctl00$MainContent$ddlShipAddresses"
@@ -754,7 +731,7 @@
                                             <div class="form-group">
                                                 <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
                                                 <input name="ctl00$MainContent$txtShipAddrName" type="text"
-                                                    value="{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}"
+                                                    wire:model="shipName"
                                                     readonly maxlength="35" id="txtShipAddrName"
                                                     class="form-control is-required" data-rule-required="true"><span
                                                     class="form-control-validate-info"></span>
@@ -772,7 +749,8 @@
                                                 <div class="form-group">
                                                     <label for="txtShipAddrStreet">Ulice</label>
                                                     <input name="ctl00$MainContent$txtShipAddrStreet" type="text"
-                                                        value="{{ auth()->user()->street }}" readonly maxlength="35"
+                                                        wire:model="shipStreet"
+                                                        readonly maxlength="35"
                                                         id="txtShipAddrStreet" class="form-control is-required"
                                                         data-rule-required="true"><span
                                                         class="form-control-validate-info"></span>
@@ -782,7 +760,8 @@
                                                 <div class="form-group">
                                                     <label for="txtShipAddrCity">Město</label>
                                                     <input name="ctl00$MainContent$txtShipAddrCity" type="text"
-                                                        value="{{ auth()->user()->city }}" readonly maxlength="35"
+                                                        wire:model="shipCity"
+                                                        readonly maxlength="35"
                                                         id="txtShipAddrCity" class="form-control is-required"
                                                         data-rule-required="true"><span
                                                         class="form-control-validate-info"></span>
@@ -794,7 +773,8 @@
                                                 <div class="form-group">
                                                     <label for="txtShipAddrZIP">PSČ</label>
                                                     <input name="ctl00$MainContent$txtShipAddrZIP" type="text"
-                                                        value="{{ auth()->user()->zip }}" readonly maxlength="6"
+                                                        wire:model="shipZip"
+                                                        readonly maxlength="6"
                                                         id="txtShipAddrZIP" class="form-control is-required"
                                                         data-rule-required="true"><span
                                                         class="form-control-validate-info"></span>
@@ -820,7 +800,8 @@
                                                 <div class="form-group">
                                                     <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
                                                     <input name="ctl00$MainContent$txtShipPhone" type="text"
-                                                        value="{{ auth()->user()->phone }}" readonly maxlength="20"
+                                                        wire:model="shipPhone"
+                                                        readonly maxlength="20"
                                                         id="txtShipPhone" class="form-control"
                                                         data-rule-phone="true">
                                                 </div>
@@ -829,7 +810,8 @@
                                                 <div class="form-group">
                                                     <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
                                                     <input name="ctl00$MainContent$txtShipEmail" type="text"
-                                                        value="{{ auth()->user()->email }}" readonly maxlength="50"
+                                                        wire:model="shipEmail"
+                                                        readonly maxlength="50"
                                                         id="txtShipEmail" class="form-control"
                                                         data-rule-email="true">
                                                 </div>
@@ -841,6 +823,73 @@
                                                     <button class="btn cart-address_btn-save" type="button">
                                                         <span class="btn_label">Uložit novou dodací adresu</span>
                                                     </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="form-base">
+                                        <div class="form-base_item">
+                                            <div class="form-group">
+                                                <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
+                                                <input type="text" wire:model="shipName" maxlength="35"
+                                                    id="txtShipAddrName" class="form-control is-required"><span
+                                                    class="form-control-validate-info"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-base_row">
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipAddrStreet">Ulice</label>
+                                                    <input type="text" wire:model="shipStreet" maxlength="35"
+                                                        id="txtShipAddrStreet" class="form-control is-required"><span
+                                                        class="form-control-validate-info"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipAddrCity">Město</label>
+                                                    <input type="text" wire:model="shipCity" maxlength="35"
+                                                        id="txtShipAddrCity" class="form-control is-required"><span
+                                                        class="form-control-validate-info"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-base_row">
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipAddrZIP">PSČ</label>
+                                                    <input type="text" wire:model="shipZip" maxlength="10"
+                                                        id="txtShipAddrZIP" class="form-control is-required"><span
+                                                        class="form-control-validate-info"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="ddlShipCountry">Stát</label>
+                                                    <div class="ux-combo">
+                                                        <select wire:model="shipCountry" id="ddlShipCountry"
+                                                            class="form-control ux-combo_field">
+                                                            <option value="Česká republika">Česká republika</option>
+                                                            <option value="Slovenská republika">Slovenská republika</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-base_row">
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
+                                                    <input type="text" wire:model="shipPhone" maxlength="20"
+                                                        id="txtShipPhone" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="form-base_item">
+                                                <div class="form-group">
+                                                    <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
+                                                    <input type="text" wire:model="shipEmail" maxlength="50"
+                                                        id="txtShipEmail" class="form-control">
                                                 </div>
                                             </div>
                                         </div>
@@ -912,12 +961,14 @@
                 </p>
             </div>
             <div class="buttons-area cart-send-area">
-                <button onclick="GAAction(11,0,$(this));if(clickValidate(this)) __doPostBack('ctl00$MainContent$ctl05','')" class="btn" type="button" data-open-order="true">
-                        <span class="btn_label">Vytvořit otevřenou objednávku</span>
-                    </button><button onclick="if(testRelPiaMfaConfirm(this)) __doPostBack('ctl00$MainContent$send_order','')" id="send_order" class="btn btn--primary" type="button" title="">
-
-                            <span class="btn_label">Odeslat objednávku</span>
-                    </button>
+                @if(auth()->check())
+                <button wire:click="placeOrder(true)" wire:loading.attr="disabled" class="btn" type="button">
+                    <span class="btn_label">Vytvořit otevřenou objednávku</span>
+                </button>
+                @endif
+                <button wire:click="placeOrder(false)" wire:loading.attr="disabled" id="send_order" class="btn btn--primary" type="button">
+                    <span class="btn_label">Odeslat objednávku</span>
+                </button>
             </div>
         </div>
 
@@ -955,7 +1006,19 @@
             $('#txtShipEmail').val(addr.email || '').prop('readonly', !editable);
             $('#ddlShipCountry').prop('disabled', !editable);
             $('#shipAddrSaveRow').toggle(editable);
+
+            $wire.applyAddress(
+                addr.name    || '',
+                addr.street  || '',
+                addr.city    || '',
+                addr.zip     || '',
+                addr.phone   || '',
+                addr.email   || ''
+            );
         }
+
+        // inicializuj shipping properties z výchozí hodnoty selectu
+        applyShipAddress($('#ddlShipAddresses').val() || @json(auth()->check() ? (string) auth()->id() : '0'));
 
         $('#ddlShipAddresses').on('select2:select', function(e) {
             applyShipAddress(String(e.params.data.id));
@@ -973,7 +1036,7 @@
         });
 
         $wire.on('address-saved', function(data) {
-            var a = data[0];
+            var a = data;
             shipAddresses[String(a.id)] = {
                 name: a.name,
                 street: a.street,
