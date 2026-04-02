@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Livewire\Template;
+
+use App\Models\Order as OrderModel;
+use Illuminate\View\View;
+use Livewire\Component;
+
+class Order extends Component
+{
+    public int $orderId;
+
+    public function mount(int $orderId): void
+    {
+        $this->orderId = $orderId;
+    }
+
+    public function render(): View
+    {
+        $order = OrderModel::with(['statusOrder', 'items'])
+            ->when(
+                auth()->check(),
+                fn ($q) => $q->where('user_id', auth()->id()),
+                fn ($q) => $q->where('session_id', session()->getId()),
+            )
+            ->findOrFail($this->orderId);
+
+        return view('livewire.template.order', ['order' => $order]);
+    }
+}
