@@ -479,162 +479,106 @@
                                     <div class="form-base_item">
 
                                         <div class="form-group">
-                                            <div class="dropdown dropdown-multi cart-transport-choose">
+                                            <div x-data="{ selectedName: 'Zvolte dopravu', selectedId: '' }"
+                                                wire:ignore
+                                                class="dropdown dropdown-multi cart-transport-choose">
                                                 <button class="btn dropdown-toggle" type="button"
                                                     data-toggle="dropdown" aria-haspopup="true"
                                                     aria-expanded="false">
                                                     <span class="dropdown-multi_toggle_in">
-
-                                                        <span class="dropdown-multi_toggle_text">Zvolte dopravu</span>
-
+                                                        <span class="dropdown-multi_toggle_text" x-text="selectedName"></span>
                                                     </span>
                                                     <span class="dropdown-caret"></span>
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu--scroll">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl01$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_0" type="button"
-                                                        class="dropdown-item" value="46">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '46' }"
+                                                        @click="selectedId = '46'; selectedName = 'Balík'; $wire.set('transportId', '46')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong
-                                                                    class="cart-transport-choose_name">Balík</strong>
-
+                                                                <strong class="cart-transport-choose_name">Balík</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">25&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl01$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_0" value="46">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl02$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_1" type="button"
-                                                        class="dropdown-item" value="3">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '3' }"
+                                                        @click="selectedId = '3'; selectedName = 'Osobně Ostrava'; $wire.set('transportId', '3')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">Osobně
-                                                                    Ostrava</strong>
-
+                                                                <strong class="cart-transport-choose_name">Osobně Ostrava</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">25&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl02$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_1" value="3">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl03$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_2" type="button"
-                                                        class="dropdown-item" value="105">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '105' }"
+                                                        @click="selectedId = '105'; selectedName = 'ČP balík'; $wire.set('transportId', '105')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">ČP
-                                                                    balík</strong>
-
+                                                                <strong class="cart-transport-choose_name">ČP balík</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">25&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl03$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_2" value="105">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl04$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_3" type="button"
-                                                        class="dropdown-item" value="47">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '47' }"
+                                                        @click="selectedId = '47'; selectedName = 'Dobírka'; $wire.set('transportId', '47')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong
-                                                                    class="cart-transport-choose_name">Dobírka</strong>
-
+                                                                <strong class="cart-transport-choose_name">Dobírka</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">55&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">55&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl04$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_3" value="47">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl05$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_4" type="button"
-                                                        class="dropdown-item" value="36">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '36' }"
+                                                        @click="selectedId = '36'; selectedName = 'DPD EX.12'; $wire.set('transportId', '36')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">DPD
-                                                                    EX.12</strong>
-
+                                                                <strong class="cart-transport-choose_name">DPD EX.12</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">150&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">150&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl05$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_4" value="36">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl06$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_5" type="button"
-                                                        class="dropdown-item" value="37">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '37' }"
+                                                        @click="selectedId = '37'; selectedName = 'DPD EX.12 dob.'; $wire.set('transportId', '37')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">DPD EX.12
-                                                                    dob.</strong>
-
+                                                                <strong class="cart-transport-choose_name">DPD EX.12 dob.</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">180&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">180&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl06$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_5" value="37">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl07$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_6" type="button"
-                                                        class="dropdown-item" value="256">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '256' }"
+                                                        @click="selectedId = '256'; selectedName = 'DPD PickupPoint dob.'; $wire.set('transportId', '256')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">DPD
-                                                                    PickupPoint dob.</strong>
-
+                                                                <strong class="cart-transport-choose_name">DPD PickupPoint dob.</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">55&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">55&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl07$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_6" value="256">
 
-                                                    <button
-                                                        onclick="__doPostBack('ctl00$MainContent$rptTransportList$ctl08$rbTra','')"
-                                                        id="MainContent_rptTransportList_rbTra_7" type="button"
-                                                        class="dropdown-item" value="103">
+                                                    <button type="button" class="dropdown-item"
+                                                        :class="{ 'active': selectedId === '103' }"
+                                                        @click="selectedId = '103'; selectedName = 'Expres OVA'; $wire.set('transportId', '103')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">Expres
-                                                                    OVA</strong>
-
+                                                                <strong class="cart-transport-choose_name">Expres OVA</strong>
                                                             </span>
-                                                            <strong
-                                                                class="cart-transport-choose_price">25&nbsp;Kč</strong>
+                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
                                                         </span>
                                                     </button>
-                                                    <input type="hidden"
-                                                        name="ctl00$MainContent$rptTransportList$ctl08$hdnTraID"
-                                                        id="MainContent_rptTransportList_hdnTraID_7" value="103">
 
                                                 </div>
                                             </div>
