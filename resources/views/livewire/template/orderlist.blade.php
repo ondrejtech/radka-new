@@ -61,7 +61,7 @@
                                         <option value="0"></option>
                                         <option value="4">Osobně</option>
                                         <option value="6">eDlink</option>
-                                        <option value="57">eD SHOP - CZ</option>
+                                        <option value="57">techDomov - CZ</option>
                                         <option value="37">Datová výměna</option>
                                     </select>
                                 </div>
@@ -226,7 +226,7 @@
                                     {{ $order->created_at->format('d.m.Y') }}</td>
                                 <td data-th="Cena" data-touchtable-el="true" class="table-col_price">
                                     {{ number_format($order->total_without_vat, 2, ',', ' ') }}&nbsp;Kč</td>
-                                <td data-th="Objednáno" class="table-col_order-from">eD SHOP</td>
+                                <td data-th="Objednáno" class="table-col_order-from">techDomov</td>
                                 <td data-th="Doprava" class="table-col_transport">
                                     {{ $transportNames[$order->transport_id] ?? '' }}</td>
                                 <td data-th="Adresa dodání" class="table-col_address">{{ $order->ship_name }},
@@ -271,7 +271,7 @@
 
 
                     <div class="buttons-area">
-                        <input type="submit" name="ctl00$MainContent$btnExport" value="Export do XML"
+                        <input type="button" wire:click="exportXml" value="Export do XML"
                             id="MainContent_btnExport" class="btn btn--export">
                     </div>
                 </div>

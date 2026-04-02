@@ -3,6 +3,7 @@
 namespace App\Livewire\Template;
 
 use App\Models\Order as OrderModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -91,9 +92,62 @@ class OrderList extends Component
         ]);
     }
 
+    public function exportXml(): mixed
+    {
+        $orders = $this->buildQuery()->with(['statusOrder', 'items'])->get();
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+
+        $root = $dom->createElement('orders');
+        $dom->appendChild($root);
+
+        foreach ($orders as $order) {
+            $orderEl = $dom->createElement('order');
+
+            foreach ($order->getAttributes() as $key => $value) {
+                $xmlKey = $key === 'id' ? 'order_number' : $key;
+                $xmlValue = $key === 'id'
+                    ? $order->created_at->format('Y').$value
+                    : (string) ($value ?? '');
+                $el = $dom->createElement($xmlKey);
+                $el->appendChild($dom->createTextNode($xmlValue));
+                $orderEl->appendChild($el);
+            }
+
+            $itemsEl = $dom->createElement('items');
+            foreach ($order->items as $item) {
+                $itemEl = $dom->createElement('item');
+                foreach ($item->getAttributes() as $key => $value) {
+                    $el = $dom->createElement($key);
+                    $el->appendChild($dom->createTextNode((string) ($value ?? '')));
+                    $itemEl->appendChild($el);
+                }
+                $itemsEl->appendChild($itemEl);
+            }
+            $orderEl->appendChild($itemsEl);
+            $root->appendChild($orderEl);
+        }
+
+        $xml = $dom->saveXML();
+
+        return response()->streamDownload(
+            fn () => print ($xml),
+            'orders-'.now()->format('Y-m-d').'.xml',
+            ['Content-Type' => 'application/xml'],
+        );
+    }
+
     public function render(): View
     {
-        $orders = OrderModel::with(['statusOrder', 'items'])
+        $orders = $this->buildQuery()->with(['statusOrder', 'items'])->paginate($this->perPage);
+
+        return view('livewire.template.orderlist', ['orders' => $orders]);
+    }
+
+    private function buildQuery(): Builder
+    {
+        return OrderModel::query()
             ->when(
                 auth()->check(),
                 fn ($q) => $q->where('user_id', auth()->id()),
@@ -106,10 +160,7 @@ class OrderList extends Component
             ->when($this->dateTo !== '', fn ($q) => $q->whereDate('created_at', '<=', $this->dateTo))
             ->when($this->filterStatus !== '', fn ($q) => $q->where('status_order_id', $this->filterStatus))
             ->when($this->filterOpen !== '-1', fn ($q) => $q->where('is_open', $this->filterOpen === '1'))
-            ->latest()
-            ->paginate($this->perPage);
-
-        return view('livewire.template.orderlist', ['orders' => $orders]);
+            ->latest();
     }
 
     private function resolveOrder(int $orderId): ?OrderModel
