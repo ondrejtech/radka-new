@@ -215,7 +215,7 @@
                                 <td data-th="Číslo" data-touchtable-el="true"
                                     class="table-col_sym {{ $statusClass }}">
                                     <div class="table-cell_in">
-                                        <a href="#">{{ $order->created_at->format('Y') }}{{ $order->id }}@if ($order->is_open)
+                                        <a href="{{ route('pages.documents.order', ['orderId' => $order->id]) }}">{{ $order->created_at->format('Y') }}{{ $order->id }}@if ($order->is_open)
                                                 - otevřená
                                             @endif
                                         </a>
@@ -246,7 +246,7 @@
 
                                     <a title="Zobrazit položky objednávky"
                                         class="btn btn--icon btn--item-show-detail js-tooltip" href="#">
-                                        <i class="icon-list btn_icon"></i>
+                                        <i wire:click='orderDetailRedirect({{ $order->id}})' class="icon-list btn_icon"></i>
                                     </a>
 
                                     <a href="#" target="_blank"
