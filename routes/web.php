@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AresController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +11,8 @@ Route::get('/', [CategoryController::class, 'home']);
 
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');
+Route::get('/pages/documents/orderlist', [DocumentController::class, 'order'])->name('pages.documents.orderlist');
+
 
 Route::get('/{slug}/product-{proId}', [PagesController::class, 'productDetail'])
     ->where('proId', '\d+')

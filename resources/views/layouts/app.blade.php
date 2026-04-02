@@ -26,11 +26,14 @@
     <link rel="stylesheet" href="{{ asset('assets/bundles/css/productcompare.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bundles/css/product-view.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/bundles/css/basket.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bundles/css/documents.css') }}">
 
 	<script src="{{ asset('assets/bundles/js/main.js') }}"></script>
     <script src="{{ asset('assets/bundles/js/product.js')}}"></script>
     {{-- <script src="{{ asset('assets/bundles/js/productcompare.js') }}"></script> --}}
 	<script src="{{ asset('asets/bundles/js/basket.js') }}"></script>
+    <script src="{{ asset('assets/bundles/js/orderdetail.js') }}"></script>
+    <script src="{{ asset('assets/bundles/js/documentlist.js') }}"></script>
 
 	<script>
 	    var g_cur_ID = 8;
