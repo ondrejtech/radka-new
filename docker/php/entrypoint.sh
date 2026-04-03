@@ -18,10 +18,9 @@ if [ "${1}" = "php-fpm" ]; then
     echo "[entrypoint] Running database migrations..."
     php artisan migrate --force
 
-    echo "[entrypoint] Caching config / routes / views..."
+    echo "[entrypoint] Caching config / routes..."
     php artisan config:cache
     php artisan route:cache
-    php artisan view:cache
 
     echo "[entrypoint] Application ready."
 fi
