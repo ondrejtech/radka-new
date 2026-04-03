@@ -13,15 +13,15 @@ mkdir -p \
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-# Run only for the main php-fpm container, not for queue workers
+# Always regenerate package discovery cache (removes stale dev providers)
+echo "[entrypoint] Caching config / routes..."
+php artisan config:cache
+php artisan route:cache
+
+# Run migrations only for the main php-fpm container
 if [ "${1}" = "php-fpm" ]; then
     echo "[entrypoint] Running database migrations..."
     php artisan migrate --force
-
-    echo "[entrypoint] Caching config / routes..."
-    php artisan config:cache
-    php artisan route:cache
-
     echo "[entrypoint] Application ready."
 fi
 
