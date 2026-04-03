@@ -18,22 +18,11 @@ FROM php:8.4-fpm-alpine AS app
 
 WORKDIR /var/www/html
 
-RUN apk add --no-cache \
-        bash \
-        curl \
-        freetype-dev \
-        icu-dev \
-        libjpeg-turbo-dev \
-        libpng-dev \
-        libwebp-dev \
-        libxml2-dev \
-        libzip-dev \
-        oniguruma-dev \
-    && docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
-        --with-webp \
-    && docker-php-ext-install \
+# install-php-extensions handles all system deps and build tools automatically
+COPY --from=mlocati/docker-php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN apk add --no-cache bash curl \
+    && install-php-extensions \
         bcmath \
         ctype \
         fileinfo \
@@ -42,11 +31,10 @@ RUN apk add --no-cache \
         mbstring \
         opcache \
         pdo_mysql \
+        redis \
         tokenizer \
         xml \
-        zip \
-    && pecl install redis \
-    && docker-php-ext-enable redis opcache
+        zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
