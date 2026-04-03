@@ -19,7 +19,7 @@ FROM php:8.4-fpm-alpine AS app
 WORKDIR /var/www/html
 
 # install-php-extensions handles all system deps and build tools automatically
-COPY --from=mlocati/docker-php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN apk add --no-cache bash curl \
     && install-php-extensions \
