@@ -252,7 +252,7 @@ class Basket extends Component
 
         $this->dispatch('cart-updated')->to('template.cart-widget');
 
-        $this->redirectRoute('pages.documents.order');
+        $this->redirectRoute('pages.documents.order', ['orderId' => $order->id]);
     }
 
     public function render(): View
