@@ -13,7 +13,13 @@ mkdir -p \
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-# Always regenerate package discovery cache (removes stale dev providers)
+# Remove stale bootstrap cache before booting Laravel
+# (prevents dev-only providers from being loaded)
+rm -f bootstrap/cache/packages.php \
+      bootstrap/cache/services.php \
+      bootstrap/cache/config.php \
+      bootstrap/cache/routes-v7.php
+
 echo "[entrypoint] Caching config / routes..."
 php artisan config:cache
 php artisan route:cache
