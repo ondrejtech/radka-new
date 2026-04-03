@@ -1,0 +1,75 @@
+services:
+
+  # ─── PHP-FPM application ────────────────────────────────────
+  app:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - techdomov
+
+  # ─── Nginx (reverse proxy to php-fpm + static files) ────────
+  nginx:
+    build:
+      context: .
+      target: nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"      # NPM proxuje na port 8080 tohoto LXC
+    depends_on:
+      - app
+    networks:
+      - techdomov
+
+  # ─── MySQL 8 ────────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    networks:
+      - techdomov
+
+  # ─── Queue worker ────────────────────────────────────────────
+  queue:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--timeout=90"]
+    env_file: .env
+    volumes:
+      - storage:/var/www/html/storage
+    depends_on:
+      app:
+        condition: service_started
+      db:
+        condition: service_healthy
+    networks:
+      - techdomov
+
+networks:
+  techdomov:
+    driver: bridge
+
+volumes:
+  db_data:
+  storage:

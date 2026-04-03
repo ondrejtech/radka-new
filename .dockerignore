@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.env.example
+node_modules
+/public/build
+/public/IMGCACHE
+storage/logs/*.log
+storage/framework/cache/data
+storage/framework/sessions
+storage/framework/views
+vendor
+tests
+phpunit.xml
+PRIVATEdoc.pdf
+*.md
