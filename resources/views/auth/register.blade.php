@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Registrace uživatele | eD system a.s.')
+@section('title', 'Registrace uživatele | {{ config('app.name') }}')
 
 @push('styles')
     <link href="{{ asset('assets/bundles/css/registration.css') }}" rel="stylesheet"/>
@@ -273,7 +273,7 @@
                                 <input id="chkbLegalCondition" type="checkbox" name="terms_accepted" value="1"
                                     {{ old('terms_accepted') ? 'checked' : '' }}>
                                 <label for="chkbLegalCondition">
-                                    Souhlasím s <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=15616" target="_blank">obchodními podmínkami</a> společnosti eD system a.s., seznámil(a) jsem se se <a href="/zpracovani-osobnich-udaju/article2-cgdpr" target="_blank">zásadami zpracování osobních údajů</a>
+                                    Souhlasím s <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=15616" target="_blank">obchodními podmínkami</a> společnosti {{ config('app.name') }}, seznámil(a) jsem se se <a href="/zpracovani-osobnich-udaju/article2-cgdpr" target="_blank">zásadami zpracování osobních údajů</a>
                                 </label>
                             </span>
                             @error('terms_accepted')
