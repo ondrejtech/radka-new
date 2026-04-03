@@ -9564,6 +9564,7 @@ function lazyImage(action) {
 
 // metoda ktera do stranky prida tlacitko pro zobrazeni wizarda
 function btnShowWizard() {
+	return;
 	var btnId = 'btnShowWizard';
 
 	if ($('#' + btnId).length > 0) {
