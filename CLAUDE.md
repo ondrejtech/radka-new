@@ -74,6 +74,84 @@ public/
 - Vždy piš migration soubory
 - Nikdy neupravuj schéma ručně
 
+## PayPal integrace
+
+### Balíček: blendbyte/paypal
+- GitHub: https://github.com/blendbyte/laravel-paypal
+- Fork od `srmklive/laravel-paypal` modernizovaný pro PHP 8.2+ a Laravel 12/13
+- Drop-in replacement — stejné API, pouze jiný namespace: `Blendbyte\PayPal` místo `Srmklive\PayPal`
+
+### Instalace
+```bash
+composer require blendbyte/paypal
+php artisan vendor:publish --provider "Blendbyte\PayPal\Providers\PayPalServiceProvider"
+```
+
+### .env proměnné
+```
+PAYPAL_MODE=sandbox
+PAYPAL_SANDBOX_CLIENT_ID=
+PAYPAL_SANDBOX_CLIENT_SECRET=
+PAYPAL_LIVE_CLIENT_ID=
+PAYPAL_LIVE_CLIENT_SECRET=
+PAYPAL_LIVE_APP_ID=
+```
+
+### Inicializace
+```php
+use Blendbyte\PayPal\Services\PayPal as PayPalClient;
+
+$provider = new PayPalClient;
+$provider->getAccessToken(); // vždy volat před API metodami
+```
+
+### Objednávky (Orders)
+```php
+$order = $provider->createOrder([
+    'intent' => 'CAPTURE',
+    'purchase_units' => [
+        ['amount' => ['currency_code' => 'CZK', 'value' => '100.00']],
+    ],
+]);
+$provider->capturePaymentOrder($orderId);
+$provider->showOrderDetails($orderId);
+```
+
+### Webhooks
+```php
+$provider->createWebHook('https://www.techdomov.eu/paypal/webhook', ['PAYMENT.CAPTURE.COMPLETED']);
+
+// Verifikace příchozího webhooку
+$provider->verifyWebHook([
+    'auth_algo'         => $request->header('PAYPAL-AUTH-ALGO'),
+    'cert_url'          => $request->header('PAYPAL-CERT-URL'),
+    'transmission_id'   => $request->header('PAYPAL-TRANSMISSION-ID'),
+    'transmission_sig'  => $request->header('PAYPAL-TRANSMISSION-SIG'),
+    'transmission_time' => $request->header('PAYPAL-TRANSMISSION-TIME'),
+    'webhook_id'        => 'your-webhook-id',
+    'webhook_event'     => $request->all(),
+]);
+```
+
+### Refundy
+```php
+$provider->refundCapturedPayment($captureId, $invoiceId, $amount, $note);
+```
+
+### Subscription helpers (fluent API)
+```php
+$provider->addProduct('Název', 'Popis', 'SERVICE', 'SOFTWARE')
+    ->addMonthlyPlan('Plán', 'Popis', 100)
+    ->setReturnAndCancelUrl('https://...', 'https://...')
+    ->setupSubscription('Jan Novak', 'jan@example.com', '2026-01-01');
+```
+
+### Pravidla použití
+- Vždy volat `getAccessToken()` před jakoukoliv API metodou
+- Logiku volání PayPal API umísťovat do `app/Services/PayPalService.php`
+- Webhook endpointy vyjmout z CSRF ochrany v `bootstrap/app.php`
+- Nikdy nelogovat `client_secret` ani access tokeny
+
 ## Co NIKDY nedělat
 - Nikdy nevymýšlej hodnoty (API klíče, URL, názvy tabulek)
 - Nikdy neměň .env soubor
