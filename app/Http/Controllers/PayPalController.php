@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\InvoiceService;
 use App\Services\PayPalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -12,7 +13,10 @@ use Illuminate\Support\Facades\Log;
 
 class PayPalController extends Controller
 {
-    public function __construct(private readonly PayPalService $payPalService) {}
+    public function __construct(
+        private readonly PayPalService $payPalService,
+        private readonly InvoiceService $invoiceService,
+    ) {}
 
     /**
      * Create PayPal order and redirect to PayPal approval page.
@@ -57,6 +61,8 @@ class PayPalController extends Controller
             return redirect()->route('pages.documents.order', ['orderId' => $order->id])
                 ->with('error', 'Platba se nezdařila. Zkuste to prosím znovu.');
         }
+
+        $this->invoiceService->createFromOrder($order);
 
         return redirect()->route('pages.documents.order', ['orderId' => $order->id])
             ->with('success', 'Platba proběhla úspěšně.');
