@@ -46,11 +46,11 @@ Route::middleware('auth')->prefix('paypal')->name('paypal.')->group(function ():
     Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
 });
 
-// PayPal – hosté (podepsané URL)
+// PayPal – hosté
 Route::prefix('paypal/guest')->name('paypal.guest.')->group(function (): void {
     Route::post('/order/{order}/create', [PayPalController::class, 'createOrder'])->name('order.create');
-    Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success')->middleware('signed');
-    Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel')->middleware('signed');
+    Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success');
+    Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
 });
 
 // PayPal webhook – bez CSRF, bez auth

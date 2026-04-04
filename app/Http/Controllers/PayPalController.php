@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Services\PayPalService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,20 +17,19 @@ class PayPalController extends Controller
     /**
      * Create PayPal order and redirect to PayPal approval page.
      */
-    public function createOrder(Request $request, Order $order): RedirectResponse
+    public function createOrder(Request $request, Order $order): JsonResponse
     {
         $this->authorizeOrder($request, $order);
 
         if ($order->payment_status === 'paid') {
-            return redirect()->route('pages.documents.order', ['orderId' => $order->id])
-                ->with('error', 'Tato objednávka je již zaplacena.');
+            return response()->json(['error' => 'Tato objednávka je již zaplacena.'], 422);
         }
 
         $isGuest = ! auth()->check();
 
         if ($isGuest) {
-            $returnUrl = URL::signedRoute('paypal.guest.order.success', ['order' => $order->id]);
-            $cancelUrl = URL::signedRoute('paypal.guest.order.cancel', ['order' => $order->id]);
+            $returnUrl = route('paypal.guest.order.success', ['order' => $order->id]);
+            $cancelUrl = route('paypal.guest.order.cancel', ['order' => $order->id]);
         } else {
             $returnUrl = route('paypal.order.success', ['order' => $order->id]);
             $cancelUrl = route('paypal.order.cancel', ['order' => $order->id]);
@@ -38,10 +38,10 @@ class PayPalController extends Controller
         try {
             $approvalUrl = $this->payPalService->createOrder($order, $returnUrl, $cancelUrl);
         } catch (\RuntimeException $e) {
-            return back()->with('error', $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
-        return redirect()->away($approvalUrl);
+        return response()->json(['url' => $approvalUrl]);
     }
 
     /**
