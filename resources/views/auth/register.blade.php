@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Registrace uživatele | {{ config('app.name') }}')
+@section('title', 'Registrace uživatele | ' . config('app.name'))
 
 @push('styles')
     <link href="{{ asset('assets/bundles/css/registration.css') }}" rel="stylesheet"/>
