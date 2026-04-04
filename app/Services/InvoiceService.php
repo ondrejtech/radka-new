@@ -14,8 +14,15 @@ class InvoiceService
     {
         $order->loadMissing(['items', 'user']);
 
+        $docNumber = now()->year.$order->id;
+
         $invoice = Invoice::create([
-            'order_number' => $order->reference ?: (string) $order->id,
+            'currency_id' => 1,
+            'partner_id' => $order->user_id,
+            'recurring_invoice_id' => null,
+            'sales_order_id' => null,
+            'variable_symbol' => $docNumber,
+            'order_number' => $docNumber,
             'date_of_issue' => $order->created_at->toDateString(),
             'date_of_maturity' => $order->created_at->toDateString(),
             'date_of_payment' => now()->toDateString(),
@@ -23,9 +30,12 @@ class InvoiceService
             'date_of_accounting_event' => now()->toDateString(),
             'note' => $order->note,
             'payment_option_id' => 9, // PayPal
+            'discount_type' => 0, // None
             'payment_status' => 1, // Paid
-            'vat_regime' => 1, // VatRegime
+            'exported' => 0, // NotExported
             'report_language' => 1, // Cz
+            'vat_on_pay_status' => 0, // Disabled
+            'vat_regime' => 0, // NonVatRegime
             'is_income_tax' => true,
             'my_address' => $this->buildMyAddress(),
             'partner_address' => $this->buildPartnerAddress($order),
