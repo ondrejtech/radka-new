@@ -26,6 +26,9 @@ class Order extends Model
         'ship_email',
         'total_without_vat',
         'total_with_vat',
+        'paypal_order_id',
+        'paypal_capture_id',
+        'payment_status',
     ];
 
     protected function casts(): array

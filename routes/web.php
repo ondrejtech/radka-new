@@ -4,8 +4,10 @@ use App\Http\Controllers\AresController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 
 Route::get('/', [CategoryController::class, 'home']);
 
@@ -36,5 +38,22 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/ares/lookup/{ico}', [AresController::class, 'lookup'])->name('ares.lookup');
+
+// PayPal – přihlášení uživatelé
+Route::middleware('auth')->prefix('paypal')->name('paypal.')->group(function (): void {
+    Route::post('/order/{order}/create', [PayPalController::class, 'createOrder'])->name('order.create');
+    Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success');
+    Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
+});
+
+// PayPal – hosté (podepsané URL)
+Route::prefix('paypal/guest')->name('paypal.guest.')->group(function (): void {
+    Route::post('/order/{order}/create', [PayPalController::class, 'createOrder'])->name('order.create');
+    Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success')->middleware('signed');
+    Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel')->middleware('signed');
+});
+
+// PayPal webhook – bez CSRF, bez auth
+Route::post('/paypal/webhook', [PayPalController::class, 'webhook'])->name('paypal.webhook');
 
 require __DIR__.'/auth.php';
