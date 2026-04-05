@@ -17,7 +17,7 @@ class Order extends Component
 
     public function render(): View
     {
-        $order = OrderModel::with(['statusOrder', 'items'])
+        $order = OrderModel::with(['statusOrder', 'items', 'invoice'])
             ->when(
                 auth()->check(),
                 fn ($q) => $q->where('user_id', auth()->id()),
