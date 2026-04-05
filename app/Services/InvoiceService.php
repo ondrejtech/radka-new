@@ -17,6 +17,7 @@ class InvoiceService
         $docNumber = now()->year.$order->id;
 
         $invoice = Invoice::create([
+            'order_id' => $order->id,
             'currency_id' => 1,
             'partner_id' => $order->user_id,
             'recurring_invoice_id' => null,
