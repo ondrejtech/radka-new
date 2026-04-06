@@ -27,4 +27,48 @@ class PagesController extends Controller
     {
         return view('pages.cart.index');
     }
+
+    public function companyMarketing()
+    {
+        return view('pages.company-marketing');
+    }
+
+    public function processingPersonalInfo()
+    {
+        return view('pages.processing-personal-info');
+    }
+
+    public function contact()
+    {
+        $persons = [
+            [
+                'id' => 202601,
+                'name' => 'Zdena Altmanova',
+                'role' => 'Jednatel/ka spolecnosti',
+                'phone' => '721 178 847',
+                'email' => 'altmanova@techdomoc.eu',
+                'role_title' => 'obchodní informace',
+            ],
+            [
+                'id' => 202602,
+                'name' => 'Lubos Petr',
+                'role' => 'Obchodni manazer',
+                'phone' => '721 178 847',
+                'email' => 'petr@techdomov.eu',
+                'role_title' => 'obchodní informace',
+            ],
+            [
+                'id' => 202603,
+                'name' => 'Petr Jakubicek',
+                'role' => 'Obchodni manazer',
+                'phone' => '721 178 847',
+                'email' => 'jakubicek@techdomov.eu',
+                'role_title' => 'obchodní informace',
+            ],
+        ];
+
+        return view('pages.contact', [
+            'persons' => array_map(fn (array $p) => (object) $p, $persons),
+        ]);
+    }
 }

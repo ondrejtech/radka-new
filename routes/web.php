@@ -11,8 +11,15 @@ Route::get('/', [CategoryController::class, 'home']);
 
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');
+Route::get('/pages/company-marketing', [PagesController::class, 'companyMarketing'])->name('pages.company-marketing');
+Route::get('/pages/processing-personal-info', [PagesController::class, 'processingPersonalInfo'])->name('pages.processing-personal-info');
+Route::get('/pages/contanct', [PagesController::class, 'contact'])->name('pages.contact');
+
 Route::get('/pages/documents/orderlist', [DocumentController::class, 'order'])->name('pages.documents.orderlist');
 Route::get('/pages/documents/order-{orderId}', [DocumentController::class, 'orderItem'])->name('pages.documents.order');
+Route::get('/pages/documents/term-service', [DocumentController::class, 'termService'])->name('pages.documents.term-service');
+Route::get('/pages/document/claim-product', [DocumentController::class, 'claimProduct'])->name('pages.documents.claim-product');
+Route::get('/pages/document/claim-policy', [DocumentController::class, 'claimPolicy'])->name('pages.documents.claim-policy');
 
 Route::get('/{slug}/product-{proId}', [PagesController::class, 'productDetail'])
     ->where('proId', '\d+')

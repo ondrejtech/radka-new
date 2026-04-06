@@ -13,4 +13,19 @@ class DocumentController extends Controller
     {
         return view('pages.document.order', ['orderId' => $orderId]);
     }
+
+    public function termService()
+    {
+        return view('pages.document.term-service');
+    }
+
+    public function claimProduct()
+    {
+        return view('pages.document.claim-product');
+    }
+
+    public function claimPolicy()
+    {
+        return view('pages.claim-policy');
+    }
 }
