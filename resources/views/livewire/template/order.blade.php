@@ -162,7 +162,7 @@
                                 <div class="document-heading_item">
                                     <span class="document-heading_label">Faktury</span>
                                     <div class="document-heading_value">
-
+                                        {{ date('Y'). $order->invoice?->id ?? '—' }}
                                     </div>
                                 </div>
                             </div>
@@ -299,12 +299,45 @@
 
 
                         </div>
-                        <div class="flex-box_item pay-box_btn-wrap">
-                            <a onclick="GAAction(22,0,$(this));" class="btn btn--submit" data-label="Comgate"
-                                href="javascript:__doPostBack('ctl00$MainContent$ctl08','')">
-                                <span class="btn_label">Zaplatit online</span>
+                        @if ($order->payment_status !== 'paid')
+                        <div class="flex-box_item pay-box_btn-wrap"
+                            x-data="{
+                                loading: false,
+                                error: '',
+                                pay() {
+                                    this.loading = true;
+                                    this.error = '';
+                                    fetch('{{ auth()->check() ? route('paypal.order.create', $order) : route('paypal.guest.order.create', $order) }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.getElementById('csrfToken').value,
+                                            'Accept': 'application/json',
+                                        },
+                                    })
+                                    .then(r => r.json())
+                                    .then(data => {
+                                        if (data.url) {
+                                            window.location.href = data.url;
+                                        } else {
+                                            this.error = data.error || 'Chyba při přesměrování na platbu.';
+                                            this.loading = false;
+                                        }
+                                    })
+                                    .catch(() => {
+                                        this.error = 'Nepodařilo se spojit se serverem.';
+                                        this.loading = false;
+                                    });
+                                }
+                            }">
+                            <a class="btn btn--submit" data-label="PayPal"
+                                :class="{ 'disabled': loading }"
+                                @click.prevent="pay()">
+                                <span class="btn_label" x-show="!loading">Zaplatit online</span>
+                                <span class="btn_label" x-show="loading" x-cloak>Načítám&hellip;</span>
                             </a>
+                            <p x-show="error" x-text="error" class="field-error" style="display:none;"></p>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>

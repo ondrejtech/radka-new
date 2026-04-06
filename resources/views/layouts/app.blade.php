@@ -112,7 +112,7 @@
 												</li>
 												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href="#"><span class="dropdown-item_label">Můj přehled</span></a></li>
 												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href="#"><span class="dropdown-item_label">Košíky a nabídky</span></a></li>
-												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href="#"><span class="dropdown-item_label">Objednávky</span></a></li>
+												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href=" {{ route('pages.documents.orderlist') }} "><span class="dropdown-item_label">Objednávky</span></a></li>
 												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href="#"><span class="dropdown-item_label">Položky objednávek</span></a></li>
 												<li class="dropdown-item-wrap"><a class="dropdown-item dropdown-item--highlight" href="#"><span class="dropdown-item_label">Faktury</span></a></li>
 												<li class="dropdown-item-wrap"><a class="dropdown-item" href="#"><span class="dropdown-item_label">Nedodané objednávky</span></a></li>
