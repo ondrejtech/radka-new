@@ -96,7 +96,7 @@
 				<div class="panel">
 					<div class="panel-heading">
 						<h4 class="panel-title">
-							<a class="collapsed" data-toggle="collapse" data-target="#foot_reklamace" href="#foot_reklamace">Reklamace</a>
+							<a class="collapsed" data-toggle="collapse" data-target="#foot_reklamace" href="{{ route('pages.documents.claim-product') }}">Reklamace</a>
 						</h4>
 					</div>
 					<div id="foot_reklamace" class="panel-collapse">
@@ -104,10 +104,10 @@
 							<div class="footer-menu_wrap">
 								<ul role="menu" class="footer-menu_group">
 									<li role="menuitem" class="footer-menu_item">
-										<a href="/jak-a-kde-reklamovat/article2-c10695">Jak a kde reklamovat</a>
+										<a href="{{ route('pages.documents.claim-product') }}">Jak a kde reklamovat</a>
 									</li>
 									<li role="menuitem" class="footer-menu_item">
-										<a href="/reklamacni-rad/article2-cI4_REK_RAD">Reklamační řád</a>
+										<a href="{{ route('pages.documents.claim-policy') }}">Reklamační řád</a>
 									</li>
 								</ul>
 							</div>
@@ -160,7 +160,7 @@
 							<div class="footer-menu_wrap">
 								<ul role="menu" class="footer-menu_group">
 									<li role="menuitem" class="footer-menu_item">
-                                        <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=15616"><strong>Obchodní podmínky</strong></a>
+                                        <a href="{{ route('pages.documents.term-service') }}"><strong>Obchodní podmínky</strong></a>
                                     </li>
                                     <li role="menuitem" class="footer-menu_item">
                                         <a href="/zpracovani-osobnich-udaju/article2-cgdpr">Zpracování osobních údajů</a>
@@ -246,7 +246,7 @@
                 <div class="panel" style="flex: 1; width: auto; float: none;">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a class="collapsed" data-toggle="collapse" data-target="#foot_reklamace" href="#foot_reklamace">Reklamace</a>
+                            <a class="collapsed" data-toggle="collapse" data-target="#foot_reklamace" href="{{ route('pages.documents.claim-product') }}">Reklamace</a>
                         </h4>
                     </div>
                     <div id="foot_reklamace" class="panel-collapse">
@@ -254,10 +254,10 @@
                             <div class="footer-menu_wrap">
                                 <ul role="menu" class="footer-menu_group">
                                     <li role="menuitem" class="footer-menu_item">
-                                        <a href="/jak-a-kde-reklamovat/article2-c10695">Jak a kde reklamovat</a>
+                                        <a href="{{ route('pages.documents.claim-product') }}">Jak a kde reklamovat</a>
                                     </li>
                                     <li role="menuitem" class="footer-menu_item">
-                                        <a href="/reklamacni-rad/article2-cI4_REK_RAD">Reklamační řád</a>
+                                        <a href="{{ route('pages.documents.claim-policy') }}">Reklamační řád</a>
                                     </li>
                                 </ul>
                             </div>
@@ -276,7 +276,7 @@
                             <div class="footer-menu_wrap">
                                 <ul role="menu" class="footer-menu_group">
                                     <li role="menuitem" class="footer-menu_item">
-										<a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14679">{{ config('app.name')}}</a>
+										<a href="{{ route('pages.company-marketing') }}">{{ config('app.name')}}</a>
 									</li>
 									<li role="menuitem" class="footer-menu_item">
 										<a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14681">{{ config('app.name') }} a datová výměna</a>
@@ -310,16 +310,16 @@
                             <div class="footer-menu_wrap">
                                 <ul role="menu" class="footer-menu_group">
                                     <li role="menuitem" class="footer-menu_item">
-                                        <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=15616"><strong>Obchodní podmínky</strong></a>
+                                        <a href="{{ route('pages.documents.term-service') }}"><strong>Obchodní podmínky</strong></a>
                                     </li>
                                     <li role="menuitem" class="footer-menu_item">
-                                        <a href="/zpracovani-osobnich-udaju/article2-cgdpr">Zpracování osobních údajů</a>
+                                        <a href="{{ route('pages.processing-personal-info') }}">Zpracování osobních údajů</a>
                                     </li>
                                     {{-- <li role="menuitem" class="footer-menu_item">
                                         <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14675">Profil společnosti</a>
                                     </li> --}}
                                     <li role="menuitem" class="footer-menu_item">
-                                        <a href="/pages/supportfirma.aspx?region=ostrava&code=0702">Kontakty</a>
+                                        <a href="{{ route('pages.contact') }}">Kontakty</a>
                                     </li>
                                     {{-- <li role="menuitem" class="footer-menu_item">
                                         <a href="https://www.edecko.cz/category/oceneni" target="_blank">Certifikáty a ocenění</a>
@@ -327,12 +327,12 @@
                                     <li role="menuitem" class="footer-menu_item">
                                         <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14678">Jsme etická firma</a>
                                     </li> --}}
-                                    <li role="menuitem" class="footer-menu_item">
+                                    {{-- <li role="menuitem" class="footer-menu_item">
                                         <a href="/pages/career.aspx">Kariéra</a>
                                     </li>
                                     <li role="menuitem" class="footer-menu_item">
                                         <a href="/cookiesConsent/article-ccookiesConsent">Ochrana soukromí</a>
-                                    </li>
+                                    </li> --}}
                                 </ul>
                             </div>
                         </div>
