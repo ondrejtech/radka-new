@@ -22,11 +22,15 @@
 
 	<link href="{{ asset('assets/bundles/css/main.css') }}" rel="stylesheet"/>
     <style>[x-cloak] { display: none !important; }</style>
-    <link rel="stylesheet" href="{{ asset('assets/bundles/css/productlist.css')}}">
-    <link rel="stylesheet" href="{{ asset('assets/bundles/css/productcompare.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bundles/css/product-view.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/bundles/css/basket.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bundles/css/documents.css') }}">
+
+
+    @foreach(File::files(public_path('assets/bundles/css/')) as $file)
+        @if($file->getExtension() === 'css')
+            <link rel="stylesheet" href="{{ asset('assets/bundles/css/' . $file->getFilename()) }}">
+        @endif
+    @endforeach
+
+
 
 	<script src="{{ asset('assets/bundles/js/main.js') }}"></script>
     <script src="{{ asset('assets/bundles/js/product.js')}}"></script>
