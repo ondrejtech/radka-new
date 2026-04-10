@@ -2,6 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs-CZ" lang="cs-CZ">
 <head><meta charset="utf-8" /><meta name="author" content="{{ env('DEVELOPER_NAME').', '.env('DEVELOPER_URL')}}" />
 
+	<!-- Heureka.cz PRODUCT DETAIL script -->
+	<script>
+		(function(t, r, a, c, k, i, n, g) {t['ROIDataObject'] = k;
+		t[k]=t[k]||function(){(t[k].q=t[k].q||[]).push(arguments)},t[k].c=i;n=r.createElement(a),
+		g=r.getElementsByTagName(a)[0];n.async=1;n.src=c;g.parentNode.insertBefore(n,g)
+		})(window, document, 'script', '//www.heureka.cz/ocm/sdk.js?version=2&page=product_detail', 'heureka', 'cz');
+	</script>
+<!-- End Heureka.cz PRODUCT DETAIL script -->
 	<meta name="robots" content="noindex,nofollow" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="format-detection" content="telephone=no" />
 

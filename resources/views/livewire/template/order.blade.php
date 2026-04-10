@@ -449,4 +449,21 @@
     </select>
 
     <input type="text" id="hdnAuth" class="hide" value="zH989SIov0r1M3wE3JHDk0yJef0YtOxw">
+    <!-- Heureka.cz THANK YOU PAGE script -->
+    <script>
+        (function(t, r, a, c, k, i, n, g) {t['ROIDataObject'] = k;
+        t[k]=t[k]||function(){(t[k].q=t[k].q||[]).push(arguments)},t[k].c=i;n=r.createElement(a),
+        g=r.getElementsByTagName(a)[0];n.async=1;n.src=c;g.parentNode.insertBefore(n,g)
+        })(window, document, 'script', '//www.heureka.cz/ocm/sdk.js?version=2&page=thank_you', 'heureka', 'cz');
+
+        heureka('authenticate', '0fe58b062802ec16f51ecd5efe4ccedea8de');
+
+        heureka('set_order_id', 'ORDER_ID');
+        heureka('add_product', 'PRODUCT_ITEM_ID', 'PRODUCT_NAME', 'SINGLE_PRODUCT_PRICE_VAT', 'NUMBER_OF_PRODUCTS');
+        heureka('add_product', 'PRODUCT_ITEM_ID', 'PRODUCT_NAME', 'SINGLE_PRODUCT_PRICE_VAT', 'NUMBER_OF_PRODUCTS');
+        heureka('set_total_vat', 'TOTAL_PRICE_WITH_VAT');
+        heureka('set_currency', 'CZK');
+        heureka('send', 'Order');
+    </script>
+    <!-- End Heureka.cz THANK YOU PAGE script -->
 </form>
