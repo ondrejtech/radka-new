@@ -6,10 +6,14 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductFeed;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
 Route::get('/', [CategoryController::class, 'home']);
+
+Route::get('/product-feed/heureka.xml', [ProductFeed::class, 'heurekaFeed'])->name('product-feed.heureka');
+
 
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');
