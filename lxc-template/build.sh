@@ -91,20 +91,23 @@ chr bash -c 'curl -sSLo /tmp/debsuryorg-keyring.deb https://packages.sury.org/de
 echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ bookworm main" \
     > "$ROOTFS/etc/apt/sources.list.d/php.list"
 
-# MySQL 8.0 — stažení apt config balíčku (spolehlivější než ruční GPG import)
-_log "Downloading MySQL APT config..."
+# MySQL 8.0 — ruční přidání repo (bez mysql-apt-config, který je interaktivní)
+# GPG klíč stahujeme na hostu kde gpg funguje bez TTY
+_log "Adding MySQL 8.0 repository..."
 mkdir -p "$ROOTFS/etc/apt/keyrings"
-MYSQL_APT_CONFIG="mysql-apt-config_0.8.33-1_all.deb"
-wget -q -O "$ROOTFS/tmp/${MYSQL_APT_CONFIG}" \
-    "https://dev.mysql.com/get/${MYSQL_APT_CONFIG}" \
-    || _err "Failed to download MySQL APT config — check internet connectivity"
+curl -fsSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 \
+    | gpg --dearmor -o "$ROOTFS/etc/apt/keyrings/mysql.gpg" \
+    || _err "Failed to download MySQL GPG key — check internet connectivity"
 
-chr bash -c "
-    export DEBIAN_FRONTEND=noninteractive
-    echo 'mysql-apt-config mysql-apt-config/select-server select mysql-8.0' | debconf-set-selections
-    dpkg -i /tmp/${MYSQL_APT_CONFIG}
-    rm /tmp/${MYSQL_APT_CONFIG}
-" || _err "Failed to install MySQL APT config"
+echo "deb [signed-by=/etc/apt/keyrings/mysql.gpg] http://repo.mysql.com/apt/debian bookworm mysql-8.0" \
+    > "$ROOTFS/etc/apt/sources.list.d/mysql.list"
+
+# Pre-seed debconf pro mysql-community-server (prázdné root heslo — first-boot.sh ho nastaví)
+chr bash -c 'cat <<EOF | debconf-set-selections
+mysql-community-server mysql-community-server/root-pass       password
+mysql-community-server mysql-community-server/re-root-pass    password
+mysql-community-server mysql-server/default-auth-override     select Use Strong Password Encryption (RECOMMENDED)
+EOF'
 
 chr_env apt-get update -qq
 
