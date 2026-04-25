@@ -91,23 +91,13 @@ chr bash -c 'curl -sSLo /tmp/debsuryorg-keyring.deb https://packages.sury.org/de
 echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ bookworm main" \
     > "$ROOTFS/etc/apt/sources.list.d/php.list"
 
-# MySQL 8.0 — ruční přidání repo (bez mysql-apt-config, který je interaktivní)
-# GPG klíč stahujeme na hostu kde gpg funguje bez TTY
-_log "Adding MySQL 8.0 repository..."
-mkdir -p "$ROOTFS/etc/apt/keyrings"
-curl -fsSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 \
-    | gpg --dearmor -o "$ROOTFS/etc/apt/keyrings/mysql.gpg" \
-    || _err "Failed to download MySQL GPG key — check internet connectivity"
-
-echo "deb [signed-by=/etc/apt/keyrings/mysql.gpg] http://repo.mysql.com/apt/debian bookworm mysql-8.0" \
-    > "$ROOTFS/etc/apt/sources.list.d/mysql.list"
-
-# Pre-seed debconf pro mysql-community-server (prázdné root heslo — first-boot.sh ho nastaví)
-chr bash -c 'cat <<EOF | debconf-set-selections
-mysql-community-server mysql-community-server/root-pass       password
-mysql-community-server mysql-community-server/re-root-pass    password
-mysql-community-server mysql-server/default-auth-override     select Use Strong Password Encryption (RECOMMENDED)
-EOF'
+# MySQL 8.0 — instalace z .deb bundle (obejde expirovaný GPG klíč)
+_log "Downloading MySQL 8.0 deb bundle..."
+mkdir -p "$ROOTFS/tmp/mysql-debs"
+wget -q --content-disposition -O "$ROOTFS/tmp/mysql-bundle.tar" \
+    "https://cdn.mysql.com//archives/mysql-8.0/mysql-server_8.0.42-1debian12_amd64.deb-bundle.tar" \
+    || _err "Failed to download MySQL bundle — check internet connectivity"
+tar xf "$ROOTFS/tmp/mysql-bundle.tar" -C "$ROOTFS/tmp/mysql-debs/"
 
 chr_env apt-get update -qq
 
@@ -117,14 +107,31 @@ _log "Step 5: Installing packages (takes several minutes)..."
 chr_env apt-get install -y --no-install-recommends \
     systemd systemd-sysv dbus \
     nginx \
-    mysql-community-server \
     php8.4-fpm php8.4-cli \
     php8.4-bcmath php8.4-gd php8.4-intl php8.4-mbstring \
     php8.4-opcache php8.4-mysql php8.4-redis \
     php8.4-xml php8.4-zip php8.4-curl \
     composer \
     unzip curl wget rsync \
-    logrotate cron
+    logrotate cron \
+    libaio1 libmecab2
+
+# MySQL 8.0 — instalace z lokálních .deb souborů ve správném pořadí
+_log "Step 5b: Installing MySQL 8.0 from deb bundle..."
+chr bash -c "
+    cd /tmp/mysql-debs
+    DEBIAN_FRONTEND=noninteractive dpkg -i \
+        mysql-common_*.deb \
+        mysql-community-client-plugins_*.deb \
+        mysql-community-client-core_*.deb \
+        mysql-community-client_*.deb \
+        mysql-client_*.deb \
+        mysql-community-server-core_*.deb \
+        mysql-community-server_*.deb \
+        mysql-server_*.deb \
+    || apt-get install -f -y
+    rm -rf /tmp/mysql-debs /tmp/mysql-bundle.tar
+"
 
 # ── Step 6: Copy project files ────────────────────────────────
 _log "Step 6: Copying project files..."
