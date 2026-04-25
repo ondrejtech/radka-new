@@ -86,22 +86,25 @@ chr_env apt-get install -y --no-install-recommends \
     ca-certificates curl gnupg lsb-release apt-transport-https wget
 
 # PHP 8.4 — packages.sury.org
-chr bash -c 'curl -sSLo /tmp/debsuryorg-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb && dpkg -i /tmp/debsuryorg-keyring.deb'
+chr bash -c 'curl -sSLo /tmp/debsuryorg-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb && dpkg -i /tmp/debsuryorg-keyring.deb' \
+    || _err "Failed to install sury.org keyring"
 echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ bookworm main" \
     > "$ROOTFS/etc/apt/sources.list.d/php.list"
 
-# MySQL 8.0 — repo.mysql.com
+# MySQL 8.0 — stažení apt config balíčku (spolehlivější než ruční GPG import)
+_log "Downloading MySQL APT config..."
 mkdir -p "$ROOTFS/etc/apt/keyrings"
-chr bash -c 'curl -fsSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 | gpg --dearmor -o /etc/apt/keyrings/mysql.gpg'
-echo "deb [signed-by=/etc/apt/keyrings/mysql.gpg] http://repo.mysql.com/apt/debian bookworm mysql-8.0" \
-    > "$ROOTFS/etc/apt/sources.list.d/mysql.list"
+MYSQL_APT_CONFIG="mysql-apt-config_0.8.33-1_all.deb"
+wget -q -O "$ROOTFS/tmp/${MYSQL_APT_CONFIG}" \
+    "https://dev.mysql.com/get/${MYSQL_APT_CONFIG}" \
+    || _err "Failed to download MySQL APT config — check internet connectivity"
 
-# Pre-answer MySQL debconf prompts (empty root password — setup script sets it later)
-chr bash -c 'cat <<DEBCONF | debconf-set-selections
-mysql-community-server mysql-community-server/root-pass       password
-mysql-community-server mysql-community-server/re-root-pass    password
-mysql-community-server mysql-server/default-auth-override     select Use Strong Password Encryption (RECOMMENDED)
-DEBCONF'
+chr bash -c "
+    export DEBIAN_FRONTEND=noninteractive
+    echo 'mysql-apt-config mysql-apt-config/select-server select mysql-8.0' | debconf-set-selections
+    dpkg -i /tmp/${MYSQL_APT_CONFIG}
+    rm /tmp/${MYSQL_APT_CONFIG}
+" || _err "Failed to install MySQL APT config"
 
 chr_env apt-get update -qq
 
