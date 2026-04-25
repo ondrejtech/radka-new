@@ -16,7 +16,8 @@ Lokální PC
                          CT Templates → Download from URL
                               ↓
                        Nový LXC kontejner
-                         /usr/local/sbin/techdomov-setup.sh
+                         techdomov-firstboot.service (automaticky při prvním bootu)
+                           └─ MySQL init + SQL import + migrate → aplikace běží
 ```
 
 ---
@@ -153,23 +154,36 @@ https://oauth2:glpat-xxxx@gitlab.ozelina.eu/api/v4/projects/proxmox%2Flxc%2Ftech
 
 ---
 
-## Krok 6 — First-boot setup
+## Krok 6 — First-boot setup (automatický)
 
-`.env` je v kontejneru předpřipravený z `.env.production` — není potřeba nic konfigurovat ručně.
+Po spuštění kontejneru **není potřeba žádný ruční zásah**. Systemd služba
+`techdomov-firstboot.service` se spustí automaticky a provede celý setup:
 
-Přihlaš se (SSH nebo Proxmox console) a spusť setup skript:
+1. Počká na MySQL
+2. Nastaví MySQL root heslo a vytvoří DB + uživatele (hodnoty z `.env`)
+3. Importuje `edsystem.sql` z `storage/app/private/mysql/`
+4. Vygeneruje nový `APP_KEY` (unikátní pro tento kontejner)
+5. Spustí `php artisan storage:link`, `config:cache`, `route:cache`, `migrate`
+6. Nastartuje Nginx, PHP-FPM, queue worker a scheduler
+
+Nginx a queue worker **čekají na dokončení firstboot** — aplikace je dostupná
+až po úspěšném setupu.
+
+Setup proběhne **pouze jednou** — při dalším rebootu se nespustí znovu
+(flag soubor `/var/lib/techdomov/.setup-done`).
+
+### Sledování průběhu firstboot
 
 ```bash
-/usr/local/sbin/techdomov-setup.sh
+journalctl -u techdomov-firstboot -f
 ```
 
-Co setup skript provede:
-1. Nastaví MySQL root heslo a vytvoří DB + uživatele (hodnoty bere z `.env`)
-2. Importuje `edsystem.sql` (pokud existuje v `storage/app/private/mysql/`)
-3. Vygeneruje nový `APP_KEY` (unikátní pro tento kontejner)
-4. Spustí `php artisan storage:link`, `config:cache`, `route:cache`, `migrate`
-5. Restartuje Nginx, PHP-FPM a queue worker
-6. Vypíše URL aplikace a phpMyAdmin
+### Ruční opakování setupu (v případě chyby)
+
+```bash
+rm /var/lib/techdomov/.setup-done
+systemctl restart techdomov-firstboot
+```
 
 ---
 
@@ -224,6 +238,7 @@ lxc-template/
 │   ├── php-fpm-www.conf      ← PHP-FPM pool
 │   └── phpmyadmin.php        ← phpMyAdmin konfigurace
 └── systemd/
+    ├── techdomov-firstboot.service  ← automatický setup při prvním bootu
     ├── laravel-queue.service
     ├── laravel-scheduler.service
     └── laravel-scheduler.timer
