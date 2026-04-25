@@ -30,7 +30,9 @@ Lokální PC
 | rsync | `sudo apt install rsync` |
 | curl | `sudo apt install curl` |
 | Node.js 22+ | https://nodejs.org |
-| PHP 8.4 + Composer | https://getcomposer.org |
+
+> **Composer není potřeba lokálně** — `build.sh` spouští `composer install`
+> přímo uvnitř chrootu, takže závislosti odpovídají přesně PHP 8.4 v kontejneru.
 
 Skript musí běžet jako **root** (kvůli `debootstrap` a mountování pseudo-fs).
 
@@ -47,25 +49,24 @@ Skript musí běžet jako **root** (kvůli `debootstrap` a mountování pseudo-f
 
 ## Krok 1 — Příprava projektu
 
-Na lokálním PC naklonuj repozitář a připrav assety:
+Na lokálním PC naklonuj repozitář a připrav frontend assety:
 
 ```bash
 git clone git@gitlab.ozelina.eu:proxmox/lxc/techdomov.git
 cd techdomov
 
-# PHP závislosti (bez dev balíčků)
-composer install --no-dev --optimize-autoloader --no-interaction
-
-# Frontend assety
+# Frontend assety (jediný krok potřebný lokálně)
 npm ci --ignore-scripts
 npm run build
 ```
 
-Zkontroluj, že existují oba adresáře:
+Zkontroluj, že adresář existuje:
 ```bash
-ls vendor/       # musí existovat
 ls public/build/ # musí existovat
 ```
+
+> `vendor/` nepotřebuješ připravovat lokálně — `build.sh` spustí
+> `composer install` přímo uvnitř chrootu.
 
 ---
 
@@ -81,9 +82,11 @@ Co skript dělá:
 1. Vytvoří čistý Debian 12 rootfs pomocí `debootstrap`
 2. Přidá repozitáře PHP 8.4 (sury.org) a MySQL 8.0
 3. Nainstaluje: Nginx, PHP 8.4-FPM, MySQL 8.0, phpMyAdmin 5.2.1
-4. Zkopíruje kód projektu (bez `.env`, bez `storage/` dat)
-5. Nainstaluje systemd služby (queue worker, scheduler)
-6. Zabalí vše do `.tar.gz`
+4. Zkopíruje kód projektu (bez `vendor/`, bez `storage/` dat)
+5. Zkopíruje `.env.production` jako `.env` a opraví `DB_HOST=db` → `DB_HOST=127.0.0.1`
+6. Spustí `composer install --no-dev` uvnitř chrootu
+7. Nainstaluje systemd služby (queue worker, scheduler)
+8. Zabalí vše do `.tar.gz`
 
 Výsledek: `/tmp/debian-12-techdomov_amd64.tar.gz`
 
@@ -152,45 +155,21 @@ https://oauth2:glpat-xxxx@gitlab.ozelina.eu/api/v4/projects/proxmox%2Flxc%2Ftech
 
 ## Krok 6 — First-boot setup
 
-Po prvním spuštění kontejneru se přihlaš (SSH nebo Proxmox console) a spusť setup skript:
+`.env` je v kontejneru předpřipravený z `.env.production` — není potřeba nic konfigurovat ručně.
 
-```bash
-/usr/local/sbin/techdomov-setup.sh
-```
+Přihlaš se (SSH nebo Proxmox console) a spusť setup skript:
 
-### První spuštění
-Skript zjistí, že chybí `.env`, zkopíruje `.env.example` a skončí:
-```
-.env not found — copying from .env.example
-Edit /var/www/html/.env and re-run this script.
-```
-
-### Konfigurace .env
-```bash
-nano /var/www/html/.env
-```
-
-Povinné hodnoty:
-```env
-APP_URL=http://192.168.xxx.xxx:8080
-
-DB_DATABASE=techdomov
-DB_USERNAME=techdomov
-DB_PASSWORD=silne-heslo
-DB_ROOT_PASSWORD=jine-silne-heslo
-```
-
-### Druhé spuštění
 ```bash
 /usr/local/sbin/techdomov-setup.sh
 ```
 
 Co setup skript provede:
-1. Nastaví MySQL root heslo a vytvoří DB + uživatele
+1. Nastaví MySQL root heslo a vytvoří DB + uživatele (hodnoty bere z `.env`)
 2. Importuje `edsystem.sql` (pokud existuje v `storage/app/private/mysql/`)
-3. Vygeneruje `APP_KEY`
+3. Vygeneruje nový `APP_KEY` (unikátní pro tento kontejner)
 4. Spustí `php artisan storage:link`, `config:cache`, `route:cache`, `migrate`
 5. Restartuje Nginx, PHP-FPM a queue worker
+6. Vypíše URL aplikace a phpMyAdmin
 
 ---
 

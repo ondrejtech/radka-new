@@ -4,10 +4,9 @@
 # Run once inside the LXC container after creation.
 #
 # What it does:
-#   1. Copies .env.example → .env if .env is missing
-#   2. Sets up MySQL root password + application DB + user
-#   3. Imports edsystem.sql if the file exists
-#   4. Generates APP_KEY, links storage, runs migrations
+#   1. Nastaví MySQL root heslo + vytvoří DB a uživatele
+#   2. Importuje edsystem.sql (pokud existuje)
+#   3. Vygeneruje APP_KEY, spustí storage:link + migrate
 # =============================================================
 set -euo pipefail
 
@@ -16,20 +15,13 @@ ENV_FILE="$APP_DIR/.env"
 SQL_DUMP="$APP_DIR/storage/app/private/mysql/edsystem.sql"
 
 _log()  { printf '\e[32m[SETUP]\e[0m %s\n' "$*"; }
+_warn() { printf '\e[33m[WARN]\e[0m %s\n'  "$*"; }
 _err()  { printf '\e[31m[ERROR]\e[0m %s\n' "$*" >&2; exit 1; }
-_ask()  { read -rp "$(printf '\e[33m[INPUT]\e[0m %s: ' "$1")" "$2"; }
 
 [[ $EUID -eq 0 ]] || _err "Run as root"
+[[ -f "$ENV_FILE" ]] || _err ".env not found at $ENV_FILE — template nebyl sestaven správně"
 
-# ── 1. .env ───────────────────────────────────────────────────
-if [[ ! -f "$ENV_FILE" ]]; then
-    _log ".env not found — copying from .env.example"
-    cp "$APP_DIR/.env.example" "$ENV_FILE"
-    _log "Edit $ENV_FILE and re-run this script."
-    _log "Set at minimum: DB_DATABASE, DB_USERNAME, DB_PASSWORD, DB_ROOT_PASSWORD"
-    exit 0
-fi
-
+# ── 1. Načti .env ─────────────────────────────────────────────
 _log "Reading .env..."
 set -a
 # shellcheck disable=SC1090
@@ -98,5 +90,5 @@ systemctl restart php8.4-fpm nginx laravel-queue
 
 _log ""
 _log "Setup complete!"
-_log "  App:        http://<container-ip>:8080"
-_log "  phpMyAdmin: http://<container-ip>:8081"
+_log "  App:        http://$(hostname -I | awk '{print $1}'):8080"
+_log "  phpMyAdmin: http://$(hostname -I | awk '{print $1}'):8081"

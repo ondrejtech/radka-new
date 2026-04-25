@@ -30,8 +30,8 @@ chr_env()  { chroot "$ROOTFS" env DEBIAN_FRONTEND=noninteractive "$@"; }
 command -v debootstrap >/dev/null || { _log "Installing debootstrap..."; apt-get install -y debootstrap; }
 command -v rsync       >/dev/null || { _log "Installing rsync...";       apt-get install -y rsync; }
 
-[[ -d "$PROJECT_DIR/vendor" ]]       || _err "vendor/ missing — run 'composer install --no-dev' in the project first"
-[[ -d "$PROJECT_DIR/public/build" ]] || _err "public/build/ missing — run 'npm run build' in the project first"
+[[ -f "$PROJECT_DIR/.env.production" ]] || _err ".env.production not found in project root"
+[[ -d "$PROJECT_DIR/public/build" ]]    || _err "public/build/ missing — run 'npm run build' in the project first"
 
 _log "Project: $PROJECT_DIR"
 _log "Output:  $OUTPUT"
@@ -127,7 +127,9 @@ mkdir -p "$ROOTFS/var/www/html"
 rsync -a --delete \
     --exclude='.git' \
     --exclude='.env' \
+    --exclude='.env.*' \
     --exclude='node_modules' \
+    --exclude='vendor' \
     --exclude='lxc-template' \
     --exclude='storage/logs/*' \
     --exclude='storage/framework/cache/data/*' \
@@ -135,6 +137,25 @@ rsync -a --delete \
     --exclude='storage/framework/views/*' \
     --exclude='bootstrap/cache/*.php' \
     "$PROJECT_DIR/" "$ROOTFS/var/www/html/"
+
+# Zkopíruj .env.production jako .env a oprav DB_HOST (Docker hostname → localhost)
+_log "Step 6b: Deploying .env.production as .env (DB_HOST: db → 127.0.0.1)..."
+sed 's/^DB_HOST=db$/DB_HOST=127.0.0.1/' "$PROJECT_DIR/.env.production" \
+    > "$ROOTFS/var/www/html/.env"
+chr chown www-data:www-data /var/www/html/.env
+chr chmod 640 /var/www/html/.env
+
+# Spusť composer install uvnitř chrootu — závislosti jsou buildnuty pro cílové PHP 8.4
+_log "Step 6c: Running composer install inside chroot..."
+chr bash -c "
+    cd /var/www/html
+    composer install \
+        --no-dev \
+        --optimize-autoloader \
+        --no-scripts \
+        --no-interaction \
+        --quiet
+"
 
 # Ensure storage directory structure exists
 mkdir -p \
