@@ -85,8 +85,8 @@ sudo -u www-data bash -c "
 "
 
 # ── 5. Restart services ───────────────────────────────────────
-_log "Restarting services..."
-systemctl restart php8.4-fpm nginx laravel-queue
+_log "Starting services..."
+systemctl restart php8.4-fpm nginx laravel-queue laravel-scheduler.timer
 
 _log ""
 _log "Setup complete!"

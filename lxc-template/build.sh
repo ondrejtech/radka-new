@@ -203,22 +203,39 @@ cp "$SCRIPT_DIR/config/php-fpm-www.conf"   "$ROOTFS/etc/php/8.4/fpm/pool.d/www.c
 # ── Step 9: Systemd services ──────────────────────────────────
 _log "Step 9: Installing systemd services..."
 
-cp "$SCRIPT_DIR/systemd/laravel-queue.service"      "$ROOTFS/etc/systemd/system/"
-cp "$SCRIPT_DIR/systemd/laravel-scheduler.service"  "$ROOTFS/etc/systemd/system/"
-cp "$SCRIPT_DIR/systemd/laravel-scheduler.timer"    "$ROOTFS/etc/systemd/system/"
+cp "$SCRIPT_DIR/systemd/laravel-queue.service"        "$ROOTFS/etc/systemd/system/"
+cp "$SCRIPT_DIR/systemd/laravel-scheduler.service"    "$ROOTFS/etc/systemd/system/"
+cp "$SCRIPT_DIR/systemd/laravel-scheduler.timer"      "$ROOTFS/etc/systemd/system/"
+cp "$SCRIPT_DIR/systemd/techdomov-firstboot.service"  "$ROOTFS/etc/systemd/system/"
 
 systemctl --root="$ROOTFS" enable \
     nginx \
     php8.4-fpm \
     mysql \
     laravel-queue \
-    laravel-scheduler.timer
+    laravel-scheduler.timer \
+    techdomov-firstboot
 
 # ── Step 10: First-boot setup script ─────────────────────────
 _log "Step 10: Installing first-boot setup script..."
 
 cp "$SCRIPT_DIR/first-boot.sh" "$ROOTFS/usr/local/sbin/techdomov-setup.sh"
 chr chmod +x /usr/local/sbin/techdomov-setup.sh
+
+# Nginx a laravel-queue startují až po dokončení firstboot setupu
+mkdir -p "$ROOTFS/etc/systemd/system/nginx.service.d"
+cat > "$ROOTFS/etc/systemd/system/nginx.service.d/after-firstboot.conf" <<'EOF'
+[Unit]
+After=techdomov-firstboot.service
+Wants=techdomov-firstboot.service
+EOF
+
+mkdir -p "$ROOTFS/etc/systemd/system/laravel-queue.service.d"
+cat > "$ROOTFS/etc/systemd/system/laravel-queue.service.d/after-firstboot.conf" <<'EOF'
+[Unit]
+After=techdomov-firstboot.service
+Wants=techdomov-firstboot.service
+EOF
 
 # ── Step 11: Cleanup ──────────────────────────────────────────
 _log "Step 11: Cleaning up..."

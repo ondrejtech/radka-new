@@ -1,0 +1,16 @@
+[Unit]
+Description=techdomov First Boot Setup
+After=mysql.service network.target
+Requires=mysql.service
+ConditionPathExists=!/var/lib/techdomov/.setup-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/techdomov-setup.sh
+ExecStartPost=/bin/bash -c 'mkdir -p /var/lib/techdomov && touch /var/lib/techdomov/.setup-done'
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
