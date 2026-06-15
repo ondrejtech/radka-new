@@ -494,7 +494,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '46' }"
-                                                        @click="selectedId = '46'; selectedName = 'Balík'; $wire.set('transportId', '46')">
+                                                        @click="selectedId = '46'; selectedName = 'Balík'; $wire.set('form.transportId', '46')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">Balík</strong>
@@ -505,7 +505,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '3' }"
-                                                        @click="selectedId = '3'; selectedName = 'Osobně Ostrava'; $wire.set('transportId', '3')">
+                                                        @click="selectedId = '3'; selectedName = 'Osobně Ostrava'; $wire.set('form.transportId', '3')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">Osobně Ostrava</strong>
@@ -516,7 +516,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '105' }"
-                                                        @click="selectedId = '105'; selectedName = 'ČP balík'; $wire.set('transportId', '105')">
+                                                        @click="selectedId = '105'; selectedName = 'ČP balík'; $wire.set('form.transportId', '105')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">ČP balík</strong>
@@ -527,7 +527,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '47' }"
-                                                        @click="selectedId = '47'; selectedName = 'Dobírka'; $wire.set('transportId', '47')">
+                                                        @click="selectedId = '47'; selectedName = 'Dobírka'; $wire.set('form.transportId', '47')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">Dobírka</strong>
@@ -538,7 +538,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '36' }"
-                                                        @click="selectedId = '36'; selectedName = 'DPD EX.12'; $wire.set('transportId', '36')">
+                                                        @click="selectedId = '36'; selectedName = 'DPD EX.12'; $wire.set('form.transportId', '36')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">DPD EX.12</strong>
@@ -549,7 +549,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '37' }"
-                                                        @click="selectedId = '37'; selectedName = 'DPD EX.12 dob.'; $wire.set('transportId', '37')">
+                                                        @click="selectedId = '37'; selectedName = 'DPD EX.12 dob.'; $wire.set('form.transportId', '37')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">DPD EX.12 dob.</strong>
@@ -560,7 +560,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '256' }"
-                                                        @click="selectedId = '256'; selectedName = 'DPD PickupPoint dob.'; $wire.set('transportId', '256')">
+                                                        @click="selectedId = '256'; selectedName = 'DPD PickupPoint dob.'; $wire.set('form.transportId', '256')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">DPD PickupPoint dob.</strong>
@@ -571,7 +571,7 @@
 
                                                     <button type="button" class="dropdown-item"
                                                         :class="{ 'active': selectedId === '103' }"
-                                                        @click="selectedId = '103'; selectedName = 'Expres OVA'; $wire.set('transportId', '103')">
+                                                        @click="selectedId = '103'; selectedName = 'Expres OVA'; $wire.set('form.transportId', '103')">
                                                         <span class="dropdown-item_in">
                                                             <span class="dropdown-item_label">
                                                                 <strong class="cart-transport-choose_name">Expres OVA</strong>
@@ -582,6 +582,7 @@
 
                                                 </div>
                                             </div>
+                                            @error('form.transportId') <span class="field-error">{{ $message }}</span> @enderror
                                         </div>
 
                                         <div>
@@ -592,7 +593,7 @@
                                         <div class="form-group">
                                             <label for="txtBahExtNo">Vaše označení objednávky</label>
                                             <input name="ctl00$MainContent$txtBahExtNo" type="text" maxlength="36"
-                                                wire:model="reference"
+                                                wire:model="form.reference"
                                                 id="txtBahExtNo" class="form-control">
                                         </div>
                                     </div>
@@ -603,7 +604,7 @@
                                         <div class="form-group">
                                             <label for="txtBahNote">Poznámka</label>
                                             <textarea name="ctl00$MainContent$txtBahNote" rows="5" cols="20"
-                                                wire:model="note"
+                                                wire:model="form.note"
                                                 id="txtBahNote" class="form-control"></textarea>
                                         </div>
                                     </div>
@@ -618,7 +619,7 @@
                                                 <label for="txtDelivDate">Termín dodání</label>
                                                 <input name="ctl00$MainContent$txtDelivDate" type="text"
                                                     maxlength="20"
-                                                    wire:model="deliveryDate"
+                                                    wire:model="form.deliveryDate"
                                                     id="txtDelivDate" class="form-control js-datepicker hasDatepicker"
                                                     data-datepicker-validdays="['2026-04-02','2026-04-03','2026-04-06']">
                                                 <i class="icon-question js-tooltip form-control_tooltip-help"
@@ -675,10 +676,9 @@
                                             <div class="form-group">
                                                 <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
                                                 <input name="ctl00$MainContent$txtShipAddrName" type="text"
-                                                    wire:model="shipName"
+                                                    wire:model="form.shipName"
                                                     readonly maxlength="35" id="txtShipAddrName"
-                                                    class="form-control is-required" data-rule-required="true"><span
-                                                    class="form-control-validate-info"></span>
+                                                    class="form-control is-required" data-rule-required="true"><span class="form-control-validate-info"></span>
                                             </div>
                                         </div>
                                         <div class="form-base_item">
@@ -693,22 +693,20 @@
                                                 <div class="form-group">
                                                     <label for="txtShipAddrStreet">Ulice</label>
                                                     <input name="ctl00$MainContent$txtShipAddrStreet" type="text"
-                                                        wire:model="shipStreet"
+                                                        wire:model="form.shipStreet"
                                                         readonly maxlength="35"
                                                         id="txtShipAddrStreet" class="form-control is-required"
-                                                        data-rule-required="true"><span
-                                                        class="form-control-validate-info"></span>
+                                                        data-rule-required="true"><span class="form-control-validate-info"></span>
                                                 </div>
                                             </div>
                                             <div class="form-base_item">
                                                 <div class="form-group">
                                                     <label for="txtShipAddrCity">Město</label>
                                                     <input name="ctl00$MainContent$txtShipAddrCity" type="text"
-                                                        wire:model="shipCity"
+                                                        wire:model="form.shipCity"
                                                         readonly maxlength="35"
                                                         id="txtShipAddrCity" class="form-control is-required"
-                                                        data-rule-required="true"><span
-                                                        class="form-control-validate-info"></span>
+                                                        data-rule-required="true"><span class="form-control-validate-info"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -717,11 +715,10 @@
                                                 <div class="form-group">
                                                     <label for="txtShipAddrZIP">PSČ</label>
                                                     <input name="ctl00$MainContent$txtShipAddrZIP" type="text"
-                                                        wire:model="shipZip"
+                                                        wire:model="form.shipZip"
                                                         readonly maxlength="6"
                                                         id="txtShipAddrZIP" class="form-control is-required"
-                                                        data-rule-required="true"><span
-                                                        class="form-control-validate-info"></span>
+                                                        data-rule-required="true"><span class="form-control-validate-info"></span>
                                                 </div>
                                             </div>
                                             <div class="form-base_item">
@@ -744,7 +741,7 @@
                                                 <div class="form-group">
                                                     <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
                                                     <input name="ctl00$MainContent$txtShipPhone" type="text"
-                                                        wire:model="shipPhone"
+                                                        wire:model="form.shipPhone"
                                                         readonly maxlength="20"
                                                         id="txtShipPhone" class="form-control"
                                                         data-rule-phone="true">
@@ -754,10 +751,12 @@
                                                 <div class="form-group">
                                                     <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
                                                     <input name="ctl00$MainContent$txtShipEmail" type="text"
-                                                        wire:model="shipEmail"
+                                                        wire:model="form.shipEmail"
                                                         readonly maxlength="50"
-                                                        id="txtShipEmail" class="form-control"
+                                                        id="txtShipEmail" class="form-control @error('form.shipEmail') error @enderror"
                                                         data-rule-email="true">
+                                                    @error('form.shipEmail') <span class="field-error">{{ $message }}</span> @enderror
+
                                                 </div>
                                             </div>
                                         </div>
@@ -776,26 +775,23 @@
                                         <div class="form-base_item">
                                             <div class="form-group">
                                                 <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
-                                                <input type="text" wire:model="shipName" maxlength="35"
-                                                    id="txtShipAddrName" class="form-control is-required"><span
-                                                    class="form-control-validate-info"></span>
+                                                <input type="text" wire:model="form.shipName" maxlength="35"
+                                                    id="txtShipAddrName" class="form-control is-required"><span class="form-control-validate-info"></span>
                                             </div>
                                         </div>
                                         <div class="form-base_row">
                                             <div class="form-base_item">
                                                 <div class="form-group">
                                                     <label for="txtShipAddrStreet">Ulice</label>
-                                                    <input type="text" wire:model="shipStreet" maxlength="35"
-                                                        id="txtShipAddrStreet" class="form-control is-required"><span
-                                                        class="form-control-validate-info"></span>
+                                                    <input type="text" wire:model="form.shipStreet" maxlength="35"
+                                                        id="txtShipAddrStreet" class="form-control is-required"><span class="form-control-validate-info"></span>
                                                 </div>
                                             </div>
                                             <div class="form-base_item">
                                                 <div class="form-group">
                                                     <label for="txtShipAddrCity">Město</label>
-                                                    <input type="text" wire:model="shipCity" maxlength="35"
-                                                        id="txtShipAddrCity" class="form-control is-required"><span
-                                                        class="form-control-validate-info"></span>
+                                                    <input type="text" wire:model="form.shipCity" maxlength="35"
+                                                        id="txtShipAddrCity" class="form-control is-required"><span class="form-control-validate-info"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -803,16 +799,15 @@
                                             <div class="form-base_item">
                                                 <div class="form-group">
                                                     <label for="txtShipAddrZIP">PSČ</label>
-                                                    <input type="text" wire:model="shipZip" maxlength="10"
-                                                        id="txtShipAddrZIP" class="form-control is-required"><span
-                                                        class="form-control-validate-info"></span>
+                                                    <input type="text" wire:model="form.shipZip" maxlength="10"
+                                                        id="txtShipAddrZIP" class="form-control is-required"><span class="form-control-validate-info"></span>
                                                 </div>
                                             </div>
                                             <div class="form-base_item">
                                                 <div class="form-group">
                                                     <label for="ddlShipCountry">Stát</label>
                                                     <div class="ux-combo">
-                                                        <select wire:model="shipCountry" id="ddlShipCountry"
+                                                        <select wire:model="form.shipCountry" id="ddlShipCountry"
                                                             class="form-control ux-combo_field">
                                                             <option value="Česká republika">Česká republika</option>
                                                             <option value="Slovenská republika">Slovenská republika</option>
@@ -825,15 +820,16 @@
                                             <div class="form-base_item">
                                                 <div class="form-group">
                                                     <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
-                                                    <input type="text" wire:model="shipPhone" maxlength="20"
+                                                    <input type="text" wire:model="form.shipPhone" maxlength="20"
                                                         id="txtShipPhone" class="form-control">
                                                 </div>
                                             </div>
                                             <div class="form-base_item">
                                                 <div class="form-group">
                                                     <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
-                                                    <input type="text" wire:model="shipEmail" maxlength="50"
-                                                        id="txtShipEmail" class="form-control">
+                                                    <input type="text" wire:model="form.shipEmail" maxlength="50"
+                                                        id="txtShipEmail" class="form-control @error('form.shipEmail') error @enderror">
+                                                    @error('form.shipEmail') <span class="field-error">{{ $message }}</span> @enderror
                                                 </div>
                                             </div>
                                         </div>

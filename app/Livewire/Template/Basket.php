@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Template;
 
+use App\Livewire\Forms\BasketOrderForm;
 use App\Models\DeliveryAddress;
 use App\Models\Order;
 use App\Models\Product;
@@ -14,49 +15,29 @@ class Basket extends Component
 {
     public string $searchError = '';
 
-    public string $reference = '';
-
-    public string $note = '';
-
-    public string $deliveryDate = '';
-
-    public string $transportId = '';
-
-    public string $shipName = '';
-
-    public string $shipStreet = '';
-
-    public string $shipCity = '';
-
-    public string $shipZip = '';
-
-    public string $shipCountry = 'Česká republika';
-
-    public string $shipPhone = '';
-
-    public string $shipEmail = '';
+    public BasketOrderForm $form;
 
     public function mount(): void
     {
         if (auth()->check()) {
             $user = auth()->user();
-            $this->shipName = trim($user->first_name.' '.$user->last_name);
-            $this->shipStreet = $user->street ?? '';
-            $this->shipCity = $user->city ?? '';
-            $this->shipZip = $user->zip ?? '';
-            $this->shipPhone = $user->phone ?? '';
-            $this->shipEmail = $user->email ?? '';
+            $this->form->shipName = trim($user->first_name.' '.$user->last_name);
+            $this->form->shipStreet = $user->street ?? '';
+            $this->form->shipCity = $user->city ?? '';
+            $this->form->shipZip = $user->zip ?? '';
+            $this->form->shipPhone = $user->phone ?? '';
+            $this->form->shipEmail = $user->email ?? '';
         }
     }
 
     public function applyAddress(string $name, string $street, string $city, string $zip, string $phone, string $email): void
     {
-        $this->shipName = $name;
-        $this->shipStreet = $street;
-        $this->shipCity = $city;
-        $this->shipZip = $zip;
-        $this->shipPhone = $phone;
-        $this->shipEmail = $email;
+        $this->form->shipName = $name;
+        $this->form->shipStreet = $street;
+        $this->form->shipCity = $city;
+        $this->form->shipZip = $zip;
+        $this->form->shipPhone = $phone;
+        $this->form->shipEmail = $email;
     }
 
     public function handleSort(int $id, int $position): void
@@ -180,31 +161,7 @@ class Basket extends Component
             return;
         }
 
-        $validated = validator([
-            'reference' => $this->reference,
-            'note' => $this->note,
-            'deliveryDate' => $this->deliveryDate,
-            'transportId' => $this->transportId,
-            'shipName' => $this->shipName,
-            'shipStreet' => $this->shipStreet,
-            'shipCity' => $this->shipCity,
-            'shipZip' => $this->shipZip,
-            'shipCountry' => $this->shipCountry,
-            'shipPhone' => $this->shipPhone,
-            'shipEmail' => $this->shipEmail,
-        ], [
-            'reference' => ['nullable', 'string', 'max:255'],
-            'note' => ['nullable', 'string'],
-            'deliveryDate' => ['nullable', 'date'],
-            'transportId' => ['nullable', 'integer'],
-            'shipName' => ['required', 'string', 'max:70'],
-            'shipStreet' => ['required', 'string', 'max:35'],
-            'shipCity' => ['required', 'string', 'max:35'],
-            'shipZip' => ['required', 'string', 'max:10'],
-            'shipCountry' => ['required', 'string', 'max:50'],
-            'shipPhone' => ['required', 'string', 'max:20'],
-            'shipEmail' => ['required', 'email', 'max:50'],
-        ])->validate();
+        $this->form->validate();
 
         $cart = app(CartService::class)->resolveCart();
         $items = $cart->items()->orderBy('position')->get();
@@ -226,17 +183,17 @@ class Basket extends Component
             'session_id' => auth()->check() ? null : session()->getId(),
             'status_order_id' => 1,
             'is_open' => $isOpen,
-            'reference' => $validated['reference'],
-            'note' => $validated['note'],
-            'delivery_date' => $validated['deliveryDate'] ?: null,
-            'transport_id' => $validated['transportId'] ?: null,
-            'ship_name' => $validated['shipName'],
-            'ship_street' => $validated['shipStreet'],
-            'ship_city' => $validated['shipCity'],
-            'ship_zip' => $validated['shipZip'],
-            'ship_country' => $validated['shipCountry'],
-            'ship_phone' => $validated['shipPhone'],
-            'ship_email' => $validated['shipEmail'],
+            'reference' => $this->form->reference ?: null,
+            'note' => $this->form->note,
+            'delivery_date' => $this->form->deliveryDate ?: null,
+            'transport_id' => $this->form->transportId ? (int) $this->form->transportId : null,
+            'ship_name' => $this->form->shipName,
+            'ship_street' => $this->form->shipStreet,
+            'ship_city' => $this->form->shipCity,
+            'ship_zip' => $this->form->shipZip,
+            'ship_country' => $this->form->shipCountry,
+            'ship_phone' => $this->form->shipPhone,
+            'ship_email' => $this->form->shipEmail,
             'total_without_vat' => $totalWithoutVat,
             'total_with_vat' => round($totalWithoutVat * 1.21, 2),
         ]);
