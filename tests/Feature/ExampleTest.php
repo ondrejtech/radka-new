@@ -1,7 +1,7 @@
 <?php
 
-it('returns a successful response', function () {
+it('returns a redirect from homepage', function () {
     $response = $this->get('/');
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
 });
