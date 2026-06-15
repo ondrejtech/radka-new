@@ -3,6 +3,7 @@
 namespace App\Livewire\Template;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductCategoryAttribute;
 use App\Models\ProductNavigatorDatum;
 use Illuminate\Support\Collection;
@@ -84,7 +85,7 @@ class ProductCompare extends Component
         }
 
         $categoryNames = $categories->isNotEmpty()
-            ? DB::table('ProductCategory')
+            ? ProductCategory::query()
                 ->whereIn('CategoryCode', $categories)
                 ->pluck('CategoryName', 'CategoryCode')
             : collect();

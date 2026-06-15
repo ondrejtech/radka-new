@@ -5,6 +5,7 @@ namespace App\Livewire\Template;
 use App\Models\Order as OrderModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
+use Livewire\Attributes\Renderless;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -92,6 +93,7 @@ class OrderList extends Component
         ]);
     }
 
+    #[Renderless]
     public function exportXml(): mixed
     {
         $orders = $this->buildQuery()->with(['statusOrder', 'items'])->get();

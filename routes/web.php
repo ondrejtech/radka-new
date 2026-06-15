@@ -7,6 +7,7 @@ use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductFeed;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
@@ -21,8 +22,6 @@ Route::get('/pages/company-marketing', [PagesController::class, 'companyMarketin
 Route::get('/pages/processing-personal-info', [PagesController::class, 'processingPersonalInfo'])->name('pages.processing-personal-info');
 Route::get('/pages/contanct', [PagesController::class, 'contact'])->name('pages.contact');
 
-Route::get('/pages/documents/orderlist', [DocumentController::class, 'order'])->name('pages.documents.orderlist');
-Route::get('/pages/documents/order-{orderId}', [DocumentController::class, 'orderItem'])->name('pages.documents.order');
 Route::get('/pages/documents/term-service', [DocumentController::class, 'termService'])->name('pages.documents.term-service');
 Route::get('/pages/document/claim-product', [DocumentController::class, 'claimProduct'])->name('pages.documents.claim-product');
 Route::get('/pages/document/claim-policy', [DocumentController::class, 'claimPolicy'])->name('pages.documents.claim-policy');
@@ -46,9 +45,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/pages/documents/orderlist', [DocumentController::class, 'order'])->name('pages.documents.orderlist');
+    Route::get('/pages/documents/order-{orderId}', [DocumentController::class, 'orderItem'])->name('pages.documents.order');
 });
 
-Route::get('/ares/lookup/{ico}', [AresController::class, 'lookup'])->name('ares.lookup');
+Route::get('/search', [SearchController::class, 'index'])->name('products.search');
+
+Route::get('/ares/lookup/{ico}', [AresController::class, 'lookup'])
+    ->middleware('throttle:10,1')
+    ->name('ares.lookup');
 
 // PayPal – přihlášení uživatelé
 Route::middleware('auth')->prefix('paypal')->name('paypal.')->group(function (): void {

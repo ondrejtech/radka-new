@@ -3,6 +3,7 @@
 namespace App\Livewire\Template;
 
 use App\Models\Product;
+use App\Models\ProductInformation;
 use App\Services\CartService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -171,7 +172,7 @@ class ProductLayout extends Component
         }
 
         if (! empty($f['excludeSale'])) {
-            $saleInfoCodes = \DB::table('ProductInformation')
+            $saleInfoCodes = ProductInformation::query()
                 ->where('InfoName', 'like', '%Doprodej%')
                 ->pluck('InfoCode');
 

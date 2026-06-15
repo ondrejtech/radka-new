@@ -3,6 +3,7 @@
 namespace App\Livewire\Template;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
@@ -110,7 +111,7 @@ class CompareBar extends Component
             : collect();
 
         $categoryNames = $categories->isNotEmpty()
-            ? \DB::table('ProductCategory')
+            ? ProductCategory::query()
                 ->whereIn('CategoryCode', $categories)
                 ->pluck('CategoryName', 'CategoryCode')
             : collect();

@@ -46,7 +46,7 @@ class PagesController extends Controller
                 'name' => 'Zdena Altmanova',
                 'role' => 'Jednatel/ka spolecnosti',
                 'phone' => '721 178 847',
-                'email' => 'altmanova@techdomoc.eu',
+                'email' => 'altmanova@techdomov.eu',
                 'role_title' => 'obchodní informace',
             ],
             [

@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Template;
 
-use App\Models\Cart;
 use App\Models\CartItem;
+use App\Services\CartService;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -22,11 +22,8 @@ class CartWidget extends Component
 
     public function removeItem(int $cartItemId): void
     {
-        $cart = $this->resolveCart();
-
-        if ($cart) {
-            $cart->items()->where('id', $cartItemId)->delete();
-        }
+        $cart = app(CartService::class)->resolveCart();
+        $cart->items()->where('id', $cartItemId)->delete();
 
         $this->dispatch('message', [
             'text' => 'Zboží bylo úspěšně odebráno z košíku',
@@ -37,12 +34,8 @@ class CartWidget extends Component
 
     public function clearCart(): void
     {
-        $cart = $this->resolveCart();
-
-        if ($cart) {
-            $cart->items()->delete();
-        }
-
+        $cart = app(CartService::class)->resolveCart();
+        $cart->items()->delete();
         $this->isOpen = false;
     }
 
@@ -53,8 +46,8 @@ class CartWidget extends Component
 
     public function render(): View
     {
-        $cart = $this->resolveCart();
-        $items = $cart ? $cart->items()->get() : collect();
+        $cart = app(CartService::class)->resolveCart();
+        $items = $cart->items()->get();
         $totalPrice = $items->sum(fn (CartItem $item) => $item->price * $item->quantity);
         $totalCount = $items->sum('quantity');
 
@@ -63,26 +56,5 @@ class CartWidget extends Component
             'totalPrice' => $totalPrice,
             'totalCount' => $totalCount,
         ]);
-    }
-
-    private function resolveCart(): ?Cart
-    {
-        if (auth()->check()) {
-            return Cart::firstOrCreate(
-                ['user_id' => auth()->id()],
-                ['session_id' => null]
-            );
-        }
-
-        $sessionId = session()->getId();
-
-        return Cart::firstOrCreate(
-            ['session_id' => $sessionId, 'user_id' => null]
-        );
-    }
-
-    private function formatPrice(float $price): string
-    {
-        return number_format($price, 0, ',', ' ').' Kč';
     }
 }

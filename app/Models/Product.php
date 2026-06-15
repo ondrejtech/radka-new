@@ -9,6 +9,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Product
@@ -82,6 +83,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Product extends Model
 {
+	use SoftDeletes;
+
 	protected $table = 'Product';
 	protected $primaryKey = 'ProId';
 	public $incrementing = false;

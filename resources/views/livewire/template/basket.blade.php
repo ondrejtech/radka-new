@@ -660,13 +660,13 @@
                                                     <option value="{{ auth()->user()->id }}" selected="selected">
                                                         {{ auth()->user()->first_name . ', ' . auth()->user()->last_name . ', ' . auth()->user()->street . ', ' . auth()->user()->city . ', ' . auth()->user()->zip }}
                                                     </option>
-                                                    @foreach ($users as $user)
-                                                        @foreach ($user->deliveryAddresses as $address)
+                                                    @if ($currentUser)
+                                                        @foreach ($currentUser->deliveryAddresses as $address)
                                                             <option value="{{ $address->id }}">
                                                                 {{ $address->first_name . ' ' . $address->last_name . ', ' . $address->street . ', ' . $address->city . ', ' . $address->zip }}
                                                             </option>
                                                         @endforeach
-                                                    @endforeach
+                                                    @endif
                                                 </select>
                                             </div>
                                         </div>

@@ -5,7 +5,6 @@ namespace App\Livewire\Template;
 use App\Models\DeliveryAddress;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
 use App\Services\CartService;
 use Illuminate\View\View;
 use Livewire\Attributes\Renderless;
@@ -259,23 +258,23 @@ class Basket extends Component
     {
         $cart = app(CartService::class)->resolveCart();
         $items = $cart->items()->with('product')->orderBy('position')->get();
-        $users = User::with('deliveryAddresses')->get();
 
         $addressData = collect();
+        $currentUser = null;
 
         if (auth()->check()) {
-            $user = auth()->user();
+            $currentUser = auth()->user()->load('deliveryAddresses');
             $addressData = collect([
-                (string) $user->id => [
-                    'name' => $user->first_name.' '.$user->last_name,
-                    'street' => $user->street ?? '',
-                    'city' => $user->city ?? '',
-                    'zip' => $user->zip ?? '',
-                    'phone' => $user->phone ?? '',
-                    'email' => $user->email ?? '',
+                (string) $currentUser->id => [
+                    'name' => $currentUser->first_name.' '.$currentUser->last_name,
+                    'street' => $currentUser->street ?? '',
+                    'city' => $currentUser->city ?? '',
+                    'zip' => $currentUser->zip ?? '',
+                    'phone' => $currentUser->phone ?? '',
+                    'email' => $currentUser->email ?? '',
                 ],
             ])->merge(
-                $users->flatMap->deliveryAddresses->mapWithKeys(fn ($a) => [
+                $currentUser->deliveryAddresses->mapWithKeys(fn ($a) => [
                     (string) $a->id => [
                         'name' => $a->first_name.' '.$a->last_name,
                         'street' => $a->street ?? '',
@@ -294,7 +293,7 @@ class Basket extends Component
         return view('livewire.template.basket', [
             'cart' => $cart,
             'items' => $items,
-            'users' => $users,
+            'currentUser' => $currentUser,
             'addressData' => $addressData,
             'totalWithoutVat' => $totalWithoutVat,
             'totalWithVat' => $totalWithVat,
