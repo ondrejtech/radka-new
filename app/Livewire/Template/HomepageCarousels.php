@@ -88,7 +88,7 @@ class HomepageCarousels extends Component
     {
         $key = $isL1 ? "homepage_carousels_l1_{$code}" : "homepage_carousels_l2_{$code}";
 
-        return Cache::remember($key, 3600, fn (): array => $isL1
+        return Cache::remember($key, 86400, fn (): array => $isL1
             ? $this->buildL1Carousels($code)
             : $this->buildL2Carousels($code)
         );
