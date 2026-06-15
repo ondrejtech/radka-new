@@ -11,7 +11,7 @@
 # =============================================================
 set -euo pipefail
 
-GITLAB_HOST="gitlab.ozelina.eu"
+GITLAB_HOST="gitlab.techdomov.eu"
 PROJECT_PATH="proxmox/lxc/techdomov"
 PROJECT_ENCODED="proxmox%2Flxc%2Ftechdomov"
 PACKAGE_NAME="lxc-template"

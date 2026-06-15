@@ -114,10 +114,23 @@ chr_env apt-get install -y --no-install-recommends \
     composer \
     unzip curl wget rsync \
     logrotate cron \
-    libaio1 libmecab2
+    libaio1t64 libmecab2
 
 # MySQL 8.0 — instalace z lokálních .deb souborů ve správném pořadí
 _log "Step 5b: Installing MySQL 8.0 from deb bundle..."
+
+# Zabrání spuštění služeb během dpkg (standardní praxe při chroot builds)
+echo '#!/bin/sh
+exit 101' > "$ROOTFS/usr/sbin/policy-rc.d"
+chmod +x "$ROOTFS/usr/sbin/policy-rc.d"
+
+# Pre-seed debconf — odpovědi na MySQL dialogy před instalací
+chr bash -c 'cat <<EOF | debconf-set-selections
+mysql-community-server mysql-community-server/root-pass       password
+mysql-community-server mysql-community-server/re-root-pass    password
+mysql-community-server mysql-server/default-auth-override     select Use Strong Password Encryption (RECOMMENDED)
+EOF'
+
 chr bash -c "
     cd /tmp/mysql-debs
     DEBIAN_FRONTEND=noninteractive dpkg -i \
@@ -128,10 +141,13 @@ chr bash -c "
         mysql-client_*.deb \
         mysql-community-server-core_*.deb \
         mysql-community-server_*.deb \
-        mysql-server_*.deb \
-    || apt-get install -f -y
+        mysql-server_*.deb 2>&1 || true
+    DEBIAN_FRONTEND=noninteractive apt-get install -f -y 2>&1 || true
     rm -rf /tmp/mysql-debs /tmp/mysql-bundle.tar
 "
+
+# Obnov normální chování služeb
+rm -f "$ROOTFS/usr/sbin/policy-rc.d"
 
 # ── Step 6: Copy project files ────────────────────────────────
 _log "Step 6: Copying project files..."
