@@ -96,86 +96,93 @@ class HomepageCarousels extends Component
 
     private function buildL1Carousels(int $l1Code): array
     {
+        // 1 query: all L2 children with their categories eager-loaded
         $l2Children = ProductSuperCategory::where('ParentSuperCategoryCode', $l1Code)
+            ->with('categories:SuperCategoryCode,CategoryCode,CategoryName')
             ->orderBy('SuperCategoryCode')
             ->get();
 
-        $carousels = [];
-
+        // Build map: L2 SuperCategoryCode → [CategoryCode, ...]
+        $l2CategoryMap = [];
         foreach ($l2Children as $l2) {
-            $categoryCodes = $l2->categories()->pluck('CategoryCode')->toArray();
-
-            if (empty($categoryCodes)) {
-                continue;
-            }
-
-            $carousel = $this->buildCarouselFromCategoryCodes($categoryCodes, $l2->SuperCategoryName);
-
-            if ($carousel) {
-                $carousels[] = $carousel;
+            $codes = $l2->categories->pluck('CategoryCode')->toArray();
+            if (! empty($codes)) {
+                $l2CategoryMap[$l2->SuperCategoryCode] = [
+                    'title' => $l2->SuperCategoryName,
+                    'categoryCodes' => $codes,
+                ];
             }
         }
 
-        return $carousels;
+        return $this->buildCarouselsFromMap($l2CategoryMap);
     }
 
     private function buildL2Carousels(int $l2Code): array
     {
+        // 1 query: all categories under this L2
         $categories = ProductCategory::where('SuperCategoryCode', $l2Code)
             ->orderBy('CategoryCode')
-            ->get();
+            ->get(['CategoryCode', 'CategoryName']);
 
-        $carousels = [];
-
-        foreach ($categories as $category) {
-            $carousel = $this->buildCarouselFromCategoryCodes(
-                [$category->CategoryCode],
-                $category->CategoryName
-            );
-
-            if ($carousel) {
-                $carousels[] = $carousel;
-            }
+        $map = [];
+        foreach ($categories as $cat) {
+            $map[$cat->CategoryCode] = [
+                'title' => $cat->CategoryName,
+                'categoryCodes' => [$cat->CategoryCode],
+            ];
         }
 
-        return $carousels;
+        return $this->buildCarouselsFromMap($map);
     }
 
-    private function buildCarouselFromCategoryCodes(array $categoryCodes, string $title): ?array
+    /** @param array<int|string, array{title: string, categoryCodes: int[]}> $map */
+    private function buildCarouselsFromMap(array $map): array
     {
-        $products = Product::whereIn('CategoryCode', $categoryCodes)
-            ->orderByDesc('IsTop')
-            ->orderByDesc('OnStock')
-            ->limit(self::PRODUCTS_PER_CAROUSEL)
-            ->get(['ProId', 'Name', 'EndUserPrice', 'OnStock', 'Status', 'DescriptionShort']);
-
-        if ($products->isEmpty()) {
-            return null;
+        if (empty($map)) {
+            return [];
         }
 
-        $productIds = $products->pluck('ProId')->toArray();
+        // N queries (one per group, with LIMIT) — necessary for correct per-carousel limiting
+        $groupProducts = [];
+        foreach ($map as $key => $entry) {
+            $groupProducts[$key] = Product::whereIn('CategoryCode', $entry['categoryCodes'])
+                ->orderByDesc('IsTop')
+                ->orderByDesc('OnStock')
+                ->limit(self::PRODUCTS_PER_CAROUSEL)
+                ->get(['ProId', 'Name', 'EndUserPrice', 'OnStock', 'Status', 'DescriptionShort']);
+        }
 
-        $images = ProductImage::whereIn('ProId', $productIds)
+        // 1 batch query: all images for all carousel products at once
+        $allProIds = collect($groupProducts)->flatten()->pluck('ProId')->unique()->toArray();
+        $allImages = ProductImage::whereIn('ProId', $allProIds)
             ->get(['ProId', 'URL'])
             ->groupBy('ProId')
             ->map(fn ($imgs) => $imgs->first()->URL);
 
-        $products = $products
-            ->map(fn (Product $p): array => [
-                'ProId' => $p->ProId,
-                'Name' => $p->Name,
-                'slug' => Str::slug($p->Name),
-                'EndUserPrice' => $p->EndUserPrice,
-                'OnStock' => (bool) $p->OnStock,
-                'Status' => $p->Status,
-                'DescriptionShort' => $p->DescriptionShort,
-                'imageUrl' => $images[$p->ProId] ?? '',
-            ])
-            ->toArray();
+        $carousels = [];
 
-        return [
-            'title' => $title,
-            'products' => $products,
-        ];
+        foreach ($map as $key => $entry) {
+            $products = $groupProducts[$key];
+
+            if ($products->isEmpty()) {
+                continue;
+            }
+
+            $carousels[] = [
+                'title' => $entry['title'],
+                'products' => $products->map(fn (Product $p): array => [
+                    'ProId' => $p->ProId,
+                    'Name' => $p->Name,
+                    'slug' => Str::slug($p->Name),
+                    'EndUserPrice' => $p->EndUserPrice,
+                    'OnStock' => (bool) $p->OnStock,
+                    'Status' => $p->Status,
+                    'DescriptionShort' => $p->DescriptionShort,
+                    'imageUrl' => $allImages[$p->ProId] ?? '',
+                ])->values()->toArray(),
+            ];
+        }
+
+        return $carousels;
     }
 }
