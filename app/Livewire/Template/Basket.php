@@ -113,7 +113,7 @@ class Basket extends Component
         app(CartService::class)->addItem(
             proId: $product->ProId,
             name: $product->Name,
-            price: (float) ($product->YourPrice ?? 0),
+            price: (float) ($product->EndUserPrice ?? 0),
             quantity: 1,
         );
 
@@ -123,6 +123,10 @@ class Basket extends Component
     #[Renderless]
     public function saveDeliveryAddress(string $name, string $street, string $city, string $zip, string $phone, string $email): void
     {
+        if (! auth()->check()) {
+            return;
+        }
+
         $validated = validator(compact('name', 'street', 'city', 'zip', 'phone', 'email'), [
             'name' => ['required', 'string', 'max:35'],
             'street' => ['required', 'string', 'max:35'],

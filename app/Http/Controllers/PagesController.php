@@ -23,22 +23,22 @@ class PagesController extends Controller
         ]);
     }
 
-    public function basket()
+    public function basket(): View
     {
         return view('pages.cart.index');
     }
 
-    public function companyMarketing()
+    public function companyMarketing(): View
     {
         return view('pages.company-marketing');
     }
 
-    public function processingPersonalInfo()
+    public function processingPersonalInfo(): View
     {
         return view('pages.processing-personal-info');
     }
 
-    public function contact()
+    public function contact(): View
     {
         $persons = [
             [

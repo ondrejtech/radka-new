@@ -5,8 +5,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PayPalController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductFeed;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
@@ -15,12 +15,11 @@ Route::get('/', [CategoryController::class, 'home']);
 
 Route::get('/product-feed/heureka.xml', [ProductFeed::class, 'heurekaFeed'])->name('product-feed.heureka');
 
-
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');
 Route::get('/pages/company-marketing', [PagesController::class, 'companyMarketing'])->name('pages.company-marketing');
 Route::get('/pages/processing-personal-info', [PagesController::class, 'processingPersonalInfo'])->name('pages.processing-personal-info');
-Route::get('/pages/contanct', [PagesController::class, 'contact'])->name('pages.contact');
+Route::get('/pages/contact', [PagesController::class, 'contact'])->name('pages.contact');
 
 Route::get('/pages/documents/term-service', [DocumentController::class, 'termService'])->name('pages.documents.term-service');
 Route::get('/pages/document/claim-product', [DocumentController::class, 'claimProduct'])->name('pages.documents.claim-product');

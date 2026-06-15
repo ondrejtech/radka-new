@@ -8,12 +8,16 @@ use Illuminate\Support\Facades\Log;
 
 class PayPalService
 {
-    private PayPalClient $client;
+    private ?PayPalClient $client = null;
 
-    public function __construct()
+    private function client(): PayPalClient
     {
-        $this->client = new PayPalClient;
-        $this->client->getAccessToken();
+        if ($this->client === null) {
+            $this->client = new PayPalClient;
+            $this->client->getAccessToken();
+        }
+
+        return $this->client;
     }
 
     /**
@@ -21,7 +25,7 @@ class PayPalService
      */
     public function createOrder(Order $order, string $returnUrl, string $cancelUrl): string
     {
-        $response = $this->client->createOrder([
+        $response = $this->client()->createOrder([
             'intent' => 'CAPTURE',
             'purchase_units' => [
                 [
@@ -72,7 +76,7 @@ class PayPalService
             return false;
         }
 
-        $response = $this->client->capturePaymentOrder($order->paypal_order_id);
+        $response = $this->client()->capturePaymentOrder($order->paypal_order_id);
 
         if (($response['status'] ?? '') !== 'COMPLETED') {
             Log::error('PayPal capture failed', ['response' => $response, 'order_id' => $order->id]);
@@ -97,7 +101,7 @@ class PayPalService
      */
     public function verifyWebhook(array $headers, array $payload): bool
     {
-        $result = $this->client->verifyWebHook([
+        $result = $this->client()->verifyWebHook([
             'auth_algo' => $headers['paypal-auth-algo'] ?? '',
             'cert_url' => $headers['paypal-cert-url'] ?? '',
             'transmission_id' => $headers['paypal-transmission-id'] ?? '',

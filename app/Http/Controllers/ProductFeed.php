@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ProductFeed extends Controller
 {
-    public function heurekaFeed()
+    public function heurekaFeed(): Response
     {
         $path = public_path('xml/heureka_feed.xml');
 

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Order extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
         'user_id',
         'session_id',
@@ -60,5 +61,10 @@ class Order extends Model
     public function invoice(): HasOne
     {
         return $this->hasOne(Invoice::class);
+    }
+
+    public function transportation(): BelongsTo
+    {
+        return $this->belongsTo(Transportation::class, 'transport_id', 'Code');
     }
 }
