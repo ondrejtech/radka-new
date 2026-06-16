@@ -48,6 +48,11 @@ class SideProductFilter extends Component
         $this->dispatch('filters-updated', filters: $this->activeFilters());
     }
 
+    public function dispatchFilters(): void
+    {
+        $this->dispatch('filters-updated', filters: $this->activeFilters());
+    }
+
     /** @return array<string, mixed> */
     private function activeFilters(): array
     {

@@ -18,12 +18,14 @@
                                     <input type="search" wire:model.live.debounce.400ms="filterFulltext"
                                         name="fulltext" id="fulltextadd_inp"
                                         class="form-control" placeholder="Hledaný výraz"
-                                        autocomplete="off">
+                                        autocomplete="off"
+                                        @keydown.enter.prevent="$wire.dispatchFilters()">
                                 </div>
                             </div>
                             <div class="form-base_item">
                                 <button type="button" class="btn" title="Dofiltrovat výsledky"
-                                    aria-label="Hledat" id="fulltextadd">
+                                    aria-label="Hledat" id="fulltextadd"
+                                    wire:click="dispatchFilters">
                                     <i class="btn_icon icon-search"></i>
                                 </button>
                             </div>
