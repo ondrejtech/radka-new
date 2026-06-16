@@ -27,3 +27,5 @@ Homestead.yaml
 Thumbs.db
 public/IMGCACHE/
 deploy.sh
+.claude/
+session-report-*.html
