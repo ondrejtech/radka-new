@@ -46,7 +46,7 @@ class PagesController extends Controller
                 'name' => 'Zdena Altmanova',
                 'role' => 'Jednatel/ka spolecnosti',
                 'phone' => '721 178 847',
-                'email' => 'altmanova@techdomov.eu',
+                'email' => 'altmanova@multishoping.eu',
                 'role_title' => 'obchodní informace',
             ],
             [
@@ -54,7 +54,7 @@ class PagesController extends Controller
                 'name' => 'Lubos Petr',
                 'role' => 'Obchodni manazer',
                 'phone' => '721 178 847',
-                'email' => 'petr@techdomov.eu',
+                'email' => 'petr@multishoping.eu',
                 'role_title' => 'obchodní informace',
             ],
             [
@@ -62,7 +62,7 @@ class PagesController extends Controller
                 'name' => 'Petr Jakubicek',
                 'role' => 'Obchodni manazer',
                 'phone' => '721 178 847',
-                'email' => 'jakubicek@techdomov.eu',
+                'email' => 'jakubicek@multishoping.eu',
                 'role_title' => 'obchodní informace',
             ],
         ];
