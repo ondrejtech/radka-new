@@ -10,6 +10,9 @@ class PayPalService
 {
     private ?PayPalClient $client = null;
 
+    /** Transient PayPal error names that are safe to retry. */
+    private const RETRYABLE_ERRORS = ['AUTHENTICATION_FAILURE', 'INTERNAL_SERVER_ERROR', 'SERVICE_UNAVAILABLE'];
+
     private function client(): PayPalClient
     {
         if ($this->client === null) {
@@ -20,32 +23,52 @@ class PayPalService
         return $this->client;
     }
 
+    private function isRetryable(array $response): bool
+    {
+        $name = $response['error']['name'] ?? $response['name'] ?? '';
+
+        return in_array($name, self::RETRYABLE_ERRORS, strict: true);
+    }
+
     /**
      * Create a PayPal order and return the approval URL.
      */
     public function createOrder(Order $order, string $returnUrl, string $cancelUrl): string
     {
-        $response = $this->client()->createOrder([
-            'intent' => 'CAPTURE',
-            'purchase_units' => [
-                [
-                    'reference_id' => (string) $order->id,
-                    'description' => 'Objednávka č. '.$order->id,
-                    'amount' => [
-                        'currency_code' => 'CZK',
-                        'value' => number_format((float) $order->total_with_vat, 2, '.', ''),
+        $response = retry(3, function () use ($order, $returnUrl, $cancelUrl) {
+            $response = $this->client()->createOrder([
+                'intent' => 'CAPTURE',
+                'purchase_units' => [
+                    [
+                        'reference_id' => (string) $order->id,
+                        'description' => 'Objednávka č. '.$order->id,
+                        'amount' => [
+                            'currency_code' => 'CZK',
+                            'value' => number_format((float) $order->total_with_vat, 2, '.', ''),
+                        ],
                     ],
                 ],
-            ],
-            'application_context' => [
-                'return_url' => $returnUrl,
-                'cancel_url' => $cancelUrl,
-                'brand_name' => config('app.name'),
-                'locale' => 'cs-CZ',
-                'landing_page' => 'BILLING',
-                'user_action' => 'PAY_NOW',
-            ],
-        ]);
+                'application_context' => [
+                    'return_url' => $returnUrl,
+                    'cancel_url' => $cancelUrl,
+                    'brand_name' => config('app.name'),
+                    'locale' => 'cs-CZ',
+                    'landing_page' => 'BILLING',
+                    'user_action' => 'PAY_NOW',
+                ],
+            ]);
+
+            if ($this->isRetryable($response)) {
+                throw new \RuntimeException($response['error']['name'] ?? $response['name'] ?? 'TRANSIENT_ERROR');
+            }
+
+            return $response;
+        }, 300, function (\Throwable $e) use ($order) {
+            Log::warning('PayPal createOrder retry', ['error' => $e->getMessage(), 'order_id' => $order->id]);
+            $this->client = null;
+
+            return true;
+        });
 
         if (empty($response['id'])) {
             Log::error('PayPal createOrder failed', ['response' => $response, 'order_id' => $order->id]);
@@ -76,7 +99,20 @@ class PayPalService
             return false;
         }
 
-        $response = $this->client()->capturePaymentOrder($order->paypal_order_id);
+        $response = retry(3, function () use ($order) {
+            $response = $this->client()->capturePaymentOrder($order->paypal_order_id);
+
+            if ($this->isRetryable($response)) {
+                throw new \RuntimeException($response['error']['name'] ?? $response['name'] ?? 'TRANSIENT_ERROR');
+            }
+
+            return $response;
+        }, 300, function (\Throwable $e) use ($order) {
+            Log::warning('PayPal captureOrder retry', ['error' => $e->getMessage(), 'order_id' => $order->id]);
+            $this->client = null;
+
+            return true;
+        });
 
         if (($response['status'] ?? '') !== 'COMPLETED') {
             Log::error('PayPal capture failed', ['response' => $response, 'order_id' => $order->id]);
