@@ -7,6 +7,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Models\ProductProducer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -41,16 +42,22 @@ class SearchForm extends Component
             ->where('ProducerName', 'like', '%'.$term.'%')
             ->limit(3)
             ->get(['ProducerId', 'ProducerCode', 'ProducerName'])
+            ->map(fn (ProductProducer $p): array => array_merge($p->toArray(), [
+                'url' => route('products.search', ['fulltext' => $p->ProducerName]),
+            ]))
             ->toArray();
 
         $categories = ProductCategory::query()
             ->where('CategoryName', 'like', '%'.$term.'%')
             ->limit(3)
             ->get(['CategoryCode', 'CategoryName'])
+            ->map(fn (ProductCategory $c): array => array_merge($c->toArray(), [
+                'url' => '/kategorie/'.Str::slug($c->CategoryName).'/n-0,'.$c->CategoryCode.',0',
+            ]))
             ->toArray();
 
         $products = Product::query()
-            ->where(function ($q) use ($term) {
+            ->where(function ($q) use ($term): void {
                 $q->where('Name', 'like', '%'.$term.'%')
                     ->orWhere('Code', 'like', '%'.$term.'%')
                     ->orWhere('PartNumber', 'like', '%'.$term.'%');
@@ -66,6 +73,9 @@ class SearchForm extends Component
             )
             ->limit(10)
             ->get(['Product.ProId', 'Product.Name', 'Product.Status', 'first_image.ImageUrl'])
+            ->map(fn (Product $p): array => array_merge($p->toArray(), [
+                'url' => route('product.detail', ['slug' => Str::slug($p->Name), 'proId' => $p->ProId]),
+            ]))
             ->toArray();
 
         $this->results = [

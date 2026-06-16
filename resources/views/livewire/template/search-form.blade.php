@@ -37,8 +37,7 @@
                             <li class="whisperer_item ui-menu-item" role="presentation" wire:key="producer-{{ $producer['ProducerId'] }}">
                                 <a class="whisperer_name whisperer_name--vendor item-vendor ui-corner-all"
                                     data-vendor-id="{{ $producer['ProducerId'] }}"
-                                    href="#"
-                                    {{-- TODO: route pro výpis produktů výrobce --}}
+                                    href="{{ $producer['url'] }}"
                                 >{!! $this->highlightTerm($producer['ProducerName'], $query) !!}</a>
                             </li>
                         @endforeach
@@ -50,8 +49,7 @@
                         @foreach ($results['categories'] as $category)
                             <li class="whisperer_item ui-menu-item" role="presentation" wire:key="category-{{ $category['CategoryCode'] }}">
                                 <a class="whisperer_name whisperer_name--category item-category ui-corner-all"
-                                    href="#"
-                                    {{-- TODO: route pro výpis produktů kategorie --}}
+                                    href="{{ $category['url'] }}"
                                 >{!! $this->highlightTerm($category['CategoryName'], $query) !!}</a>
                             </li>
                         @endforeach
@@ -63,14 +61,12 @@
                         @foreach ($results['products'] as $product)
                             <li class="whisperer_item ui-menu-item" role="presentation" wire:key="product-{{ $product['ProId'] }}">
                                 @if (!empty($product['ImageUrl']))
-                                    <a href="#" class="whisperer_box-img ui-corner-all" tabindex="-1">
-                                        {{-- TODO: route pro detail produktu --}}
+                                    <a href="{{ $product['url'] }}" class="whisperer_box-img ui-corner-all" tabindex="-1">
                                         <img class="pro-img" src="{{ $product['ImageUrl'] }}" alt="" />
                                     </a>
                                 @endif
                                 <a class="whisperer_name ui-corner-all"
-                                    href="#"
-                                    {{-- TODO: route pro detail produktu --}}
+                                    href="{{ $product['url'] }}"
                                     tabindex="-1"
                                 >
                                     {!! $this->highlightTerm($product['Name'], $query) !!}
