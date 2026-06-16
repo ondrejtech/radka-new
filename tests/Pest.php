@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +45,43 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function validRegistrationPayload(array $overrides = []): array
 {
-    // ..
+    return array_merge([
+        'first_name' => 'Test',
+        'last_name' => 'User',
+        'email' => 'newuser@example.com',
+        'phone' => '+420123456789',
+        'company_name' => 'Test s.r.o.',
+        'company_ic' => '12345678',
+        'company_dic' => null,
+        'street' => 'Testovací 1',
+        'city' => 'Praha',
+        'zip' => '11000',
+        'country' => 'Česká republika',
+        'note' => null,
+        'password' => 'Password1!',
+        'password_confirmation' => 'Password1!',
+        'terms_accepted' => '1',
+    ], $overrides);
+}
+
+function createTestOrder(array $overrides = []): Order
+{
+    return Order::create(array_merge([
+        'user_id' => null,
+        'session_id' => 'test-session-default',
+        'status_order_id' => 1,
+        'is_open' => false,
+        'ship_name' => 'Test User',
+        'ship_street' => 'Testovací 1',
+        'ship_city' => 'Praha',
+        'ship_zip' => '11000',
+        'ship_country' => 'CZ',
+        'ship_phone' => '+420123456789',
+        'ship_email' => 'test@example.com',
+        'total_without_vat' => 100.00,
+        'total_with_vat' => 121.00,
+        'payment_status' => 'unpaid',
+    ], $overrides));
 }
