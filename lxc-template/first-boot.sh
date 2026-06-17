@@ -42,8 +42,10 @@ for i in {1..30}; do
 done
 
 _log "Configuring MySQL root password and application user..."
-mysql -h 127.0.0.1 -u root <<SQL
+# Fresh install: root accessible via unix socket without password
+mysql -u root --socket=/var/run/mysqld/mysqld.sock <<SQL
 ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '${DB_ROOT_PASSWORD}';
+ALTER USER 'root'@'127.0.0.1' IDENTIFIED WITH caching_sha2_password BY '${DB_ROOT_PASSWORD}' ;
 CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`
     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
