@@ -42,10 +42,19 @@ for i in {1..30}; do
 done
 
 _log "Configuring MySQL root password and application user..."
-# Fresh install: root accessible via unix socket without password
-mysql -u root --socket=/var/run/mysqld/mysqld.sock <<SQL
+# Fresh install: try root with no password first (--initialize-insecure),
+# fall back to DB_ROOT_PASSWORD if already set
+MYSQL_INIT_OPTS="-u root --socket=/var/run/mysqld/mysqld.sock"
+if mysql $MYSQL_INIT_OPTS -e "SELECT 1;" >/dev/null 2>&1; then
+    _log "Connected as root without password (fresh install)"
+elif mysql $MYSQL_INIT_OPTS --password="${DB_ROOT_PASSWORD}" -e "SELECT 1;" >/dev/null 2>&1; then
+    _log "Connected as root with DB_ROOT_PASSWORD"
+    MYSQL_INIT_OPTS="$MYSQL_INIT_OPTS --password=${DB_ROOT_PASSWORD}"
+else
+    _err "Cannot connect to MySQL as root — check credentials"
+fi
+mysql $MYSQL_INIT_OPTS <<SQL
 ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '${DB_ROOT_PASSWORD}';
-ALTER USER 'root'@'127.0.0.1' IDENTIFIED WITH caching_sha2_password BY '${DB_ROOT_PASSWORD}' ;
 CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`
     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
@@ -54,6 +63,9 @@ FLUSH PRIVILEGES;
 SQL
 
 # ── 3. Import edsystem.sql ────────────────────────────────────
+# Drop and recreate DB to ensure clean import (idempotent re-runs)
+mysql -h 127.0.0.1 -u root -p"${DB_ROOT_PASSWORD}" -e "DROP DATABASE IF EXISTS \`${DB_DATABASE}\`; CREATE DATABASE \`${DB_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
 if [[ -f "$SQL_DUMP" ]]; then
     _log "Importing edsystem.sql (foreign key checks disabled)..."
     {
@@ -69,7 +81,7 @@ fi
 # ── 4. Laravel bootstrap ──────────────────────────────────────
 _log "Running Laravel bootstrap as www-data..."
 
-sudo -u www-data bash -c "
+su -s /bin/bash www-data -c "
     cd $APP_DIR
 
     php artisan key:generate --force
