@@ -307,7 +307,7 @@
                                 pay() {
                                     this.loading = true;
                                     this.error = '';
-                                    fetch('{{ auth()->check() ? route('paypal.order.create', $order) : route('paypal.guest.order.create', $order) }}', {
+                                    fetch('/paypal{{ auth()->check() ? '' : '/guest' }}/order/{{ $order->id }}/create', {
                                         method: 'POST',
                                         headers: {
                                             'X-CSRF-TOKEN': document.getElementById('csrfToken').value,
