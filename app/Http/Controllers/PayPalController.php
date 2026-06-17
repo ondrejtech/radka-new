@@ -57,6 +57,10 @@ class PayPalController extends Controller
 
         $captured = $this->payPalService->captureOrder($order);
 
+        if (is_string($captured)) {
+            return redirect()->away($captured);
+        }
+
         if (! $captured) {
             return redirect()->route('pages.documents.order', ['orderId' => $order->id])
                 ->with('error', 'Platba se nezdařila. Zkuste to prosím znovu.');

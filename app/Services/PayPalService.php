@@ -92,8 +92,11 @@ class PayPalService
 
     /**
      * Capture payment after customer approval.
+     *
+     * Returns true on success, a redirect URL string when instrument is declined
+     * (user should be sent back to PayPal to retry), or false on hard failure.
      */
-    public function captureOrder(Order $order): bool
+    public function captureOrder(Order $order): bool|string
     {
         if (! $order->paypal_order_id) {
             return false;
@@ -115,6 +118,20 @@ class PayPalService
         });
 
         if (($response['status'] ?? '') !== 'COMPLETED') {
+            $issue = $response['error']['details'][0]['issue'] ?? $response['details'][0]['issue'] ?? '';
+
+            // INSTRUMENT_DECLINED: redirect user back to PayPal to try a different payment method
+            if ($issue === 'INSTRUMENT_DECLINED') {
+                $retryUrl = collect($response['error']['links'] ?? $response['links'] ?? [])
+                    ->firstWhere('rel', 'redirect')['href'] ?? null;
+
+                if ($retryUrl) {
+                    Log::warning('PayPal instrument declined, redirecting to retry', ['order_id' => $order->id]);
+
+                    return $retryUrl;
+                }
+            }
+
             Log::error('PayPal capture failed', ['response' => $response, 'order_id' => $order->id]);
             $order->update(['payment_status' => 'failed']);
 
