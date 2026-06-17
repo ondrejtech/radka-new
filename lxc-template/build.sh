@@ -6,7 +6,7 @@
 # Usage:
 #   bash build.sh [output-path]
 #
-# Default output: /var/lib/vz/template/cache/debian-12-techdomov_YYYYMMDD_amd64.tar.gz
+# Default output: /var/lib/vz/template/cache/debian-13-techdomov_YYYYMMDD_amd64.tar.gz
 # =============================================================
 set -euo pipefail
 
@@ -14,7 +14,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ROOTFS="/tmp/techdomov-rootfs"
-OUTPUT="${1:-/var/lib/vz/template/cache/debian-12-techdomov_$(date +%Y%m%d)_amd64.tar.gz}"
+OUTPUT="${1:-/var/lib/vz/template/cache/debian-13-techdomov_$(date +%Y%m%d)_amd64.tar.gz}"
 PMA_VERSION="5.2.1"
 
 # ── Helpers ───────────────────────────────────────────────────
@@ -39,22 +39,41 @@ _log "Output:  $OUTPUT"
 # ── Cleanup on exit ───────────────────────────────────────────
 cleanup() {
     _log "Unmounting pseudo-filesystems..."
-    for mp in proc sys dev/pts dev; do
+    for mp in proc sys dev/pts dev/shm dev; do
         mountpoint -q "$ROOTFS/$mp" 2>/dev/null && umount -lf "$ROOTFS/$mp" || true
     done
 }
 trap cleanup EXIT
 
-# ── Step 1: Bootstrap Debian 12 ───────────────────────────────
-_log "Step 1: Bootstrapping Debian 12 (bookworm) — this takes a few minutes..."
-[[ -d "$ROOTFS" ]] && rm -rf "$ROOTFS"
-debootstrap --arch=amd64 bookworm "$ROOTFS" http://deb.debian.org/debian
+# ── Step 1: Bootstrap Debian 13 (trixie) ─────────────────────
+_log "Step 1: Bootstrapping Debian 13 (trixie) — this takes a few minutes..."
+if [[ -d "$ROOTFS" ]]; then
+    for mp in proc sys dev/pts dev; do
+        mountpoint -q "$ROOTFS/$mp" 2>/dev/null && umount -lf "$ROOTFS/$mp" || true
+    done
+    rm -rf "$ROOTFS"
+fi
+debootstrap --arch=amd64 trixie "$ROOTFS" http://deb.debian.org/debian
 
 # ── Step 2: Mount pseudo-filesystems ─────────────────────────
-mount -t proc    proc     "$ROOTFS/proc"
-mount -t sysfs   sysfs    "$ROOTFS/sys"
-mount --bind     /dev     "$ROOTFS/dev"
-mount -t devpts  devpts   "$ROOTFS/dev/pts"
+mount -t proc   proc    "$ROOTFS/proc"
+mount -t sysfs  sysfs   "$ROOTFS/sys"
+
+# Use isolated tmpfs for /dev — never bind-mount host /dev (would corrupt host device nodes)
+mount -t tmpfs tmpfs "$ROOTFS/dev"
+mknod -m 666 "$ROOTFS/dev/null"    c 1 3
+mknod -m 666 "$ROOTFS/dev/zero"    c 1 5
+mknod -m 666 "$ROOTFS/dev/random"  c 1 8
+mknod -m 666 "$ROOTFS/dev/urandom" c 1 9
+mknod -m 666 "$ROOTFS/dev/tty"     c 5 0
+mknod -m 620 "$ROOTFS/dev/tty0"    c 4 0
+ln -s /proc/self/fd   "$ROOTFS/dev/fd"
+ln -s /proc/self/fd/0 "$ROOTFS/dev/stdin"
+ln -s /proc/self/fd/1 "$ROOTFS/dev/stdout"
+ln -s /proc/self/fd/2 "$ROOTFS/dev/stderr"
+mkdir -p "$ROOTFS/dev/pts" "$ROOTFS/dev/shm"
+mount -t devpts devpts "$ROOTFS/dev/pts" -o gid=5,mode=620
+mount -t tmpfs  tmpfs  "$ROOTFS/dev/shm"
 
 # Forward DNS into chroot
 cp /etc/resolv.conf "$ROOTFS/etc/resolv.conf"
@@ -88,7 +107,7 @@ chr_env apt-get install -y --no-install-recommends \
 # PHP 8.4 — packages.sury.org
 chr bash -c 'curl -sSLo /tmp/debsuryorg-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb && dpkg -i /tmp/debsuryorg-keyring.deb' \
     || _err "Failed to install sury.org keyring"
-echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ bookworm main" \
+echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ trixie main" \
     > "$ROOTFS/etc/apt/sources.list.d/php.list"
 
 # MySQL 8.0 — instalace z .deb bundle (obejde expirovaný GPG klíč)
@@ -114,7 +133,30 @@ chr_env apt-get install -y --no-install-recommends \
     composer \
     unzip curl wget rsync \
     logrotate cron \
-    libaio1t64 libmecab2
+    equivs libaio1t64 libnuma1 libmecab2 perl
+
+# Debian 13 (trixie) compat: libaio1t64 was renamed from libaio1 and does NOT provide
+# the libaio1 virtual package. MySQL debian12 bundle depends on libaio1, so we create
+# a compatibility stub + symlink so MySQL can be installed and run on trixie.
+chr bash -c '
+    # Runtime symlink: MySQL binary links against libaio.so.1, trixie only has libaio.so.1t64
+    ln -sf libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+
+    # Create equivs stub so dpkg considers libaio1 satisfied
+    cat > /tmp/libaio1-compat.ctl <<EOF
+Section: libs
+Priority: optional
+Standards-Version: 4.5.1
+Package: libaio1
+Version: 0.3.113-8+compat1
+Architecture: amd64
+Maintainer: Compat <root@localhost>
+Depends: libaio1t64
+Description: Debian 13 compatibility stub for libaio1 -> libaio1t64
+EOF
+    cd /tmp && equivs-build /tmp/libaio1-compat.ctl 2>&1
+    dpkg -i /tmp/libaio1_0.3.113-8+compat1_amd64.deb 2>&1 || dpkg -i /tmp/libaio1*.deb 2>&1
+'
 
 # MySQL 8.0 — instalace z lokálních .deb souborů ve správném pořadí
 _log "Step 5b: Installing MySQL 8.0 from deb bundle..."
@@ -280,7 +322,7 @@ rm -rf \
     "$ROOTFS/usr/share/man"
 
 # Unmount (trap will also handle this)
-for mp in proc sys dev/pts dev; do
+for mp in proc sys dev/pts dev/shm dev; do
     mountpoint -q "$ROOTFS/$mp" 2>/dev/null && umount -lf "$ROOTFS/$mp" || true
 done
 

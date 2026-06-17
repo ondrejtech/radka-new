@@ -49,6 +49,7 @@ RUN composer install \
 
 # Copy application source
 COPY . .
+RUN cp .env.production .env
 
 # Copy compiled frontend assets from node stage
 COPY --from=node-builder /app/public/build ./public/build

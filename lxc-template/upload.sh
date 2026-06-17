@@ -16,9 +16,9 @@ PROJECT_PATH="proxmox/lxc/techdomov"
 PROJECT_ENCODED="proxmox%2Flxc%2Ftechdomov"
 PACKAGE_NAME="lxc-template"
 PACKAGE_VERSION="latest"
-REMOTE_FILENAME="debian-12-techdomov_amd64.tar.gz"
+REMOTE_FILENAME="debian-13-techdomov_amd64.tar.gz"
 
-TEMPLATE_FILE="${1:-/var/lib/vz/template/cache/debian-12-techdomov_$(date +%Y%m%d)_amd64.tar.gz}"
+TEMPLATE_FILE="${1:-/var/lib/vz/template/cache/debian-13-techdomov_$(date +%Y%m%d)_amd64.tar.gz}"
 
 # ── Checks ────────────────────────────────────────────────────
 [[ -n "${GITLAB_TOKEN:-}" ]] || { echo "Chybí GITLAB_TOKEN"; exit 1; }
