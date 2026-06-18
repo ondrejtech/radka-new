@@ -1,224 +1,356 @@
 # Proxmox LXC Template — techdomov
 
-Tento dokument popisuje celý proces: sestavení template na lokálním PC,
-nahrání na GitLab a stažení do Proxmox VE 9.1.
+Kompletní postup: sestavení šablony na lokálním PC → přenos na Proxmox → vytvoření kontejneru → spuštění aplikace.
 
 ---
 
-## Přehled
+## Architektura
 
 ```
-Lokální PC
-  └─ build.sh        → debian-12-techdomov_amd64.tar.gz
-  └─ upload.sh       → GitLab Package Registry (gitlab.ozelina.eu)
-                              ↓
-                       Proxmox VE 9.1
-                         CT Templates → Download from URL
-                              ↓
-                       Nový LXC kontejner
-                         techdomov-firstboot.service (automaticky při prvním bootu)
-                           └─ MySQL init + SQL import + migrate → aplikace běží
+Lokální PC (Linux, root)
+  └─ lxc-template/build.sh
+       └─ debian-13-techdomov_YYYYMMDD_amd64.tar.gz  (~375 MB)
+            │
+            │  scp
+            ▼
+         vps3 (kuber, 37.205.14.42)
+            │
+            │  scp
+            ▼
+          pve  (Proxmox VE, 192.168.122.213)
+            └─ /var/lib/vz/template/cache/
+                 └─ pct restore <CTID> template.tar.gz
+                      └─ Nový LXC kontejner
+                           └─ techdomov-firstboot.service (automaticky při prvním bootu)
+                                └─ MySQL init + SQL import + laravel migrate → app běží
+```
+
+SSH přístup:
+```bash
+ssh vps3                 # kuber (37.205.14.42)
+ssh pve                  # Proxmox VE (192.168.122.213) — z kuber
 ```
 
 ---
 
-## Požadavky
+## Požadavky na lokální PC
 
-### Lokální PC (Linux — Debian / Ubuntu)
-| Balíček | Instalace |
-|---|---|
-| debootstrap | `sudo apt install debootstrap` |
-| rsync | `sudo apt install rsync` |
-| curl | `sudo apt install curl` |
-| Node.js 22+ | https://nodejs.org |
+- OS: **Linux** (Debian/Ubuntu) — macOS nepodporuje debootstrap nativně
+- Přihlášen jako **root** (debootstrap a mount vyžadují root)
+- Nainstalované balíčky:
 
-> **Composer není potřeba lokálně** — `build.sh` spouští `composer install`
-> přímo uvnitř chrootu, takže závislosti odpovídají přesně PHP 8.4 v kontejneru.
+```bash
+sudo apt install debootstrap rsync curl wget
+```
 
-Skript musí běžet jako **root** (kvůli `debootstrap` a mountování pseudo-fs).
+- **Node.js 22+** (pro `npm run build`):
 
-### GitLab (gitlab.ozelina.eu)
-- Personal Access Token se scopem **`api`**
-  - GitLab → User Settings → Access Tokens → Create
+```bash
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
+sudo apt install nodejs
+```
 
-### Proxmox VE 9.1
-- Storage `local` musí mít povolený typ **CT Templates**
-  - Datacenter → Storage → local → Edit → Content → zaškrtnout `CT Templates`
-- Přístup do sítě `192.168.192.0/18` (GitLab je na `192.168.201.109`)
+> Composer není potřeba lokálně — `build.sh` spouští `composer install`
+> uvnitř chrootu s PHP 8.4, takže závislosti odpovídají přesně cílovému prostředí.
 
 ---
 
 ## Krok 1 — Příprava projektu
 
-Na lokálním PC naklonuj repozitář a připrav frontend assety:
+Naklonuj repozitář a zbuilduj frontend assety:
 
 ```bash
-git clone git@gitlab.ozelina.eu:proxmox/lxc/techdomov.git
-cd techdomov
+git clone git@gitlab.com:petr9931705/eshop.git
+cd eshop
 
-# Frontend assety (jediný krok potřebný lokálně)
+# Frontend assety — musí existovat před buildem šablony
 npm ci --ignore-scripts
 npm run build
+
+# Ověř výstup
+ls public/build/   # musí existovat a obsahovat soubory
 ```
 
-Zkontroluj, že adresář existuje:
-```bash
-ls public/build/ # musí existovat
-```
-
-> `vendor/` nepotřebuješ připravovat lokálně — `build.sh` spustí
-> `composer install` přímo uvnitř chrootu.
-
----
-
-## Krok 2 — Build template
-
-Spusť jako root. Build trvá přibližně **10–20 minut** (debootstrap + instalace balíčků).
+Zkontroluj, že existuje `.env.production`:
 
 ```bash
-sudo bash lxc-template/build.sh /tmp/debian-12-techdomov_amd64.tar.gz
+ls .env.production   # musí existovat
 ```
 
-Co skript dělá:
-1. Vytvoří čistý Debian 12 rootfs pomocí `debootstrap`
-2. Přidá repozitáře PHP 8.4 (sury.org) a MySQL 8.0
-3. Nainstaluje: Nginx, PHP 8.4-FPM, MySQL 8.0, phpMyAdmin 5.2.1
-4. Zkopíruje kód projektu (bez `vendor/`, bez `storage/` dat)
-5. Zkopíruje `.env.production` jako `.env` a opraví `DB_HOST=db` → `DB_HOST=127.0.0.1`
-6. Spustí `composer install --no-dev` uvnitř chrootu
-7. Nainstaluje systemd služby (queue worker, scheduler)
-8. Zabalí vše do `.tar.gz`
-
-Výsledek: `/tmp/debian-12-techdomov_amd64.tar.gz`
+> `.env.production` se stane `.env` uvnitř kontejneru.
+> `build.sh` automaticky opraví `DB_HOST=db` → `DB_HOST=127.0.0.1`.
 
 ---
 
-## Krok 3 — Upload na GitLab
+## Krok 2 — Build šablony
+
+Spusť jako **root**. Build trvá přibližně **15–25 minut** (debootstrap + stažení MySQL bundle + instalace balíčků).
 
 ```bash
-GITLAB_TOKEN=glpat-xxxx \
-  bash lxc-template/upload.sh /tmp/debian-12-techdomov_amd64.tar.gz
+sudo bash lxc-template/build.sh
 ```
 
-Skript nahraje soubor do GitLab Package Registry pod fixním názvem `latest`.
-**URL se nikdy nemění** — každý nový upload přepíše předchozí verzi.
+Výchozí výstupní soubor: `/var/lib/vz/template/cache/debian-13-techdomov_YYYYMMDD_amd64.tar.gz`
 
-Po dokončení skript vypíše hotovou URL pro Proxmox:
-```
-https://oauth2:glpat-xxxx@gitlab.ozelina.eu/api/v4/projects/proxmox%2Flxc%2Ftechdomov/packages/generic/lxc-template/latest/debian-12-techdomov_amd64.tar.gz
-```
-
----
-
-## Krok 4 — Stažení v Proxmox VE 9.1
-
-1. Přihlaš se do Proxmox webového rozhraní
-2. Navigace: **Datacenter → `<tvůj node>` → local → CT Templates**
-3. Klikni na **Download from URL**
-4. Vyplň:
-
-| Pole | Hodnota |
-|---|---|
-| URL | viz výstup `upload.sh` (s tokenem v URL) |
-| File name | `debian-12-techdomov_amd64.tar.gz` |
-| Checksum algorithm | (nechej prázdné) |
-
-5. Klikni **Download** — soubor se uloží do `/var/lib/vz/template/cache/`
-
-> **Poznámka k SSL:** Pokud Proxmox hlásí chybu certifikátu (self-signed CA),
-> zaškrtni v dialogu **"Skip TLS Verification"** nebo importuj CA certifikát
-> GitLab instance do Proxmox hostu:
-> ```bash
-> # Na Proxmox hostu:
-> openssl s_client -connect gitlab.ozelina.eu:443 </dev/null 2>/dev/null \
->   | openssl x509 -outform PEM \
->   > /usr/local/share/ca-certificates/gitlab-ozelina.crt
-> update-ca-certificates
-> ```
-
----
-
-## Krok 5 — Vytvoření kontejneru z template
-
-1. Proxmox → **Create CT**
-2. **General:**
-   - CT ID: (libovolné, např. `200`)
-   - Hostname: `techdomov`
-   - Password: nastav root heslo (potřebuješ ho pro první přihlášení)
-3. **Template:** vyber `debian-12-techdomov_amd64.tar.gz`
-4. **Disk:** doporučeno min. **20 GB**
-5. **CPU:** min. 2 jádra
-6. **Memory:** min. 1024 MB (doporučeno 2048 MB)
-7. **Network:** přiřaď IP ze sítě `192.168.192.0/18`
-8. Dokončit → **Start**
-
----
-
-## Krok 6 — First-boot setup (automatický)
-
-Po spuštění kontejneru **není potřeba žádný ruční zásah**. Systemd služba
-`techdomov-firstboot.service` se spustí automaticky a provede celý setup:
-
-1. Počká na MySQL
-2. Nastaví MySQL root heslo a vytvoří DB + uživatele (hodnoty z `.env`)
-3. Importuje `edsystem.sql` z `storage/app/private/mysql/`
-4. Vygeneruje nový `APP_KEY` (unikátní pro tento kontejner)
-5. Spustí `php artisan storage:link`, `config:cache`, `route:cache`, `migrate`
-6. Nastartuje Nginx, PHP-FPM, queue worker a scheduler
-
-Nginx a queue worker **čekají na dokončení firstboot** — aplikace je dostupná
-až po úspěšném setupu.
-
-Setup proběhne **pouze jednou** — při dalším rebootu se nespustí znovu
-(flag soubor `/var/lib/techdomov/.setup-done`).
-
-### Sledování průběhu firstboot
+Vlastní cesta:
 
 ```bash
-journalctl -u techdomov-firstboot -f
+sudo bash lxc-template/build.sh /tmp/debian-13-techdomov_amd64.tar.gz
 ```
+
+### Co build.sh dělá (přehled kroků)
+
+| Krok | Popis |
+|------|-------|
+| 1 | Bootstrapuje Debian 13 (trixie) do `/tmp/techdomov-rootfs` |
+| 2 | Mountuje pseudo-filesystémy (proc, sysfs, izolovaný tmpfs pro /dev) |
+| 3 | Konfiguruje hostname, timezone (Europe/Prague), síť (DHCP) |
+| 4 | Přidává repozitáře PHP 8.4 (sury.org) a stahuje MySQL 8.0 deb bundle |
+| 5 | Instaluje: Nginx, PHP 8.4-FPM, MySQL 8.0, Composer, equivs |
+| 5b | Instaluje libaio1 compat stub (Debian 13 → MySQL 8.0 kompatibilita) |
+| 5c | Instaluje MySQL 8.0 z lokálního deb bundle |
+| 6 | Kopíruje kód projektu (bez vendor/, bez .env, bez storage dat) |
+| 6b | Nasazuje `.env.production` jako `.env`, opravuje DB_HOST |
+| 6c | Spouští `composer install --no-dev` uvnitř chrootu |
+| 7 | Instaluje phpMyAdmin 5.2.1 |
+| 8 | Kopíruje config soubory (nginx, php.ini, php-fpm) |
+| 9 | Instaluje a povoluje systemd služby (nginx, php-fpm, mysql, laravel-queue, laravel-scheduler, firstboot) |
+| 10 | Kopíruje first-boot.sh → `/usr/local/sbin/techdomov-setup.sh` |
+| 11 | Čistí apt cache, tmp, logy, doc |
+| 12 | Vytváří výsledný `.tar.gz` archiv |
+
+### Kontrola buildu
+
+Sleduj výstup — každý krok je ohlášen zeleně `[BUILD]`. Pokud skript selže, oprav chybu a spusť znovu (automaticky smaže předchozí rootfs).
+
+---
+
+## Krok 3 — Přenos šablony na Proxmox
+
+### 3a — Nahrání na kuber (vps3)
+
+```bash
+scp /var/lib/vz/template/cache/debian-13-techdomov_$(date +%Y%m%d)_amd64.tar.gz \
+    vps3:/tmp/debian-13-techdomov_amd64.tar.gz
+```
+
+> Soubor má ~375 MB, přenos trvá podle rychlosti připojení.
+
+### 3b — Přesun z kuber na Proxmox (pve)
+
+Přihlaš se na kuber a přesuň na pve:
+
+```bash
+ssh vps3
+scp /tmp/debian-13-techdomov_amd64.tar.gz \
+    pve:/var/lib/vz/template/cache/debian-13-techdomov_amd64.tar.gz
+rm /tmp/debian-13-techdomov_amd64.tar.gz
+```
+
+### 3c — Ověření na pve
+
+```bash
+ssh vps3
+ssh pve
+ls -lh /var/lib/vz/template/cache/debian-13-techdomov_amd64.tar.gz
+```
+
+---
+
+## Krok 4 — Vytvoření LXC kontejneru
+
+Přihlaš se na pve a vytvoř kontejner pomocí `pct restore`:
+
+```bash
+ssh vps3
+ssh pve
+
+pct restore <CTID> /var/lib/vz/template/cache/debian-13-techdomov_amd64.tar.gz \
+    --hostname multishoping.eu \
+    --rootfs local-lvm:<velikost_GB> \
+    --memory <RAM_MB> \
+    --cores <pocet_jader> \
+    --net0 name=eth0,bridge=vmbr0,tag=10,ip=10.0.0.<X>/24,gw=10.0.0.1,type=veth \
+    --nameserver 8.8.8.8 \
+    --features nesting=1 \
+    --unprivileged 1
+```
+
+**Parametry pro produkci (CT108):**
+
+```bash
+pct restore 108 /var/lib/vz/template/cache/debian-13-techdomov_amd64.tar.gz \
+    --hostname multishoping.eu \
+    --rootfs local-lvm:32 \
+    --memory 4096 \
+    --cores 2 \
+    --net0 name=eth0,bridge=vmbr0,tag=10,ip=10.0.0.19/24,gw=10.0.0.1,type=veth \
+    --nameserver 8.8.8.8 \
+    --features nesting=1 \
+    --unprivileged 1
+```
+
+> **Poznámka:** `tag=10` = VLAN 10, IP musí být volná v rozsahu `10.0.0.0/24`.
+> Zkontroluj obsazené IP: `pct list` + `grep ip /etc/pve/lxc/*.conf`
+
+### Spuštění kontejneru
+
+```bash
+pct start 108
+pct status 108   # → running
+```
+
+---
+
+## Krok 5 — First-boot setup (automatický)
+
+Po spuštění kontejneru **techdomov-firstboot.service** proběhne automaticky.
+
+### Sledování průběhu
+
+```bash
+# Z pve:
+pct exec 108 -- journalctl -u techdomov-firstboot -f
+```
+
+Výstup bude vypadat přibližně takto:
+
+```
+[SETUP] Reading .env...
+[SETUP] Waiting for MySQL to be ready...
+[SETUP] Configuring MySQL root password and application user...
+[SETUP] Connected as root without password (fresh install)
+[SETUP] Importing edsystem.sql (foreign key checks disabled)...
+[SETUP] Import complete.
+[SETUP] Running Laravel bootstrap as www-data...
+   INFO  Application key set successfully.
+   INFO  Configuration cached successfully.
+   INFO  Routes cached successfully.
+   INFO  Running migrations.
+[SETUP] Starting services...
+[SETUP] Setup complete!
+[SETUP]   App:        http://10.0.0.19:8080
+[SETUP]   phpMyAdmin: http://10.0.0.19:8081
+```
+
+### Co firstboot provede
+
+1. Načte hodnoty z `/var/www/html/.env`
+2. Počká až MySQL nastartuje (max 60 sekund)
+3. Nastaví MySQL root heslo (z `DB_ROOT_PASSWORD` v .env)
+4. Vytvoří databázi a aplikačního uživatele
+5. Smaže a znovu vytvoří DB (idempotentní re-run)
+6. Importuje `storage/app/private/mysql/edsystem.sql` (pokud existuje)
+7. Spustí Laravel bootstrap jako `www-data`:
+   - `php artisan key:generate --force`
+   - `php artisan storage:link --force`
+   - `php artisan config:cache`
+   - `php artisan route:cache`
+   - `php artisan migrate --force`
+8. Nastartuje: nginx, php8.4-fpm, laravel-queue, laravel-scheduler.timer
+
+> Nginx a laravel-queue čekají na dokončení firstboot přes systemd závislost.
+> Setup se spustí **pouze jednou** — flag soubor `/var/lib/techdomov/.setup-done`.
 
 ### Ruční opakování setupu (v případě chyby)
 
 ```bash
-rm /var/lib/techdomov/.setup-done
-systemctl restart techdomov-firstboot
+pct exec 108 -- bash -c "rm -f /var/lib/techdomov/.setup-done && systemctl restart techdomov-firstboot"
+pct exec 108 -- journalctl -u techdomov-firstboot -f
 ```
+
+### Ruční spuštění setupu okamžitě
+
+```bash
+pct exec 108 -- bash /usr/local/sbin/techdomov-setup.sh
+```
+
+---
+
+## Krok 6 — Ověření funkčnosti
+
+```bash
+# HTTP odpověď
+curl -s -o /dev/null -w "%{http_code}" http://10.0.0.19:8080
+# → 200 nebo 302
+
+# Stav služeb
+pct exec 108 -- systemctl status nginx php8.4-fpm mysql laravel-queue
+```
+
+---
+
+## Krok 7 — Nginx Proxy Manager (SSL + reverse proxy)
+
+NPM běží v CT100 (10.0.0.20), dostupné na `http://37.205.14.42:81`.
+
+### Přidat proxy host
+
+1. Přihlaš se do NPM (`http://37.205.14.42:81`)
+2. **Hosts → Proxy Hosts → Add Proxy Host**
+3. **Details:**
+   - Domain Names: `multishoping.eu`
+   - Scheme: `http`
+   - Forward Hostname / IP: `10.0.0.19`
+   - Forward Port: `8080`
+   - Websockets Support: zapnout
+4. **SSL tab:**
+   - SSL Certificate: Request a new Certificate
+   - Force SSL: zapnout
+   - I Agree to the Let's Encrypt ToS: zaškrtnout
+5. Uložit
+
+> **Předpoklad pro Let's Encrypt:** `multishoping.eu` musí v DNS ukazovat na `37.205.14.42`.
+> Ověř: `dig multishoping.eu +short` → musí vrátit `37.205.14.42`.
 
 ---
 
 ## Služby v kontejneru
 
-| Služba | Popis | Port |
-|---|---|---|
+| Služba | Popis | Port/Socket |
+|--------|-------|-------------|
 | `nginx` | Webserver | 8080 (app), 8081 (phpMyAdmin) |
-| `php8.4-fpm` | PHP FastCGI | unix socket |
+| `php8.4-fpm` | PHP FastCGI | `/run/php/php8.4-fpm.sock` |
 | `mysql` | MySQL 8.0 | 3306 (pouze localhost) |
 | `laravel-queue` | Queue worker | — |
 | `laravel-scheduler.timer` | Cron (minutely) | — |
 
 ```bash
-# Správa služeb
-systemctl status laravel-queue
-systemctl status laravel-scheduler.timer
-journalctl -u laravel-queue -f
+# Správa ze hosta (pve):
+pct exec 108 -- systemctl status laravel-queue
+pct exec 108 -- journalctl -u laravel-queue -f
+
+# Shell uvnitř kontejneru:
+pct enter 108
 ```
 
 ---
 
-## Aktualizace template
+## Aktualizace šablony (nový build)
 
-Při každé změně projektu:
+Při každé změně kódu projdi celý postup od kroku 2:
 
 ```bash
-# 1. Na lokálním PC — build
-sudo bash lxc-template/build.sh /tmp/debian-12-techdomov_amd64.tar.gz
+# 1. Aktualizuj kód a frontend
+git pull
+npm run build
 
-# 2. Upload (přepíše předchozí verzi, URL zůstává stejná)
-GITLAB_TOKEN=glpat-xxxx \
-  bash lxc-template/upload.sh /tmp/debian-12-techdomov_amd64.tar.gz
+# 2. Spusť build (přepíše předchozí rootfs)
+sudo bash lxc-template/build.sh /tmp/debian-13-techdomov_amd64.tar.gz
 
-# 3. Proxmox — znovu stáhnout přes stejnou URL (přepíše soubor v cache)
+# 3. Přenos na Proxmox
+scp /tmp/debian-13-techdomov_amd64.tar.gz vps3:/tmp/
+ssh vps3 "scp /tmp/debian-13-techdomov_amd64.tar.gz pve:/var/lib/vz/template/cache/ && rm /tmp/debian-13-techdomov_amd64.tar.gz"
+
+# 4. Vytvoř nový CT (nebo smaž starý a obnov)
+ssh vps3
+ssh pve
+pct stop 108 && pct destroy 108
+pct restore 108 /var/lib/vz/template/cache/debian-13-techdomov_amd64.tar.gz \
+    --hostname multishoping.eu --rootfs local-lvm:32 --memory 4096 --cores 2 \
+    --net0 name=eth0,bridge=vmbr0,tag=10,ip=10.0.0.19/24,gw=10.0.0.1,type=veth \
+    --nameserver 8.8.8.8 --features nesting=1 --unprivileged 1
+pct start 108
 ```
 
 ---
@@ -227,19 +359,61 @@ GITLAB_TOKEN=glpat-xxxx \
 
 ```
 lxc-template/
-├── build.sh                  ← sestavení rootfs (spustit jako root)
-├── upload.sh                 ← nahrání na GitLab Package Registry
-├── first-boot.sh             ← setup uvnitř kontejneru (→ /usr/local/sbin/)
-├── HOWTO.md                  ← tento dokument
+├── build.sh                        ← sestavení rootfs (spustit jako root)
+├── upload.sh                       ← nahrání na GitLab Package Registry
+├── first-boot.sh                   ← setup uvnitř kontejneru
+├── HOWTO.md                        ← tento dokument
 ├── config/
-│   ├── nginx-app.conf        ← Nginx vhost port 8080
-│   ├── nginx-pma.conf        ← Nginx vhost port 8081 (phpMyAdmin)
-│   ├── php.ini               ← PHP produkční nastavení
-│   ├── php-fpm-www.conf      ← PHP-FPM pool
-│   └── phpmyadmin.php        ← phpMyAdmin konfigurace
+│   ├── nginx-app.conf              ← Nginx vhost port 8080 (Laravel app)
+│   ├── nginx-pma.conf              ← Nginx vhost port 8081 (phpMyAdmin)
+│   ├── php.ini                     ← PHP produkční nastavení
+│   ├── php-fpm-www.conf            ← PHP-FPM pool konfigurace
+│   └── phpmyadmin.php              ← phpMyAdmin config.inc.php
 └── systemd/
-    ├── techdomov-firstboot.service  ← automatický setup při prvním bootu
-    ├── laravel-queue.service
-    ├── laravel-scheduler.service
-    └── laravel-scheduler.timer
+    ├── techdomov-firstboot.service ← automatický setup při prvním bootu
+    ├── laravel-queue.service       ← queue:work worker
+    ├── laravel-scheduler.service   ← schedule:run
+    └── laravel-scheduler.timer     ← minutový timer pro scheduler
+```
+
+---
+
+## Řešení problémů
+
+### MySQL se nespustil
+
+```bash
+pct exec 108 -- journalctl -u mysql -n 50
+pct exec 108 -- cat /var/log/mysql/error.log | tail -20
+```
+
+### Firstboot selhal (Access denied)
+
+MySQL root heslo mohlo být nastaveno při předchozím (neúspěšném) běhu:
+
+```bash
+pct exec 108 -- bash -c "
+    mysqladmin -u root --socket=/var/run/mysqld/mysqld.sock ping 2>/dev/null \
+        && echo 'no password' \
+        || echo 'has password'
+"
+```
+
+Pokud MySQL nereaguje vůbec — zkontroluj zda datadir existuje:
+
+```bash
+pct exec 108 -- ls /var/lib/mysql/
+```
+
+### Nginx vrací 502
+
+```bash
+pct exec 108 -- systemctl status php8.4-fpm
+pct exec 108 -- php -v   # musí být PHP 8.4
+```
+
+### Aplikace se nenačítá (storage/views)
+
+```bash
+pct exec 108 -- su -s /bin/bash www-data -c "cd /var/www/html && php artisan view:clear && php artisan config:clear"
 ```
