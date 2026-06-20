@@ -36,11 +36,12 @@ return [
     ],
 
     'google_ads' => [
-        'client_id'     => env('GOOGLE_ADS_CLIENT_ID'),
-        'client_secret' => env('GOOGLE_ADS_CLIENT_SECRET'),
+        'client_id'       => env('GOOGLE_ADS_CLIENT_ID'),
+        'client_secret'   => env('GOOGLE_ADS_CLIENT_SECRET'),
         'developer_token' => env('GOOGLE_ADS_DEVELOPER_TOKEN'),
-        'refresh_token' => env('GOOGLE_ADS_REFRESH_TOKEN'),
-        'redirect_uri'  => env('GOOGLE_ADS_REDIRECT_URI', 'https://www.multishoping.eu/google/ads/callback'),
+        'refresh_token'   => env('GOOGLE_ADS_REFRESH_TOKEN'),
+        'customer_id'     => env('GOOGLE_ADS_CUSTOMER_ID'),
+        'redirect_uri'    => env('GOOGLE_ADS_REDIRECT_URI', 'https://www.multishoping.eu/google/ads/callback'),
     ],
 
 ];
