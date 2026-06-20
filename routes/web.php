@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AresController;
+use App\Http\Controllers\GoogleAdsAuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PagesController;
@@ -67,6 +68,10 @@ Route::prefix('paypal/guest')->name('paypal.guest.')->group(function (): void {
     Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success');
     Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
 });
+
+// Google Ads OAuth – dočasné routes pro získání Refresh Tokenu
+Route::get('/google/ads/auth', [GoogleAdsAuthController::class, 'redirect'])->name('google.ads.auth');
+Route::get('/google/ads/callback', [GoogleAdsAuthController::class, 'callback'])->name('google.ads.callback');
 
 // PayPal webhook – bez CSRF, bez auth
 Route::post('/paypal/webhook', [PayPalController::class, 'webhook'])->name('paypal.webhook');
