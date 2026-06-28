@@ -4,7 +4,6 @@
 .env.backup
 .phpactor.json
 .phpunit.result.cache
-storage/app/private/
 PRIVATEdoc.pdf
 
 
