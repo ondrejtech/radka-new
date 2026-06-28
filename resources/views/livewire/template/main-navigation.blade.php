@@ -34,34 +34,16 @@
 
                     <ul class="level-3 head-nav_group head-nav_group--level-3">
 
-                        @foreach ($level1['categories'] as $index => $category)
+                        @foreach ($level1['categories'] as $category)
                             @php
-                                $isVisible = $index < $visibleLimit;
                                 $isCurrentL3 = request()->is(ltrim($category['url'], '/') . '*');
                             @endphp
 
-                            @if ($index === $visibleLimit)
-                                <li class="head-nav_item head-nav_item--level-3 head-nav_item--more-categories">
-                                    <span class="head-nav_item_separator">&nbsp;|&nbsp;</span>
-                                    <div class="nav-link-wrap head-nav_link-wrap">
-                                        <a class="nav-link head-nav_link head-nav_link--level-3 head-nav_link--more"
-                                            href="{{ $level1['url'] }}"
-                                        >
-                                            <span class="head-nav_link-label">Další kategorie</span>
-                                        </a>
-                                    </div>
-                                </li>
-                            @endif
-
                             <li data-menu-pnc="{{ $category['CategoryCode'] }}"
                                 data-menu-pnsub="{{ $category['SuperCategoryCode'] }}"
-                                class="head-nav_item head-nav_item--level-3{{ ! $isVisible ? ' head-nav_item--invisible' : '' }}{{ $isCurrentL3 ? ' is-current' : '' }}"
+                                class="head-nav_item head-nav_item--level-3{{ $isCurrentL3 ? ' is-current' : '' }}"
                                 wire:key="nav-l3-{{ $category['CategoryCode'] }}"
                             >
-                                @if ($index > 0)
-                                    <span class="head-nav_item_separator">&nbsp;|&nbsp;</span>
-                                @endif
-
                                 <div class="nav-link-wrap head-nav_link-wrap">
                                     <a class="nav-link head-nav_link head-nav_link--level-3"
                                         data-ga-category="1"
