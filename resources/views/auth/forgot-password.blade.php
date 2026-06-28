@@ -13,7 +13,7 @@
 
         <div class="card-pf">
             <header class="login-pf-header">
-                <div class="logo"></div>
+                <div class="logo" style="background-image: url('{{ asset('Images/loga/td.png') }}')"></div>
                 <div class="" id="kc-locale">
                     <div id="kc-locale-wrapper" class="">
                         <div id="kc-locale-dropdown" class="">
