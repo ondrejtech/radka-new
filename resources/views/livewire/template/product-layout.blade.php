@@ -113,7 +113,7 @@
                                 @else
                                 <img class="pro-img"
                                     alt="{{ $product->Name }}"
-                                    src="{{ asset('IMGCACHE/no_image/no_image_7.jpg') }}">
+                                    src="{{ config('images.fallback') }}">
                                 @endif
 
                             </a>
@@ -251,7 +251,7 @@
                                 @else
                                 <img class="pro-img"
                                     alt="{{ $product->Name }}"
-                                    src="{{ asset('IMGCACHE/no_image/no_image_7.jpg') }}">
+                                    src="{{ config('images.fallback') }}">
                                 @endif
                             </a>
                         </figure>

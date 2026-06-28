@@ -60,11 +60,9 @@
                         <li class="ui-autocomplete-category whisperer_item whisperer_header">Produkt</li>
                         @foreach ($results['products'] as $product)
                             <li class="whisperer_item ui-menu-item" role="presentation" wire:key="product-{{ $product['ProId'] }}">
-                                @if (!empty($product['ImageUrl']))
-                                    <a href="{{ $product['url'] }}" class="whisperer_box-img ui-corner-all" tabindex="-1">
-                                        <img class="pro-img" src="{{ $product['ImageUrl'] }}" alt="" />
-                                    </a>
-                                @endif
+                                <a href="{{ $product['url'] }}" class="whisperer_box-img ui-corner-all" tabindex="-1">
+                                    <img class="pro-img" src="{{ $product['ImageUrl'] ?: config('images.fallback') }}" alt="" />
+                                </a>
                                 <a class="whisperer_name ui-corner-all"
                                     href="{{ $product['url'] }}"
                                     tabindex="-1"

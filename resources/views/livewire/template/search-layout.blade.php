@@ -122,7 +122,7 @@
                                         data-src="{{ $product->product_images->first()->URL }}">
                                 @else
                                     <img class="pro-img" alt="{{ $product->Name }}"
-                                        src="{{ asset('Images/ed_logo.png') }}">
+                                        src="{{ config('images.fallback') }}">
                                 @endif
                             </a>
                         </figure>
@@ -214,7 +214,7 @@
                                     data-src="{{ $product->product_images->first()->URL }}">
                             @else
                                 <img class="pro-img" alt="{{ $product->Name }}"
-                                    src="{{ asset('Images/ed_logo.png') }}">
+                                    src="{{ config('images.fallback') }}">
                             @endif
                         </a>
                     </figure>

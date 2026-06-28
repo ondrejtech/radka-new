@@ -61,11 +61,9 @@
                                 <div class="pro-compare_value_row">
                                     <div class="pro-compare_value_item">
                                         <a class="pro-compare_img-wrap" href="{{ $productUrl }}">
-                                            @if ($product->product_images->isNotEmpty())
                                             <img class="pro-img pro-compare_img"
-                                                 src="{{ $product->product_images->first()->URL }}"
+                                                 src="{{ optional($product->product_images->first())->URL ?: config('images.fallback') }}"
                                                  alt="{{ $product->Name }}">
-                                            @endif
                                         </a>
                                     </div>
                                     <div class="pro-compare_value_item">

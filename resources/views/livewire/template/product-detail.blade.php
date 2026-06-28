@@ -48,7 +48,7 @@
                             <img class="pro-img" src="{{ $mainImgLarge }}" alt="{{ $product->Name }}">
                         </a>
                         @else
-                        <img class="pro-img" src="{{ asset('IMGCACHE/no_image/no_image_7.jpg') }}" alt="{{ $product->Name }}">
+                        <img class="pro-img" src="{{ config('images.fallback') }}" alt="{{ $product->Name }}">
                         @endif
                     </figure>
 
@@ -411,7 +411,7 @@
                                                         @if ($item->product_images->isNotEmpty())
                                                             <img class="pro-img b-lazy" alt="{{ $item->Name }}" data-src="{{ $item->product_images->first()->URL }}">
                                                         @else
-                                                            <img class="pro-img" alt="{{ $item->Name }}" src="{{ asset('IMGCACHE/no_image/no_image_7.jpg') }}">
+                                                            <img class="pro-img" alt="{{ $item->Name }}" src="{{ config('images.fallback') }}">
                                                         @endif
                                                     </a>
                                                 </figure>

@@ -21,11 +21,8 @@
                                             <a class="js-html5-storage"
                                                 href="/{{ $product['slug'] }}/product-{{ $product['ProId'] }}">
                                                 <img class="pro-img b-lazy" alt="{{ $product['Name'] }}"
-                                                    src="{{ $product['imageUrl'] }}"
-                                                    data-src="{{ $product['imageUrl'] }}">
-                                                @if (! $product['imageUrl'])
-                                                    <div class="spinner"></div>
-                                                @endif
+                                                    src="{{ $product['imageUrl'] ?: config('images.fallback') }}"
+                                                    data-src="{{ $product['imageUrl'] ?: config('images.fallback') }}">
                                             </a>
                                         </figure>
 

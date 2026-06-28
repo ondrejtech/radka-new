@@ -34,11 +34,9 @@
                         data-pro-id="{{ $product->ProId }}">
                         <a class="compare-bar_product_in" href="{{ $productUrl }}">
                             <div class="compare-bar_product_img-wrap">
-                                @if ($product->product_images->isNotEmpty())
                                 <img class="pro-img compare-bar_product_img"
-                                    src="{{ $product->product_images->first()->URL }}"
+                                    src="{{ optional($product->product_images->first())->URL ?: config('images.fallback') }}"
                                     alt="{{ $product->Name }}">
-                                @endif
                             </div>
                             <h2 class="compare-bar_product_name">{{ $product->Name }}</h2>
                         </a>
