@@ -20,6 +20,7 @@ PRIVATEdoc.pdf
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/app/private/mysql/
 /vendor
 Homestead.json
 Homestead.yaml
