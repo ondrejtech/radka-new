@@ -47,16 +47,14 @@ class SideNavigation extends Component
 
         $catCode = (int) $product->CategoryCode;
 
-        foreach ($navigationService->getNavigation() as $level1) {
-            foreach ($level1['children'] as $level2) {
-                foreach ($level2['categories'] as $category) {
-                    if ((int) $category['CategoryCode'] === $catCode) {
-                        return [
-                            (int) $level1['SuperCategoryCode'],
-                            (int) $level2['SuperCategoryCode'],
-                            $catCode,
-                        ];
-                    }
+        foreach ($navigationService->getNavigation() as $level2) {
+            foreach ($level2['categories'] as $category) {
+                if ((int) $category['CategoryCode'] === $catCode) {
+                    return [
+                        $this->resolveParentCode((int) $level2['SuperCategoryCode']),
+                        (int) $level2['SuperCategoryCode'],
+                        $catCode,
+                    ];
                 }
             }
         }

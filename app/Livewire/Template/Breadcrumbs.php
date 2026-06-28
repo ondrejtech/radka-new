@@ -59,43 +59,33 @@ class Breadcrumbs extends Component
 
         $navigation = $navigationService->getNavigation();
 
-        foreach ($navigation as $level1) {
-            // Level 1 direct hit
-            if ((string) $level1['SuperCategoryCode'] === $superCatCode) {
+        foreach ($navigation as $level2) {
+            if ((string) $level2['SuperCategoryCode'] !== $superCatCode) {
+                continue;
+            }
+
+            // Level 2 page: just the category itself as current
+            if ($catCode === 0) {
                 return [
-                    [['label' => $level1['SuperCategoryName'], 'url' => null, 'icon' => true]],
+                    [['label' => $level2['SuperCategoryName'], 'url' => null, 'icon' => true]],
                     [],
                     null,
                 ];
             }
 
-            foreach ($level1['children'] as $level2) {
-                if ((string) $level2['SuperCategoryCode'] !== $superCatCode) {
-                    continue;
+            // L3: add L2 link + current category, return sibling dropdown
+            $items = [
+                ['label' => $level2['SuperCategoryName'], 'url' => $level2['url'], 'icon' => true],
+            ];
+
+            foreach ($level2['categories'] as $category) {
+                if ((int) $category['CategoryCode'] === $catCode) {
+                    $items[] = ['label' => $category['CategoryName'], 'url' => null, 'icon' => false];
+                    break;
                 }
-
-                $items = [
-                    ['label' => $level1['SuperCategoryName'], 'url' => $level1['url'], 'icon' => true],
-                ];
-
-                if ($catCode === 0) {
-                    $items[] = ['label' => $level2['SuperCategoryName'], 'url' => null, 'icon' => false];
-
-                    return [$items, [], null];
-                }
-
-                // L3: add L2 link + current category, return sibling dropdown
-                $items[] = ['label' => $level2['SuperCategoryName'], 'url' => $level2['url'], 'icon' => false];
-
-                foreach ($level2['categories'] as $category) {
-                    if ((int) $category['CategoryCode'] === $catCode) {
-                        $items[] = ['label' => $category['CategoryName'], 'url' => null, 'icon' => false];
-                        break;
-                    }
-                }
-
-                return [$items, $level2['categories'], (int) $level2['SuperCategoryCode']];
             }
+
+            return [$items, $level2['categories'], (int) $level2['SuperCategoryCode']];
         }
 
         return [[], [], null];
@@ -120,21 +110,18 @@ class Breadcrumbs extends Component
 
         $navigation = $navigationService->getNavigation();
 
-        foreach ($navigation as $level1) {
-            foreach ($level1['children'] as $level2) {
-                foreach ($level2['categories'] as $category) {
-                    if ((int) $category['CategoryCode'] !== (int) $product->CategoryCode) {
-                        continue;
-                    }
-
-                    $items = [
-                        ['label' => $level1['SuperCategoryName'], 'url' => $level1['url'], 'icon' => true],
-                        ['label' => $level2['SuperCategoryName'], 'url' => $level2['url'], 'icon' => false],
-                        ['label' => $category['CategoryName'], 'url' => $category['url'], 'icon' => false],
-                    ];
-
-                    return [$items, $level2['categories'], (int) $level2['SuperCategoryCode']];
+        foreach ($navigation as $level2) {
+            foreach ($level2['categories'] as $category) {
+                if ((int) $category['CategoryCode'] !== (int) $product->CategoryCode) {
+                    continue;
                 }
+
+                $items = [
+                    ['label' => $level2['SuperCategoryName'], 'url' => $level2['url'], 'icon' => true],
+                    ['label' => $category['CategoryName'], 'url' => $category['url'], 'icon' => false],
+                ];
+
+                return [$items, $level2['categories'], (int) $level2['SuperCategoryCode']];
             }
         }
 
