@@ -43,13 +43,14 @@ test('paypal sandbox createOrder returns approval url', function () {
 
     $service = new PayPalService;
 
-    $approvalUrl = $service->createOrder(
+    $result = $service->createOrder(
         $order,
         'https://example.com/paypal/success',
         'https://example.com/paypal/cancel',
     );
 
-    expect($approvalUrl)
+    expect($result['id'])->toBeString()->not->toBeEmpty();
+    expect($result['approval_url'])
         ->toBeString()
         ->toContain('sandbox.paypal.com');
 

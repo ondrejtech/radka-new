@@ -208,9 +208,7 @@ class Basket extends Component
             ]);
         }
 
-        $cart->items()->delete();
-
-        $this->dispatch('cart-updated')->to('template.cart-widget');
+        // Košík se vyprázdní až po úspěšné platbě (viz PayPalController), ne při vytvoření objednávky.
 
         $this->redirectRoute('pages.documents.order', ['orderId' => $order->id]);
     }

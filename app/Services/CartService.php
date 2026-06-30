@@ -20,6 +20,11 @@ class CartService
         );
     }
 
+    public function clear(): void
+    {
+        $this->resolveCart()->items()->delete();
+    }
+
     public function addItem(int $proId, string $name, float $price, int $quantity): void
     {
         $cart = $this->resolveCart();

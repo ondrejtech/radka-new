@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\AresController;
-use App\Http\Controllers\GoogleAdsAuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GoogleAdsAuthController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ProductFeed;
@@ -58,6 +58,8 @@ Route::get('/ares/lookup/{ico}', [AresController::class, 'lookup'])
 // PayPal – přihlášení uživatelé
 Route::middleware('auth')->prefix('paypal')->name('paypal.')->group(function (): void {
     Route::post('/order/{order}/create', [PayPalController::class, 'createOrder'])->name('order.create');
+    Route::post('/order/{order}/card/create', [PayPalController::class, 'createCardOrder'])->name('order.card.create');
+    Route::post('/order/{order}/card/capture', [PayPalController::class, 'captureCard'])->name('order.card.capture');
     Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success');
     Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
 });
@@ -65,6 +67,8 @@ Route::middleware('auth')->prefix('paypal')->name('paypal.')->group(function ():
 // PayPal – hosté
 Route::prefix('paypal/guest')->name('paypal.guest.')->group(function (): void {
     Route::post('/order/{order}/create', [PayPalController::class, 'createOrder'])->name('order.create');
+    Route::post('/order/{order}/card/create', [PayPalController::class, 'createCardOrder'])->name('order.card.create');
+    Route::post('/order/{order}/card/capture', [PayPalController::class, 'captureCard'])->name('order.card.capture');
     Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success');
     Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
 });

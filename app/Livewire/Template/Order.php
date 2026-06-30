@@ -3,6 +3,7 @@
 namespace App\Livewire\Template;
 
 use App\Models\Order as OrderModel;
+use App\Services\PayPalService;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -15,7 +16,7 @@ class Order extends Component
         $this->orderId = $orderId;
     }
 
-    public function render(): View
+    public function render(PayPalService $payPalService): View
     {
         $order = OrderModel::with(['statusOrder', 'items', 'invoice'])
             ->when(
@@ -25,6 +26,9 @@ class Order extends Component
             )
             ->findOrFail($this->orderId);
 
-        return view('livewire.template.order', ['order' => $order]);
+        return view('livewire.template.order', [
+            'order' => $order,
+            'payPalClientId' => $payPalService->publicClientId(),
+        ]);
     }
 }

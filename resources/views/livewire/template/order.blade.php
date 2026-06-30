@@ -299,43 +299,118 @@
 
 
                         </div>
-                        @if ($order->payment_status !== 'paid')
+                        @if ($order->payment_status !== 'paid' && $payPalClientId)
                         <div class="flex-box_item pay-box_btn-wrap"
                             x-data="{
+                                open: false,
+                                ready: false,
+                                rendered: false,
                                 loading: false,
                                 error: '',
+                                cardField: null,
+                                baseUrl: '/paypal{{ auth()->check() ? '' : '/guest' }}/order/{{ $order->id }}/card',
+                                csrf() { return document.getElementById('csrfToken').value; },
+                                loadSdk() {
+                                    return new Promise((resolve, reject) => {
+                                        if (window.paypal && window.paypal.CardFields) { resolve(); return; }
+                                        const existing = document.getElementById('paypal-sdk');
+                                        if (existing) { existing.addEventListener('load', () => resolve()); existing.addEventListener('error', () => reject()); return; }
+                                        const s = document.createElement('script');
+                                        s.id = 'paypal-sdk';
+                                        s.src = 'https://www.paypal.com/sdk/js?client-id={{ $payPalClientId }}&components=card-fields&currency={{ config('paypal.currency') }}&intent=capture';
+                                        s.onload = () => resolve();
+                                        s.onerror = () => reject();
+                                        document.head.appendChild(s);
+                                    });
+                                },
+                                async ensure() {
+                                    if (this.cardField) { return; }
+                                    await this.loadSdk();
+                                    const self = this;
+                                    this.cardField = window.paypal.CardFields({
+                                        createOrder: () => fetch(self.baseUrl + '/create', { method: 'POST', headers: { 'X-CSRF-TOKEN': self.csrf(), 'Accept': 'application/json' } })
+                                            .then(r => r.json()).then(d => { if (d.id) { return d.id; } throw new Error(d.error || 'Chyba'); }),
+                                        onApprove: () => fetch(self.baseUrl + '/capture', { method: 'POST', headers: { 'X-CSRF-TOKEN': self.csrf(), 'Accept': 'application/json' } })
+                                            .then(r => r.json()).then(d => { if (d.redirect) { window.location.href = d.redirect; } else { self.error = d.error || 'Platba se nezdařila.'; self.loading = false; } }),
+                                        onError: () => { self.error = 'Platba se nezdařila. Zkontrolujte údaje karty.'; self.loading = false; },
+                                        style: { input: { 'font-size': '16px', 'font-family': 'sans-serif', 'color': '#333333' } },
+                                    });
+                                    this.ready = this.cardField.isEligible();
+                                },
+                                async init() {
+                                    try { await this.ensure(); } catch (e) { /* tlačítko zůstane, chyba se ukáže až po kliknutí */ }
+                                },
+                                async openModal() {
+                                    this.error = '';
+                                    if (!this.cardField) {
+                                        try { await this.ensure(); } catch (e) { this.error = 'Nepodařilo se načíst platební bránu.'; return; }
+                                    }
+                                    if (!this.ready) { this.error = 'Platba kartou není pro tuto objednávku dostupná.'; return; }
+                                    this.open = true;
+                                    this.$nextTick(() => {
+                                        if (this.rendered) { return; }
+                                        requestAnimationFrame(() => {
+                                            this.cardField.NumberField().render('#pp-card-number');
+                                            this.cardField.ExpiryField().render('#pp-card-expiry');
+                                            this.cardField.CVVField().render('#pp-card-cvv');
+                                            this.rendered = true;
+                                        });
+                                    });
+                                },
+                                close() { this.open = false; },
                                 pay() {
+                                    if (!this.cardField) { return; }
                                     this.loading = true;
                                     this.error = '';
-                                    fetch('/paypal{{ auth()->check() ? '' : '/guest' }}/order/{{ $order->id }}/create', {
-                                        method: 'POST',
-                                        headers: {
-                                            'X-CSRF-TOKEN': document.getElementById('csrfToken').value,
-                                            'Accept': 'application/json',
-                                        },
-                                    })
-                                    .then(r => r.json())
-                                    .then(data => {
-                                        if (data.url) {
-                                            window.location.href = data.url;
-                                        } else {
-                                            this.error = data.error || 'Chyba při přesměrování na platbu.';
-                                            this.loading = false;
-                                        }
-                                    })
-                                    .catch(() => {
-                                        this.error = 'Nepodařilo se spojit se serverem.';
-                                        this.loading = false;
-                                    });
+                                    this.cardField.submit().catch(() => { this.error = 'Platba se nezdařila. Zkontrolujte údaje karty.'; this.loading = false; });
                                 }
                             }">
                             <a class="btn btn--submit" data-label="PayPal"
-                                :class="{ 'disabled': loading }"
-                                @click.prevent="pay()">
-                                <span class="btn_label" x-show="!loading">Zaplatit online</span>
-                                <span class="btn_label" x-show="loading" x-cloak>Načítám&hellip;</span>
+                                @click.prevent="openModal()">
+                                <span class="btn_label">Zaplatit online</span>
                             </a>
-                            <p x-show="error" x-text="error" class="field-error" style="display:none;"></p>
+                            <p x-show="error && !open" x-text="error" class="field-error" style="display:none;"></p>
+
+                            <template x-teleport="body">
+                                <div x-show="open" x-cloak
+                                    @keydown.escape.window="close()"
+                                    style="position: fixed; inset: 0; z-index: 1050; background: rgba(0,0,0,.5);"
+                                    @click.self="close()">
+                                    <div @click.stop
+                                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 4px; width: calc(100% - 40px); max-width: 460px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,.3);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                                            <strong style="font-size: 18px;">Platba kartou online</strong>
+                                            <button type="button" @click="close()" aria-label="Zavřít"
+                                                style="background: none; border: 0; font-size: 26px; line-height: 1; cursor: pointer; color: #888;">&times;</button>
+                                        </div>
+
+                                        <div wire:ignore>
+                                            <label style="display: block; margin-bottom: 4px;">Číslo karty</label>
+                                            <div id="pp-card-number"></div>
+
+                                            <div style="display: flex; gap: 12px; margin-top: 12px;">
+                                                <div style="flex: 1;">
+                                                    <label style="display: block; margin-bottom: 4px;">Platnost (MM/RR)</label>
+                                                    <div id="pp-card-expiry"></div>
+                                                </div>
+                                                <div style="flex: 1;">
+                                                    <label style="display: block; margin-bottom: 4px;">CVV</label>
+                                                    <div id="pp-card-cvv"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <a class="btn btn--submit" data-label="Karta"
+                                            :class="{ 'disabled': loading }"
+                                            @click.prevent="pay()"
+                                            style="margin-top: 18px; width: 100%;">
+                                            <span class="btn_label" x-show="!loading">Zaplatit kartou</span>
+                                            <span class="btn_label" x-show="loading" x-cloak>Zpracovávám&hellip;</span>
+                                        </a>
+                                        <p x-show="error" x-text="error" class="field-error" style="display:none; margin-top: 10px;"></p>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                         @endif
                     </div>

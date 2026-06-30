@@ -2,6 +2,8 @@
 
 use App\Models\StatusOrder;
 use App\Models\User;
+use App\Services\CartService;
+use App\Services\InvoiceService;
 use App\Services\PayPalService;
 
 beforeEach(function () {
@@ -101,7 +103,10 @@ test('guest can create paypal order via guest route', function () {
     $this->mock(PayPalService::class)
         ->shouldReceive('createOrder')
         ->once()
-        ->andReturn('https://sandbox.paypal.com/checkoutnow?token=GUESTTOKEN');
+        ->andReturn([
+            'id' => 'GUESTORDER',
+            'approval_url' => 'https://sandbox.paypal.com/checkoutnow?token=GUESTTOKEN',
+        ]);
 
     $this->withCredentials()
         ->withCookies([$cookieName => $sessionId])
@@ -137,11 +142,131 @@ test('paypal service retries on authentication failure and succeeds', function (
         ->andReturnUsing(function () use (&$callCount) {
             $callCount++;
 
-            return 'https://sandbox.paypal.com/checkoutnow?token=RETRIED';
+            return [
+                'id' => 'RETRIEDORDER',
+                'approval_url' => 'https://sandbox.paypal.com/checkoutnow?token=RETRIED',
+            ];
         });
 
     $this->actingAs($user)
         ->postJson(route('paypal.order.create', $order))
         ->assertOk()
         ->assertJsonPath('url', 'https://sandbox.paypal.com/checkoutnow?token=RETRIED');
+});
+
+// --- Card-fields flow ---
+
+test('guest can create card order and receives paypal order id', function () {
+    $cookieName = config('session.cookie', 'laravel_session');
+    $this->get('/login');
+    $sessionId = session()->getId();
+
+    $order = createTestOrder(['session_id' => $sessionId]);
+
+    $this->mock(PayPalService::class)
+        ->shouldReceive('createOrder')
+        ->once()
+        ->andReturn(['id' => 'CARDORDER123', 'approval_url' => null]);
+
+    $this->withCredentials()
+        ->withCookies([$cookieName => $sessionId])
+        ->postJson(route('paypal.guest.order.card.create', $order))
+        ->assertOk()
+        ->assertJsonPath('id', 'CARDORDER123');
+});
+
+test('card capture finalizes order and returns redirect on success', function () {
+    $user = User::factory()->create();
+    $order = createTestOrder([
+        'user_id' => $user->id,
+        'session_id' => null,
+        'payment_status' => 'pending',
+        'paypal_order_id' => 'CARDORDER123',
+    ]);
+
+    $this->mock(PayPalService::class)
+        ->shouldReceive('captureOrder')
+        ->once()
+        ->andReturn(true);
+
+    $this->mock(InvoiceService::class)
+        ->shouldReceive('createFromOrder')
+        ->once();
+
+    $this->actingAs($user)
+        ->postJson(route('paypal.order.card.capture', $order))
+        ->assertOk()
+        ->assertJsonPath('status', 'paid')
+        ->assertJsonPath('redirect', route('pages.documents.order', ['orderId' => $order->id]));
+});
+
+test('card capture returns 422 on failure', function () {
+    $user = User::factory()->create();
+    $order = createTestOrder([
+        'user_id' => $user->id,
+        'session_id' => null,
+        'payment_status' => 'pending',
+        'paypal_order_id' => 'CARDORDER123',
+    ]);
+
+    $this->mock(PayPalService::class)
+        ->shouldReceive('captureOrder')
+        ->once()
+        ->andReturn(false);
+
+    $this->actingAs($user)
+        ->postJson(route('paypal.order.card.capture', $order))
+        ->assertStatus(422);
+});
+
+// --- Cart is only cleared after successful payment ---
+
+test('successful card capture clears the cart', function () {
+    $user = User::factory()->create();
+    $order = createTestOrder([
+        'user_id' => $user->id,
+        'session_id' => null,
+        'payment_status' => 'pending',
+        'paypal_order_id' => 'CARDORDER123',
+    ]);
+
+    $this->mock(PayPalService::class)
+        ->shouldReceive('captureOrder')
+        ->once()
+        ->andReturn(true);
+
+    $this->mock(InvoiceService::class)
+        ->shouldReceive('createFromOrder')
+        ->once();
+
+    $this->mock(CartService::class)
+        ->shouldReceive('clear')
+        ->once();
+
+    $this->actingAs($user)
+        ->postJson(route('paypal.order.card.capture', $order))
+        ->assertOk();
+});
+
+test('failed card capture does not clear the cart', function () {
+    $user = User::factory()->create();
+    $order = createTestOrder([
+        'user_id' => $user->id,
+        'session_id' => null,
+        'payment_status' => 'pending',
+        'paypal_order_id' => 'CARDORDER123',
+    ]);
+
+    $this->mock(PayPalService::class)
+        ->shouldReceive('captureOrder')
+        ->once()
+        ->andReturn(false);
+
+    $this->mock(CartService::class)
+        ->shouldReceive('clear')
+        ->never();
+
+    $this->actingAs($user)
+        ->postJson(route('paypal.order.card.capture', $order))
+        ->assertStatus(422);
 });

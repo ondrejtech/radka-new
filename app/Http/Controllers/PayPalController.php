@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\CartService;
 use App\Services\InvoiceService;
 use App\Services\PayPalService;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +17,7 @@ class PayPalController extends Controller
     public function __construct(
         private readonly PayPalService $payPalService,
         private readonly InvoiceService $invoiceService,
+        private readonly CartService $cartService,
     ) {}
 
     /**
@@ -40,12 +42,58 @@ class PayPalController extends Controller
         }
 
         try {
-            $approvalUrl = $this->payPalService->createOrder($order, $returnUrl, $cancelUrl);
+            $result = $this->payPalService->createOrder($order, $returnUrl, $cancelUrl);
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
 
-        return response()->json(['url' => $approvalUrl]);
+        if (! $result['approval_url']) {
+            return response()->json(['error' => 'PayPal nevrátil odkaz pro schválení platby.'], 500);
+        }
+
+        return response()->json(['url' => $result['approval_url']]);
+    }
+
+    /**
+     * Create a PayPal order for the card-fields flow and return its ID.
+     */
+    public function createCardOrder(Request $request, Order $order): JsonResponse
+    {
+        $this->authorizeOrder($request, $order);
+
+        if ($order->payment_status === 'paid') {
+            return response()->json(['error' => 'Tato objednávka je již zaplacena.'], 422);
+        }
+
+        try {
+            $result = $this->payPalService->createOrder($order);
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
+        return response()->json(['id' => $result['id']]);
+    }
+
+    /**
+     * Capture a card-fields payment and return a JSON result.
+     */
+    public function captureCard(Request $request, Order $order): JsonResponse
+    {
+        $this->authorizeOrder($request, $order);
+
+        $captured = $this->payPalService->captureOrder($order);
+
+        if ($captured !== true) {
+            return response()->json(['error' => 'Platba se nezdařila. Zkuste to prosím znovu.'], 422);
+        }
+
+        $this->invoiceService->createFromOrder($order);
+        $this->cartService->clear();
+
+        return response()->json([
+            'status' => 'paid',
+            'redirect' => route('pages.documents.order', ['orderId' => $order->id]),
+        ]);
     }
 
     /**
@@ -67,6 +115,7 @@ class PayPalController extends Controller
         }
 
         $this->invoiceService->createFromOrder($order);
+        $this->cartService->clear();
 
         return redirect()->route('pages.documents.order', ['orderId' => $order->id])
             ->with('success', 'Platba proběhla úspěšně.');

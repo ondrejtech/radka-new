@@ -76,81 +76,80 @@ public/
 
 ## PayPal integrace
 
-### Balíček: blendbyte/paypal
-- GitHub: https://github.com/blendbyte/laravel-paypal
-- Fork od `srmklive/laravel-paypal` modernizovaný pro PHP 8.2+ a Laravel 12/13
-- Drop-in replacement — stejné API, pouze jiný namespace: `Blendbyte\PayPal` místo `Srmklive\PayPal`
+### Balíček: paypal/paypal-server-sdk
+- Oficiální PayPal Server SDK (generované APIMATIC SDK), namespace `PaypalServerSdkLib`
+- GitHub: https://github.com/paypal/PayPal-PHP-Server-SDK
+- Není to Laravel package — žádný service provider ani vendor:publish, config se nečte automaticky
+- Controllery: Orders (v2), Payments (v2), Vault (v3, jen US), Transaction Search (v1), Subscriptions (v1)
+- **Neobsahuje** verifikaci webhooků ani fluent subscription helpery — řešíme ručně
 
 ### Instalace
 ```bash
-composer require blendbyte/paypal
-php artisan vendor:publish --provider "Blendbyte\PayPal\Providers\PayPalServiceProvider"
+composer require paypal/paypal-server-sdk
 ```
 
 ### .env proměnné
 ```
-PAYPAL_MODE=sandbox
+PAYPAL_MODE=sandbox            # sandbox | live
 PAYPAL_SANDBOX_CLIENT_ID=
 PAYPAL_SANDBOX_CLIENT_SECRET=
 PAYPAL_LIVE_CLIENT_ID=
 PAYPAL_LIVE_CLIENT_SECRET=
-PAYPAL_LIVE_APP_ID=
+PAYPAL_CURRENCY=CZK
+PAYPAL_WEBHOOK_ID=
 ```
+Konfigurace v `config/paypal.php`.
 
-### Inicializace
+### Inicializace klienta
 ```php
-use Blendbyte\PayPal\Services\PayPal as PayPalClient;
+use PaypalServerSdkLib\Authentication\ClientCredentialsAuthCredentialsBuilder;
+use PaypalServerSdkLib\Environment;
+use PaypalServerSdkLib\PaypalServerSdkClientBuilder;
 
-$provider = new PayPalClient;
-$provider->getAccessToken(); // vždy volat před API metodami
+$client = PaypalServerSdkClientBuilder::init()
+    ->clientCredentialsAuthCredentials(
+        ClientCredentialsAuthCredentialsBuilder::init($clientId, $clientSecret)
+    )
+    ->environment(Environment::SANDBOX) // nebo Environment::PRODUCTION
+    ->build();
+
+$orders = $client->getOrdersController();
 ```
 
 ### Objednávky (Orders)
+- `body` lze předat jako PHP pole — SDK serializuje přes `json_encode`
+- Metody vrací `ApiResponse`; raw JSON přes `getBody()`, typovaný model přes `getResult()`
+- 4xx chyby vyhazují `PaypalServerSdkLib\Exceptions\ErrorException` (`getName()`, `getDetails()`, `getLinks()`)
 ```php
-$order = $provider->createOrder([
-    'intent' => 'CAPTURE',
-    'purchase_units' => [
-        ['amount' => ['currency_code' => 'CZK', 'value' => '100.00']],
+$response = $orders->createOrder([
+    'body' => [
+        'intent' => 'CAPTURE',
+        'purchase_units' => [
+            ['amount' => ['currency_code' => 'CZK', 'value' => '100.00']],
+        ],
     ],
+    'prefer' => 'return=representation',
 ]);
-$provider->capturePaymentOrder($orderId);
-$provider->showOrderDetails($orderId);
+$body = json_decode($response->getBody(), true); // ['id' => ..., 'links' => [...], ...]
+
+$orders->captureOrder(['id' => $orderId, 'prefer' => 'return=representation']);
 ```
 
-### Webhooks
-```php
-$provider->createWebHook('https://www.techdomov.eu/paypal/webhook', ['PAYMENT.CAPTURE.COMPLETED']);
-
-// Verifikace příchozího webhooку
-$provider->verifyWebHook([
-    'auth_algo'         => $request->header('PAYPAL-AUTH-ALGO'),
-    'cert_url'          => $request->header('PAYPAL-CERT-URL'),
-    'transmission_id'   => $request->header('PAYPAL-TRANSMISSION-ID'),
-    'transmission_sig'  => $request->header('PAYPAL-TRANSMISSION-SIG'),
-    'transmission_time' => $request->header('PAYPAL-TRANSMISSION-TIME'),
-    'webhook_id'        => 'your-webhook-id',
-    'webhook_event'     => $request->all(),
-]);
-```
+### Webhooks (ruční verifikace)
+SDK helper nemá → voláme REST `/v1/notifications/verify-webhook-signature` s OAuth tokenem (`client_credentials`). Viz `PayPalService::verifyWebhook()`.
 
 ### Refundy
-```php
-$provider->refundCapturedPayment($captureId, $invoiceId, $amount, $note);
-```
+Přes `PaymentsController` (`$client->getPaymentsController()`), metoda `refundCapturedPayment(['capture_id' => ..., 'body' => [...]])`.
 
-### Subscription helpers (fluent API)
-```php
-$provider->addProduct('Název', 'Popis', 'SERVICE', 'SOFTWARE')
-    ->addMonthlyPlan('Plán', 'Popis', 100)
-    ->setReturnAndCancelUrl('https://...', 'https://...')
-    ->setupSubscription('Jan Novak', 'jan@example.com', '2026-01-01');
-```
+### Platební toky v projektu
+- **Redirect (PayPal Checkout):** `createOrder()` s `application_context` → approval URL → návrat na `success` → `captureOrder()`
+- **Card-fields (platba kartou bez přihlášení / ACDC):** frontend PayPal JS SDK `components=card-fields`; server jen `createCardOrder` (vrací order ID) a `captureCard`. Vyžaduje schválení ACDC na účtu + podporu měny (mimo kód).
 
 ### Pravidla použití
-- Vždy volat `getAccessToken()` před jakoukoliv API metodou
-- Logiku volání PayPal API umísťovat do `app/Services/PayPalService.php`
-- Webhook endpointy vyjmout z CSRF ochrany v `bootstrap/app.php`
+- Veškerou logiku PayPal API držet v `app/Services/PayPalService.php`
+- Webhook endpoint vyjmout z CSRF ochrany v `bootstrap/app.php`
 - Nikdy nelogovat `client_secret` ani access tokeny
+- Public client ID pro JS SDK brát přes `PayPalService::publicClientId()`
 
 ## Co NIKDY nedělat
 - Nikdy nevymýšlej hodnoty (API klíče, URL, názvy tabulek)
