@@ -300,6 +300,31 @@
 
                         </div>
                         @if ($order->payment_status !== 'paid' && $payPalClientId)
+                        <style>
+                            .pp-modal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #30313d; }
+                            .pp-modal_title { font-size: 18px; font-weight: 600; }
+                            .pp-modal_close { background: none; border: 0; font-size: 26px; line-height: 1; cursor: pointer; color: #888; }
+                            .pp-tabs { display: flex; gap: 10px; margin-bottom: 18px; }
+                            .pp-tab { flex: 1; border: 1px solid #e6e6e6; border-radius: 6px; padding: 10px 12px; background: #fff; }
+                            .pp-tab.is-active { border-color: #0570de; box-shadow: 0 0 0 1px #0570de; }
+                            .pp-tab_icon { height: 20px; margin-bottom: 8px; color: #6d6e78; }
+                            .pp-tab.is-active .pp-tab_icon, .pp-tab.is-active .pp-tab_label { color: #0570de; }
+                            .pp-tab_label { font-size: 14px; font-weight: 500; }
+                            .pp-label { display: block; font-size: 14px; margin: 14px 0 4px; color: #30313d; }
+                            .pp-field { position: relative; border: 1px solid #e6e6e6; border-radius: 6px; height: 44px; background: #fff; box-shadow: 0 1px 1px rgba(0,0,0,.03); overflow: hidden; }
+                            .pp-field.is-focus { border-color: #0570de; box-shadow: 0 0 0 3px rgba(5,112,222,.25); }
+                            .pp-field > div { height: 44px !important; }
+                            .pp-field_brands { position: absolute; top: 0; right: 10px; height: 100%; display: flex; align-items: center; gap: 4px; pointer-events: none; z-index: 3; }
+                            .pp-field_brands img { height: 18px; border-radius: 3px; }
+                            .pp-field_cvc { position: absolute; top: 0; right: 12px; height: 100%; display: flex; align-items: center; pointer-events: none; z-index: 3; color: #c4c6cf; }
+                            .pp-row { display: flex; gap: 12px; }
+                            .pp-row > div { flex: 1; }
+                            .pp-input { width: 100%; height: 44px; border: 1px solid #e6e6e6; border-radius: 6px; padding: 0 12px; font-size: 16px; color: #30313d; background: #fff; box-shadow: 0 1px 1px rgba(0,0,0,.03); -webkit-appearance: none; appearance: none; }
+                            .pp-input:focus { outline: none; border-color: #0570de; box-shadow: 0 0 0 3px rgba(5,112,222,.25); }
+                            select.pp-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236d6e78' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+                            .pp-paybtn { width: 100%; height: 48px; margin-top: 22px; border: 0; border-radius: 6px; background: #15be53; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+                            .pp-paybtn:disabled { opacity: .6; cursor: default; }
+                        </style>
                         <div class="flex-box_item pay-box_btn-wrap"
                             x-data="{
                                 open: false,
@@ -308,6 +333,8 @@
                                 loading: false,
                                 error: '',
                                 cardField: null,
+                                country: 'Česká republika',
+                                zip: '',
                                 baseUrl: '/paypal{{ auth()->check() ? '' : '/guest' }}/order/{{ $order->id }}/card',
                                 csrf() { return document.getElementById('csrfToken').value; },
                                 loadSdk() {
@@ -333,7 +360,11 @@
                                         onApprove: () => fetch(self.baseUrl + '/capture', { method: 'POST', headers: { 'X-CSRF-TOKEN': self.csrf(), 'Accept': 'application/json' } })
                                             .then(r => r.json()).then(d => { if (d.redirect) { window.location.href = d.redirect; } else { self.error = d.error || 'Platba se nezdařila.'; self.loading = false; } }),
                                         onError: () => { self.error = 'Platba se nezdařila. Zkontrolujte údaje karty.'; self.loading = false; },
-                                        style: { input: { 'font-size': '16px', 'font-family': 'sans-serif', 'color': '#333333' } },
+                                        style: {
+                                            input: { 'font-size': '16px', 'font-family': 'sans-serif', 'color': '#30313d', 'padding': '0 12px', 'border': 'none', 'outline': 'none', 'line-height': '44px', 'height': '44px' },
+                                            ':focus': { 'outline': 'none', 'border': 'none', 'box-shadow': 'none' },
+                                            '::placeholder': { 'color': '#757680' },
+                                        },
                                     });
                                     this.ready = this.cardField.isEligible();
                                 },
@@ -350,9 +381,10 @@
                                     this.$nextTick(() => {
                                         if (this.rendered) { return; }
                                         requestAnimationFrame(() => {
-                                            this.cardField.NumberField().render('#pp-card-number');
-                                            this.cardField.ExpiryField().render('#pp-card-expiry');
-                                            this.cardField.CVVField().render('#pp-card-cvv');
+                                            const f = (id, on) => { const el = document.getElementById(id); if (el) { el.classList.toggle('is-focus', on); } };
+                                            this.cardField.NumberField({ placeholder: '1234 1234 1234 1234', inputEvents: { onFocus: () => f('pp-card-number', true), onBlur: () => f('pp-card-number', false) } }).render('#pp-card-number');
+                                            this.cardField.ExpiryField({ placeholder: 'MM / YY', inputEvents: { onFocus: () => f('pp-card-expiry', true), onBlur: () => f('pp-card-expiry', false) } }).render('#pp-card-expiry');
+                                            this.cardField.CVVField({ placeholder: 'CVC', inputEvents: { onFocus: () => f('pp-card-cvv', true), onBlur: () => f('pp-card-cvv', false) } }).render('#pp-card-cvv');
                                             this.rendered = true;
                                         });
                                     });
@@ -376,37 +408,72 @@
                                     @keydown.escape.window="close()"
                                     style="position: fixed; inset: 0; z-index: 1050; background: rgba(0,0,0,.5);"
                                     @click.self="close()">
-                                    <div @click.stop
-                                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 4px; width: calc(100% - 40px); max-width: 460px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,.3);">
+                                    <div @click.stop class="pp-modal"
+                                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 8px; width: calc(100% - 40px); max-width: 460px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,.3); max-height: calc(100vh - 40px); overflow-y: auto;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-                                            <strong style="font-size: 18px;">Platba kartou online</strong>
-                                            <button type="button" @click="close()" aria-label="Zavřít"
-                                                style="background: none; border: 0; font-size: 26px; line-height: 1; cursor: pointer; color: #888;">&times;</button>
+                                            <span class="pp-modal_title">Platba kartou online</span>
+                                            <button type="button" @click="close()" aria-label="Zavřít" class="pp-modal_close">&times;</button>
+                                        </div>
+
+                                        <div class="pp-tabs">
+                                            <div class="pp-tab is-active">
+                                                <svg class="pp-tab_icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                                <div class="pp-tab_label">Card</div>
+                                            </div>
+                                            <div class="pp-tab" style="opacity:.7">
+                                                <svg class="pp-tab_icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h3.5a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H14"/></svg>
+                                                <div class="pp-tab_label">Cash App Pay</div>
+                                            </div>
+                                            <div class="pp-tab" style="opacity:.7">
+                                                <svg class="pp-tab_icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-5 9 5M4 9v9M20 9v9M3 18h18M8 9v9M12 9v9M16 9v9"/></svg>
+                                                <div class="pp-tab_label">US bank account</div>
+                                            </div>
                                         </div>
 
                                         <div wire:ignore>
-                                            <label style="display: block; margin-bottom: 4px;">Číslo karty</label>
-                                            <div id="pp-card-number"></div>
-
-                                            <div style="display: flex; gap: 12px; margin-top: 12px;">
-                                                <div style="flex: 1;">
-                                                    <label style="display: block; margin-bottom: 4px;">Platnost (MM/RR)</label>
-                                                    <div id="pp-card-expiry"></div>
+                                            <label class="pp-label">Card number</label>
+                                            <div id="pp-card-number" class="pp-field">
+                                                <div class="pp-field_brands">
+                                                    <img src="{{ asset('staticcontent/images/platby/visa.png') }}" alt="Visa">
+                                                    <img src="{{ asset('staticcontent/images/platby/master_card.png') }}" alt="Mastercard">
                                                 </div>
-                                                <div style="flex: 1;">
-                                                    <label style="display: block; margin-bottom: 4px;">CVV</label>
-                                                    <div id="pp-card-cvv"></div>
+                                            </div>
+
+                                            <div class="pp-row">
+                                                <div>
+                                                    <label class="pp-label">Expiration</label>
+                                                    <div id="pp-card-expiry" class="pp-field"></div>
+                                                </div>
+                                                <div>
+                                                    <label class="pp-label">CVC</label>
+                                                    <div id="pp-card-cvv" class="pp-field">
+                                                        <div class="pp-field_cvc">
+                                                            <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="24" height="16" rx="2"/><line x1="1" y1="6" x2="25" y2="6"/></svg>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <a class="btn btn--submit" data-label="Karta"
-                                            :class="{ 'disabled': loading }"
-                                            @click.prevent="pay()"
-                                            style="margin-top: 18px; width: 100%;">
-                                            <span class="btn_label" x-show="!loading">Zaplatit kartou</span>
-                                            <span class="btn_label" x-show="loading" x-cloak>Zpracovávám&hellip;</span>
-                                        </a>
+                                        <div class="pp-row">
+                                            <div>
+                                                <label class="pp-label">Country</label>
+                                                <select class="pp-input" x-model="country">
+                                                    <option>Česká republika</option>
+                                                    <option>Slovensko</option>
+                                                    <option>United States</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="pp-label">ZIP</label>
+                                                <input type="text" class="pp-input" placeholder="12345" x-model="zip">
+                                            </div>
+                                        </div>
+
+                                        <button type="button" class="pp-paybtn" :disabled="loading" @click.prevent="pay()">
+                                            <span x-show="!loading">Zaplatit kartou</span>
+                                            <span x-show="loading" x-cloak>Zpracovávám&hellip;</span>
+                                        </button>
                                         <p x-show="error" x-text="error" class="field-error" style="display:none; margin-top: 10px;"></p>
                                     </div>
                                 </div>
