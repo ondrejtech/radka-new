@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs-CZ" lang="cs-CZ">
 <head><meta charset="utf-8" /><meta name="author" content="{{ env('DEVELOPER_NAME').', '.env('DEVELOPER_URL')}}" />
+	@include('partials.meta-pixel')
+	@include('partials.meta-events')
 
 	<!-- Heureka.cz PRODUCT DETAIL script -->
 	<script>

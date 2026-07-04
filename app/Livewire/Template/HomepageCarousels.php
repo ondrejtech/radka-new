@@ -42,6 +42,8 @@ class HomepageCarousels extends Component
             $quantity
         );
 
+        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->EndUserPrice * $quantity, 2));
+
         $this->dispatch('cart-updated');
         $this->dispatch('message', [
             'text' => 'Zboží bylo úspěšně přidáno do košíku',

@@ -90,6 +90,8 @@ class PayPalController extends Controller
         $this->invoiceService->createFromOrder($order);
         $this->cartService->clear();
 
+        session()->flash('meta_purchase', $order->id);
+
         return response()->json([
             'status' => 'paid',
             'redirect' => route('pages.documents.order', ['orderId' => $order->id]),
@@ -118,7 +120,8 @@ class PayPalController extends Controller
         $this->cartService->clear();
 
         return redirect()->route('pages.documents.order', ['orderId' => $order->id])
-            ->with('success', 'Platba proběhla úspěšně.');
+            ->with('success', 'Platba proběhla úspěšně.')
+            ->with('meta_purchase', $order->id);
     }
 
     /**

@@ -28,6 +28,16 @@ class Basket extends Component
             $this->form->shipPhone = $user->phone ?? '';
             $this->form->shipEmail = $user->email ?? '';
         }
+
+        $items = app(CartService::class)->resolveCart()->items()->get(['pro_id', 'price', 'quantity']);
+
+        if ($items->isNotEmpty()) {
+            $this->dispatch(
+                'meta-initiate-checkout',
+                value: round($items->sum(fn ($item) => $item->price * $item->quantity), 2),
+                ids: $items->pluck('pro_id')->map(fn ($id) => (string) $id)->all(),
+            );
+        }
     }
 
     public function applyAddress(string $name, string $street, string $city, string $zip, string $phone, string $email): void

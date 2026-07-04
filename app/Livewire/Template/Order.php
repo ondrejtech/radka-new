@@ -14,6 +14,18 @@ class Order extends Component
     public function mount(int $orderId): void
     {
         $this->orderId = $orderId;
+
+        if ((int) session('meta_purchase') === $orderId) {
+            $order = OrderModel::with('items')->find($orderId);
+
+            if ($order) {
+                $this->dispatch(
+                    'meta-purchase',
+                    value: round((float) $order->total_with_vat, 2),
+                    ids: $order->items->pluck('pro_id')->map(fn ($id) => (string) $id)->all(),
+                );
+            }
+        }
     }
 
     public function render(PayPalService $payPalService): View
