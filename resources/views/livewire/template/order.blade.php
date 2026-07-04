@@ -358,8 +358,8 @@
                                         createOrder: () => fetch(self.baseUrl + '/create', { method: 'POST', headers: { 'X-CSRF-TOKEN': self.csrf(), 'Accept': 'application/json' } })
                                             .then(r => r.json()).then(d => { if (d.id) { return d.id; } throw new Error(d.error || 'Chyba'); }),
                                         onApprove: () => fetch(self.baseUrl + '/capture', { method: 'POST', headers: { 'X-CSRF-TOKEN': self.csrf(), 'Accept': 'application/json' } })
-                                            .then(r => r.json()).then(d => { if (d.redirect) { window.location.href = d.redirect; } else { self.error = d.error || 'Platba se nezdařila.'; self.loading = false; } }),
-                                        onError: () => { self.error = 'Platba se nezdařila. Zkontrolujte údaje karty.'; self.loading = false; },
+                                            .then(r => r.json()).then(d => { if (d.redirect) { window.location.href = d.redirect; } else { self.notifyError(d.error || 'Platba se nezdařila.'); } }),
+                                        onError: () => { self.notifyError('Platba se nezdařila. Zkontrolujte údaje karty.'); },
                                         style: {
                                             input: { 'font-size': '16px', 'font-family': 'sans-serif', 'color': '#30313d', 'padding': '0 12px', 'border': 'none', 'outline': 'none', 'line-height': '44px', 'height': '44px' },
                                             ':focus': { 'outline': 'none', 'border': 'none', 'box-shadow': 'none' },
@@ -390,11 +390,12 @@
                                     });
                                 },
                                 close() { this.open = false; },
+                                notifyError(msg) { this.error = msg; this.loading = false; if (window.alertify) { alertify.set('notifier', 'position', 'top-right'); alertify.error(msg); } },
                                 pay() {
                                     if (!this.cardField) { return; }
                                     this.loading = true;
                                     this.error = '';
-                                    this.cardField.submit().catch(() => { this.error = 'Platba se nezdařila. Zkontrolujte údaje karty.'; this.loading = false; });
+                                    this.cardField.submit().catch(() => { this.notifyError('Platba se nezdařila. Zkontrolujte údaje karty.'); });
                                 }
                             }">
                             <a class="btn btn--submit" data-label="PayPal"
