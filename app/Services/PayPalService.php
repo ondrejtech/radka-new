@@ -215,17 +215,25 @@ class PayPalService
             return false;
         }
 
-        if (($body['status'] ?? '') !== 'COMPLETED') {
-            Log::error('PayPal capture not completed', ['response' => $body, 'order_id' => $order->id]);
+        $capture = $body['purchase_units'][0]['payments']['captures'][0] ?? null;
+        $captureStatus = $capture['status'] ?? null;
+
+        // Ověř stav objednávky I samotného capture. PayPal u karet (ACDC) může
+        // vrátit order status COMPLETED, ale capture DECLINED/PENDING/FAILED —
+        // taková platba NESMÍ projít jako zaplaceno (peníze se nestrhly).
+        if (($body['status'] ?? '') !== 'COMPLETED' || $captureStatus !== 'COMPLETED') {
+            Log::error('PayPal capture not completed', [
+                'order_status' => $body['status'] ?? null,
+                'capture_status' => $captureStatus,
+                'order_id' => $order->id,
+            ]);
             $order->update(['payment_status' => 'failed']);
 
             return false;
         }
 
-        $captureId = $body['purchase_units'][0]['payments']['captures'][0]['id'] ?? null;
-
         $order->update([
-            'paypal_capture_id' => $captureId,
+            'paypal_capture_id' => $capture['id'] ?? null,
             'payment_status' => 'paid',
             'status_order_id' => 3, // Čeká na fakturaci
         ]);
