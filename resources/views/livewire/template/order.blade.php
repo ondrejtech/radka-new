@@ -162,7 +162,7 @@
                                 <div class="document-heading_item">
                                     <span class="document-heading_label">Faktury</span>
                                     <div class="document-heading_value">
-                                        {{ date('Y'). $order->invoice?->id ?? '—' }}
+                                        {{ $order->invoice ? date('Y').$order->invoice->id : '—' }}
                                     </div>
                                 </div>
                             </div>

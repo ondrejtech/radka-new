@@ -12,6 +12,12 @@ class InvoiceService
      */
     public function createFromOrder(Order $order): Invoice
     {
+        // Idempotence: fakturu vytvoř jen jednou (nikdy pro nezaplacenou objednávku
+        // ani duplicitně při opakovaném volání / webhooku).
+        if ($existing = $order->invoice()->first()) {
+            return $existing;
+        }
+
         $order->loadMissing(['items', 'user']);
 
         $docNumber = now()->year.$order->id;
