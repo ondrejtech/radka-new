@@ -6,6 +6,7 @@ use App\Livewire\Forms\BasketOrderForm;
 use App\Models\DeliveryAddress;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Transportation;
 use App\Services\CartService;
 use Illuminate\View\View;
 use Livewire\Attributes\Renderless;
@@ -266,6 +267,7 @@ class Basket extends Component
             'addressData' => $addressData,
             'totalWithoutVat' => $totalWithoutVat,
             'totalWithVat' => $totalWithVat,
+            'transports' => Transportation::where('Active', 1)->orderBy('SortOrder')->get(['Code', 'Name', 'Price']),
         ]);
     }
 }

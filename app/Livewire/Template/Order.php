@@ -30,7 +30,7 @@ class Order extends Component
 
     public function render(PayPalService $payPalService): View
     {
-        $order = OrderModel::with(['statusOrder', 'items', 'invoice'])
+        $order = OrderModel::with(['statusOrder', 'items', 'invoice', 'transportation'])
             ->when(
                 auth()->check(),
                 fn ($q) => $q->where('user_id', auth()->id()),

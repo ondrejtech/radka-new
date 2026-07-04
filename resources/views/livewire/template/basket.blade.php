@@ -492,93 +492,18 @@
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu--scroll">
 
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '46' }"
-                                                        @click="selectedId = '46'; selectedName = 'Balík'; $wire.set('form.transportId', '46')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">Balík</strong>
+                                                    @foreach ($transports as $t)
+                                                        <button type="button" class="dropdown-item"
+                                                            :class="{ 'active': selectedId === '{{ $t->Code }}' }"
+                                                            @click="selectedId = '{{ $t->Code }}'; selectedName = '{{ $t->Name }}'; $wire.set('form.transportId', '{{ $t->Code }}')">
+                                                            <span class="dropdown-item_in">
+                                                                <span class="dropdown-item_label">
+                                                                    <strong class="cart-transport-choose_name">{{ $t->Name }}</strong>
+                                                                </span>
+                                                                <strong class="cart-transport-choose_price">{{ number_format($t->Price, 0, ',', ' ') }}&nbsp;Kč</strong>
                                                             </span>
-                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
-
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '3' }"
-                                                        @click="selectedId = '3'; selectedName = 'Osobně Ostrava'; $wire.set('form.transportId', '3')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">Osobně Ostrava</strong>
-                                                            </span>
-                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
-
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '105' }"
-                                                        @click="selectedId = '105'; selectedName = 'ČP balík'; $wire.set('form.transportId', '105')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">ČP balík</strong>
-                                                            </span>
-                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
-
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '47' }"
-                                                        @click="selectedId = '47'; selectedName = 'Dobírka'; $wire.set('form.transportId', '47')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">Dobírka</strong>
-                                                            </span>
-                                                            <strong class="cart-transport-choose_price">55&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
-
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '36' }"
-                                                        @click="selectedId = '36'; selectedName = 'DPD EX.12'; $wire.set('form.transportId', '36')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">DPD EX.12</strong>
-                                                            </span>
-                                                            <strong class="cart-transport-choose_price">150&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
-
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '37' }"
-                                                        @click="selectedId = '37'; selectedName = 'DPD EX.12 dob.'; $wire.set('form.transportId', '37')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">DPD EX.12 dob.</strong>
-                                                            </span>
-                                                            <strong class="cart-transport-choose_price">180&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
-
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '256' }"
-                                                        @click="selectedId = '256'; selectedName = 'DPD PickupPoint dob.'; $wire.set('form.transportId', '256')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">DPD PickupPoint dob.</strong>
-                                                            </span>
-                                                            <strong class="cart-transport-choose_price">55&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
-
-                                                    <button type="button" class="dropdown-item"
-                                                        :class="{ 'active': selectedId === '103' }"
-                                                        @click="selectedId = '103'; selectedName = 'Expres OVA'; $wire.set('form.transportId', '103')">
-                                                        <span class="dropdown-item_in">
-                                                            <span class="dropdown-item_label">
-                                                                <strong class="cart-transport-choose_name">Expres OVA</strong>
-                                                            </span>
-                                                            <strong class="cart-transport-choose_price">25&nbsp;Kč</strong>
-                                                        </span>
-                                                    </button>
+                                                        </button>
+                                                    @endforeach
 
                                                 </div>
                                             </div>

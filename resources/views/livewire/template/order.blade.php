@@ -112,10 +112,7 @@
 
                                 <div class="document-heading_item">
                                     <span class="document-heading_label">Doprava</span>
-                                    @php
-                                        $transportNames = [46 => 'Balík', 3 => 'Osobně Ostrava', 105 => 'ČP balík', 47 => 'Dobírka', 36 => 'DPD EX.12', 37 => 'DPD EX.12 dob.', 256 => 'DPD PickupPoint dob.', 103 => 'Expres OVA'];
-                                    @endphp
-                                    <strong class="document-heading_value">{{ $transportNames[$order->transport_id] ?? '' }}</strong>
+                                    <strong class="document-heading_value">{{ $order->transportation?->Name }}</strong>
                                 </div>
 
                                 <div class="document-heading_item">

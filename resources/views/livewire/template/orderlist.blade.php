@@ -191,18 +191,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $transportNames = [
-                                46 => 'Balík',
-                                3 => 'Osobně Ostrava',
-                                105 => 'ČP balík',
-                                47 => 'Dobírka',
-                                36 => 'DPD EX.12',
-                                37 => 'DPD EX.12 dob.',
-                                256 => 'DPD PickupPoint dob.',
-                                103 => 'Expres OVA',
-                            ];
-                        @endphp
                         @forelse ($orders as $order)
                             @php
                                 $statusClass = match ((int) $order->status_order_id) {
@@ -228,7 +216,7 @@
                                     {{ number_format($order->total_without_vat, 2, ',', ' ') }}&nbsp;Kč</td>
                                 <td data-th="Objednáno" class="table-col_order-from">techDomov</td>
                                 <td data-th="Doprava" class="table-col_transport">
-                                    {{ $transportNames[$order->transport_id] ?? '' }}</td>
+                                    {{ $order->transportation?->Name }}</td>
                                 <td data-th="Adresa dodání" class="table-col_address">{{ $order->ship_name }},
                                     {{ $order->ship_street }}, {{ $order->ship_city }}, {{ $order->ship_zip }}</td>
                                 <td data-th="Faktury" class="table-col_sym">

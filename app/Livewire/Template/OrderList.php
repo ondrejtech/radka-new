@@ -96,7 +96,7 @@ class OrderList extends Component
     #[Renderless]
     public function exportXml(): mixed
     {
-        $orders = $this->buildQuery()->with(['statusOrder', 'items'])->get();
+        $orders = $this->buildQuery()->with(['statusOrder', 'items', 'transportation'])->get();
 
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
@@ -142,7 +142,7 @@ class OrderList extends Component
 
     public function render(): View
     {
-        $orders = $this->buildQuery()->with(['statusOrder', 'items'])->paginate($this->perPage);
+        $orders = $this->buildQuery()->with(['statusOrder', 'items', 'transportation'])->paginate($this->perPage);
 
         return view('livewire.template.orderlist', ['orders' => $orders]);
     }
