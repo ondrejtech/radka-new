@@ -1,0 +1,20 @@
+GOOGLE ADS API TOKEN APPLICATION — odpovědi k vložení
+=======================================================
+
+POLE 1 — API contact email is accurate and up-to-date
+[zaškrtnout checkbox]
+
+POLE 2 — Google Ads manager account (MCC) ID
+484-383-0227
+
+POLE 3 — Your contact email address
+api@multishoping.eu
+
+POLE 4 — Ongoing relationship with a Google representative?
+No
+
+POLE 5 — URL for your company's primary website
+https://www.multishoping.eu
+
+POLE 6 — Company's business model and how you use Google Ads
+I am an independent SEM professional (sole trader, Ondrej Zelina, Czech Republic, IČO 02453681) managing Google Ads campaigns for clients under my manager account (MCC). My client GastroACS s.r.o. operates the e-commerce store https://www.multishoping.eu (IT hardware and electronics), which is linked under my MCC. I use the Google Ads API (v24) to create, update and remove Search and Shopping campaigns, ad groups, keywords and ads, manage budgets and bids, and pull performance reports for the client. The website was briefly unavailable during the previous review and is now fully functional.

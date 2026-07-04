@@ -38,7 +38,7 @@ class PagesController extends Controller
         return view('pages.processing-personal-info');
     }
 
-    public function contact(): View
+        public function contact(): View
     {
         $persons = [
             [
@@ -51,18 +51,18 @@ class PagesController extends Controller
             ],
             [
                 'id' => 202602,
-                'name' => 'Lubos Petr',
+                'name' => 'Pavel Burda',
                 'role' => 'Obchodni manazer',
-                'phone' => '721 178 847',
-                'email' => 'petr@multishoping.eu',
+                'phone' => '',
+                'email' => 'burda@multishoping.eu',
                 'role_title' => 'obchodní informace',
             ],
             [
                 'id' => 202603,
-                'name' => 'Petr Jakubicek',
+                'name' => 'Josef Psota',
                 'role' => 'Obchodni manazer',
-                'phone' => '721 178 847',
-                'email' => 'jakubicek@multishoping.eu',
+                'phone' => '',
+                'email' => 'psota@multishoping.eu',
                 'role_title' => 'obchodní informace',
             ],
         ];
