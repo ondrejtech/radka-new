@@ -21,3 +21,14 @@
 @section('compare-bar')
     <livewire:template.compare-bar />
 @endsection
+
+@if (config('services.meta.pixel_id'))
+    @push('scripts')
+        <script>
+            window.fbq && fbq('track', 'ViewContent', {
+                content_type: 'product',
+                content_ids: ['{{ $proId }}'],
+            });
+        </script>
+    @endpush
+@endif
