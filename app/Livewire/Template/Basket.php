@@ -160,6 +160,15 @@ class Basket extends Component
         ]);
     }
 
+    private function shippingPrice(): float
+    {
+        if (! $this->form->transportId) {
+            return 0.0;
+        }
+
+        return (float) (Transportation::where('Code', (int) $this->form->transportId)->value('Price') ?? 0);
+    }
+
     public function placeOrder(bool $isOpen): void
     {
         if ($isOpen && ! auth()->check()) {
@@ -187,7 +196,7 @@ class Basket extends Component
             return;
         }
 
-        $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity);
+        $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity) + $this->shippingPrice();
 
         $order = Order::create([
             'user_id' => auth()->id(),
@@ -257,7 +266,8 @@ class Basket extends Component
             );
         }
 
-        $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity);
+        $shippingPrice = $this->shippingPrice();
+        $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity) + $shippingPrice;
         $totalWithVat = round($totalWithoutVat * 1.21, 2);
 
         return view('livewire.template.basket', [
@@ -267,6 +277,7 @@ class Basket extends Component
             'addressData' => $addressData,
             'totalWithoutVat' => $totalWithoutVat,
             'totalWithVat' => $totalWithVat,
+            'shippingPrice' => $shippingPrice,
             'transports' => Transportation::where('Active', 1)->orderBy('SortOrder')->get(['Code', 'Name', 'Price']),
         ]);
     }

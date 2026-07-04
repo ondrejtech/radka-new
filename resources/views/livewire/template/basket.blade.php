@@ -424,11 +424,22 @@
                     </tbody>
                 </table>
                 @php
-                    $totalWithoutVat = $items->sum(fn($item) => $item->price * $item->quantity);
+                    $totalWithoutVat = $items->sum(fn($item) => $item->price * $item->quantity) + ($shippingPrice ?? 0);
                     $totalWithVat = $totalWithoutVat * 1.21;
                 @endphp
                 <table class="table cart-tbl cart-tbl-items cart-tbl-sum">
                     <tfoot>
+                        @if (($shippingPrice ?? 0) > 0)
+                            <tr class="table-foot-row table-row--full-width">
+                                <td class="table-foot-cell table-foot-cell_label">
+                                    <span class="cart-tbl-sum_label">Doprava (bez DPH)</span>
+                                </td>
+                                <td class="table-foot-cell table-foot-cell_price table-col_price table-col_total-sum">
+                                    <span class="cart-tbl-sum_price">{{ number_format($shippingPrice, 2, ',', ' ') }}&nbsp;Kč</span>
+                                </td>
+                                <td class="table-foot-cell table-col_control table-col_control--append"></td>
+                            </tr>
+                        @endif
                         <tr class="table-foot-row table-row--full-width">
                             <td class="table-foot-cell table-foot-cell_label">
                                 <span class="cart-tbl-sum_label">Cena bez DPH</span>
