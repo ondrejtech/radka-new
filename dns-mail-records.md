@@ -90,7 +90,21 @@ Odpovídá UI: Configuration → Routing → Relayhosts + přiřazení doméně.
 v=spf1 mx include:spf.brevo.com ~all
 ```
 Bez `include:spf.brevo.com` by SPF na příjmu selhal (připojuje se Brevo IP, ne server).
-DKIM (`d=multishoping.eu`) zůstává platný — mailcow podepisuje před odesláním na relay.
+
+### Brevo domain authentication (nutné — jinak Brevo přepisuje From!)
+Bez autentizace domény Brevo přepisoval `From` na `@xxx.brevosend.com` a rozbíjel DKIM
+(mění tělo → body hash fail). Po autentizaci posílá jako `@multishoping.eu` s aligned DKIM.
+
+DNS záznamy pro Brevo autentizaci (stav: **Authenticated ✅** 4. 7. 2026):
+```
+@                 TXT    brevo-code:a4be8e215d61acbd07779e64d5dc1d9e   (ověření vlastnictví)
+brevo1._domainkey CNAME  b1.multishoping-eu.dkim.brevo.com.            (Brevo DKIM 1)
+brevo2._domainkey CNAME  b2.multishoping-eu.dkim.brevo.com.            (Brevo DKIM 2)
+_dmarc            TXT    v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com  (Brevo přepsal DMARC)
+```
+Pozn.: Brevo přepsal DMARC `rua` na svůj (`rua@dmarc.brevo.com`) — reporty chodí do Brevo dashboardu.
+Pro reporty i k sobě lze: `rua=mailto:rua@dmarc.brevo.com,mailto:dmarc@multishoping.eu`.
+Původní mailcow DKIM (`dkim._domainkey`) zůstává, ale při relayi přes Brevo se použije Brevo DKIM.
 
 ### Ověření odesílání
 ```bash
