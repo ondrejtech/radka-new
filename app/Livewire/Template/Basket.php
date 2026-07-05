@@ -196,7 +196,8 @@ class Basket extends Component
             return;
         }
 
-        $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity) + $this->shippingPrice();
+        $shippingPrice = $this->shippingPrice();
+        $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity) + $shippingPrice;
 
         $order = Order::create([
             'user_id' => auth()->id(),
@@ -216,6 +217,7 @@ class Basket extends Component
             'ship_email' => $this->form->shipEmail,
             'total_without_vat' => $totalWithoutVat,
             'total_with_vat' => round($totalWithoutVat * 1.21, 2),
+            'shipping_price' => $shippingPrice,
         ]);
 
         foreach ($items as $item) {

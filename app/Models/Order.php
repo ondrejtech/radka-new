@@ -30,6 +30,7 @@ class Order extends Model
         'ship_email',
         'total_without_vat',
         'total_with_vat',
+        'shipping_price',
         'paypal_order_id',
         'paypal_capture_id',
         'payment_status',
@@ -40,6 +41,7 @@ class Order extends Model
         return [
             'is_open' => 'boolean',
             'delivery_date' => 'date',
+            'shipping_price' => 'float',
         ];
     }
 

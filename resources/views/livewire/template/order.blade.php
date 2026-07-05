@@ -156,6 +156,13 @@
                                     <strong class="document-heading_value document-heading_value--nowrap">{{ number_format($order->total_with_vat, 2, ',', ' ') }}&nbsp;Kč</strong>
                                 </div>
 
+                                @if ($order->shipping_price > 0)
+                                    <div class="document-heading_item">
+                                        <span class="document-heading_label">Doprava (bez DPH)</span>
+                                        <strong class="document-heading_value document-heading_value--nowrap">{{ number_format($order->shipping_price, 2, ',', ' ') }}&nbsp;Kč</strong>
+                                    </div>
+                                @endif
+
                                 <div class="document-heading_item">
                                     <span class="document-heading_label">Faktury</span>
                                     <div class="document-heading_value">
