@@ -20,6 +20,7 @@ Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])-
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');
 Route::get('/pages/company-marketing', [PagesController::class, 'companyMarketing'])->name('pages.company-marketing');
 Route::get('/pages/processing-personal-info', [PagesController::class, 'processingPersonalInfo'])->name('pages.processing-personal-info');
+Route::get('/pages/data-deletion', [PagesController::class, 'dataDeletion'])->name('pages.data-deletion');
 Route::get('/pages/contact', [PagesController::class, 'contact'])->name('pages.contact');
 
 Route::get('/pages/documents/term-service', [DocumentController::class, 'termService'])->name('pages.documents.term-service');

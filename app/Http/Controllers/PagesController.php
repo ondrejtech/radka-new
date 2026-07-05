@@ -38,7 +38,12 @@ class PagesController extends Controller
         return view('pages.processing-personal-info');
     }
 
-        public function contact(): View
+    public function dataDeletion(): View
+    {
+        return view('pages.data-deletion');
+    }
+
+    public function contact(): View
     {
         $persons = [
             [
