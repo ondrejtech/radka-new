@@ -12,6 +12,11 @@
 - Před psaním kódu polož max 2-3 upřesňující otázky
 - Nezačínej psát kód bez potvrzení plánu
 
+## Screenshoty
+- Uživatel ukládá screenshoty do `~/Pictures/Screenshots/` (`/home/marty/Pictures/Screenshots/`)
+- Název souboru obsahuje datum a čas: `Screenshot From YYYY-MM-DD HH-MM-SS.png`
+- Když uživatel řekne „poslední screenshot", vezmi nejnovější podle času úpravy (`ls -t`)
+
 ## Architektura
 - Controllers jsou tenké — logika patří do Service tříd nebo Actions
 - app/Actions/ — jednorázové akce (CreateOrder, ProcessPayment)
