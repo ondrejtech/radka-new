@@ -79,6 +79,14 @@ public/
 - Vždy piš migration soubory
 - Nikdy neupravuj schéma ručně
 
+## Produkce a deploy
+- Produkční server: SSH host `multishoping.eu` (alias v `~/.ssh/config`, IP 34.66.99.210, user marty)
+- Pracovní adresář na produkci: `/var/www/multishoping.eu/category-52`
+- Aktuálně nasazená větev: `category-52`, remote `origin` = `git@gitlab.com:petr9931705/eshop.git`
+- Web se servíruje **nativně** (Apache + PHP-FPM 8.4) přímo z pracovního adresáře — **na serveru NEBĚŽÍ žádný Docker** (i když `docker-compose.yml` v repu existuje, na produkci se nepoužívá)
+- **Deploy = `git pull origin category-52`** v pracovním adresáři + `php artisan optimize:clear`
+- NIKDY nespouštět `deploy.sh` na produkci — obsahuje `docker compose down -v`, což by smazalo DB volume (`db_data`)
+
 ## PayPal integrace
 
 ### Balíček: paypal/paypal-server-sdk
