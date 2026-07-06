@@ -48,12 +48,6 @@ class GoogleMerchantFeedService
                     'ProId', 'Name', 'NameB2C', 'DescriptionShort',
                     'EndUserPrice', 'ProducerName', 'EANCode',
                 ])
-                ->addSelect(['image_url' => function ($query): void {
-                    $query->select('URL')
-                        ->from('ProductImage')
-                        ->whereColumn('ProId', 'Product.ProId')
-                        ->limit(1);
-                }])
                 ->chunkById(500, function ($products) use ($writer): void {
                     foreach ($products as $product) {
                         $this->writeItem($writer, $product);
@@ -80,7 +74,7 @@ class GoogleMerchantFeedService
         $writer->writeElement('title', Str::limit($this->clean($product->NameB2C ?: $product->Name), 150, ''));
         $writer->writeElement('description', Str::limit($this->clean($product->DescriptionShort ?: $product->Name), 5000, ''));
         $writer->writeElement('g:link', $this->productUrl($product));
-        $writer->writeElement('g:image_link', $this->imageUrl((string) $product->image_url));
+        $writer->writeElement('g:image_link', route('product-image', ['proId' => $product->ProId]));
         $writer->writeElement('g:availability', 'in_stock');
         $writer->writeElement('g:price', $this->price((float) $product->EndUserPrice));
         $writer->writeElement('g:condition', 'new');
@@ -111,18 +105,6 @@ class GoogleMerchantFeedService
             'slug' => Str::slug((string) $product->Name),
             'proId' => $product->ProId,
         ]);
-    }
-
-    private function imageUrl(string $imageUrl): string
-    {
-        // Use the full-size variant (drop the size suffix, e.g. "_9.jpg" -> ".jpg").
-        $imageUrl = (string) preg_replace('/_\d+\.jpg$/', '.jpg', $imageUrl);
-
-        if (Str::startsWith($imageUrl, ['http://', 'https://'])) {
-            return $imageUrl;
-        }
-
-        return rtrim((string) config('app.url'), '/').'/'.ltrim($imageUrl, '/');
     }
 
     private function price(float $price): string

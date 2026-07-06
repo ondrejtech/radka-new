@@ -7,6 +7,7 @@ use App\Http\Controllers\GoogleAdsAuthController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ProductFeed;
+use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,7 @@ Route::get('/', [CategoryController::class, 'home']);
 
 Route::get('/product-feed/heureka.xml', [ProductFeed::class, 'heurekaFeed'])->name('product-feed.heureka');
 Route::get('/product-feed/google-merchant.xml', [ProductFeed::class, 'googleMerchantFeed'])->name('product-feed.google-merchant');
+Route::get('/product-image/{proId}.jpg', [ProductImageController::class, 'show'])->where('proId', '\d+')->name('product-image');
 
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');

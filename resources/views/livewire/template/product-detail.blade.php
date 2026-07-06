@@ -45,7 +45,7 @@
                            data-thumbnail="{{ $mainImgThumb }}"
                            data-itemindex="0"
                            class="fancybox fn-detail-pic">
-                            <img class="pro-img" src="{{ $mainImgLarge }}" alt="{{ $product->Name }}">
+                            <img class="pro-img" src="{{ route('product-image', ['proId' => $product->ProId]) }}" alt="{{ $product->Name }}">
                         </a>
                         @else
                         <img class="pro-img" src="{{ config('images.fallback') }}" alt="{{ $product->Name }}">
