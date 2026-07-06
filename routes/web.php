@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\URL;
 Route::get('/', [CategoryController::class, 'home']);
 
 Route::get('/product-feed/heureka.xml', [ProductFeed::class, 'heurekaFeed'])->name('product-feed.heureka');
+Route::get('/product-feed/google-merchant.xml', [ProductFeed::class, 'googleMerchantFeed'])->name('product-feed.google-merchant');
 
 Route::get('/pages/productcompare', [PagesController::class, 'productCompare'])->name('pages.product-compare');
 Route::get('/pages/basket', [PagesController::class, 'basket'])->name('pages.basket.index');
