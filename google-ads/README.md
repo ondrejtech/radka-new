@@ -104,6 +104,8 @@ Geo: ČR. Audience signals: seznam zákazníků (first-party), high-intent segme
   - Purchase label: `gMusCN_j4cscEPPS9f1D` (nákup s hodnotou + CZK + transaction_id)
   - ID i label jsou jako default v `config/services.php` (lze přebít env proměnnými)
 - [x] Google Ads účet (Gastro ACS, CZK) + PMax kampaň vytvořena (ve schvalování)
-- [ ] Merchant Center + napojení feedu (aby PMax běžel na produktech)
+- [x] Merchant Center (ID 5820411636) + feed napojený + doprava nastavena
+- [x] Image proxy `/product-image/{proId}.jpg` — obrázky z crawlovatelné domény (edsystem robots.txt blokoval Googlebot-Image); feed i detail používají proxy
+- [ ] Re-fetch feedu v Merchant Center + počkat na re-crawl obrázků (schválení produktů)
 - [ ] Search + Standard Shopping kampaně
 - [ ] Navýšit PMax rozpočet na 24 000 Kč po kontrole trackingu + feedu
