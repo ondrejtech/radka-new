@@ -51,7 +51,7 @@ return [
     'google_tag' => [
         'ga4_id' => env('GOOGLE_GA4_ID'),
         'ads_conversion_id' => env('GOOGLE_ADS_CONVERSION_ID', 'AW-18249247091'),
-        'ads_purchase_label' => env('GOOGLE_ADS_PURCHASE_LABEL'),
+        'ads_purchase_label' => env('GOOGLE_ADS_PURCHASE_LABEL', 'gMusCN_j4cscEPPS9f1D'),
     ],
 
 ];
