@@ -98,8 +98,12 @@ Geo: ČR. Audience signals: seznam zákazníků (first-party), high-intent segme
 
 ## Stav implementace
 
-- [x] Feed controller + route + service (79 214 položek, ověřeno)
-- [x] Conversion tracking (base tag + view_item/add_to_cart/begin_checkout/purchase + Ads conversion) — čeká na ID v `.env`
-- [ ] Merchant Center + Google Ads účet (manuálně — nemáš zatím)
-- [ ] Doplnit `GOOGLE_GA4_ID` / `GOOGLE_ADS_CONVERSION_ID` / `GOOGLE_ADS_PURCHASE_LABEL` do `.env`
-- [ ] Spuštění kampaní
+- [x] Feed controller + route + service (79 214 položek, ověřeno, živé na produkci)
+- [x] Conversion tracking nasazený a AKTIVNÍ na produkci
+  - Conversion ID: `AW-18249247091` (base tag na všech stránkách)
+  - Purchase label: `gMusCN_j4cscEPPS9f1D` (nákup s hodnotou + CZK + transaction_id)
+  - ID i label jsou jako default v `config/services.php` (lze přebít env proměnnými)
+- [x] Google Ads účet (Gastro ACS, CZK) + PMax kampaň vytvořena (ve schvalování)
+- [ ] Merchant Center + napojení feedu (aby PMax běžel na produktech)
+- [ ] Search + Standard Shopping kampaně
+- [ ] Navýšit PMax rozpočet na 24 000 Kč po kontrole trackingu + feedu
