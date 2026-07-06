@@ -48,4 +48,10 @@ return [
         'pixel_id' => env('META_PIXEL_ID'),
     ],
 
+    'google_tag' => [
+        'ga4_id' => env('GOOGLE_GA4_ID'),
+        'ads_conversion_id' => env('GOOGLE_ADS_CONVERSION_ID'),
+        'ads_purchase_label' => env('GOOGLE_ADS_PURCHASE_LABEL'),
+    ],
+
 ];

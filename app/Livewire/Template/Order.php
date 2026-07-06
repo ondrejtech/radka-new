@@ -23,6 +23,7 @@ class Order extends Component
                     'meta-purchase',
                     value: round((float) $order->total_with_vat, 2),
                     ids: $order->items->pluck('pro_id')->map(fn ($id) => (string) $id)->all(),
+                    transactionId: (string) $order->id,
                 );
             }
         }

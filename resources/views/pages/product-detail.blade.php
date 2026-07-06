@@ -32,3 +32,14 @@
         </script>
     @endpush
 @endif
+
+@if (config('services.google_tag.ga4_id'))
+    @push('scripts')
+        <script>
+            window.gtag && gtag('event', 'view_item', {
+                currency: 'CZK',
+                items: [{ item_id: '{{ $proId }}' }],
+            });
+        </script>
+    @endpush
+@endif

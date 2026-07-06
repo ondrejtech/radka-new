@@ -3,6 +3,8 @@
 <head><meta charset="utf-8" /><meta name="author" content="{{ env('DEVELOPER_NAME').', '.env('DEVELOPER_URL')}}" />
 	@include('partials.meta-pixel')
 	@include('partials.meta-events')
+	@include('partials.google-tag')
+	@include('partials.google-events')
 
 	<!-- Heureka.cz PRODUCT DETAIL script -->
 	<script>
