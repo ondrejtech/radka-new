@@ -1,0 +1,58 @@
+=== ODKAZY NA PODSTRÁNKY / SITELINKY (6) ===
+POZOR na správná pole:
+  "Text odkazu na podstránky" = jen krátký NÁZEV (max 25), NE URL!
+  "První popisný řádek reklamy" (max 35)
+  "Druhý popisný řádek reklamy" (max 35)
+  "Cílová URL" = sem patří ODKAZ
+
+1)
+Text odkazu na podstránky: Notebooky a PC
+První popisný řádek reklamy: Notebooky, ultrabooky, PC
+Druhý popisný řádek reklamy: Skladem a ihned k odběru
+Cílová URL: https://www.multishoping.eu/info-other/pc-a-notebooky/n-11,0,0
+
+2)
+Text odkazu na podstránky: Tiskárny a multifunkce
+První popisný řádek reklamy: Laserové i inkoustové
+Druhý popisný řádek reklamy: Tonery a náplně skladem
+Cílová URL: https://www.multishoping.eu/info-other/multifunkce-a-tiskarny/n-121,0,0
+
+3)
+Text odkazu na podstránky: Servery a zálohování
+První popisný řádek reklamy: Servery, NAS, UPS zdroje
+Druhý popisný řádek reklamy: Řešení pro firmy
+Cílová URL: https://www.multishoping.eu/info-other/servery-a-zalohovani/n-7,0,0
+
+4)
+Text odkazu na podstránky: Síťové prvky
+První popisný řádek reklamy: Switche, routery, wifi
+Druhý popisný řádek reklamy: Pro domácnost i firmy
+Cílová URL: https://www.multishoping.eu/info-other/sitove-prvky/n-8,0,0
+
+5)
+Text odkazu na podstránky: Mobily a tablety
+První popisný řádek reklamy: Telefony, tablety, hodinky
+Druhý popisný řádek reklamy: Široká nabídka značek
+Cílová URL: https://www.multishoping.eu/info-other/mobilni-telefony-a-tablety/n-18,0,0
+
+6)
+Text odkazu na podstránky: Komponenty
+První popisný řádek reklamy: Grafické karty, SSD, RAM
+Druhý popisný řádek reklamy: Vše pro stavbu PC
+Cílová URL: https://www.multishoping.eu/info-other/komponenty/n-3,0,0
+
+
+=== POPISKY / CALLOUTS (max 25 znaků, vlož všechny) ===
+Skladem ihned
+Rychlé dodání po ČR
+Široký sortiment IT
+Notebooky, PC, tiskárny
+Servery a sítě
+Pro firmy i domácnost
+Nákup online snadno
+Tisíce produktů skladem
+
+
+=== STRUKTUROVANÉ ÚRYVKY ===
+Záhlaví: Typy
+Hodnoty (max 25): Notebooky, Tiskárny, Servery, Monitory, Komponenty, Tablety, Síťové prvky, Pokladní systémy
