@@ -176,6 +176,15 @@ Přes `PaymentsController` (`$client->getPaymentsController()`), metoda `refundC
 - **Změna `.mcp.json` se projeví až po PLNÉM restartu Claude Code (exit) — `/mcp` reconnect nestačí** (drží env z okamžiku spuštění)
 - Pozn.: Laravel `app/Services/GoogleAdsService.php` (google-ads-php SDK) je samostatná cesta, nesouvisí s MCP serverem
 
+## Google Ads monitoring kampaně
+
+- Denní monitoring PMax kampaně `multishoping-cz-sk` (24006465965) běží mimo Claude Code
+- **Skript:** `/home/marty/google-ads-monitor/monitor.py` — Python, řídí lokální binárku `mcp-google-ads` přes stdio JSON-RPC (`GOOGLE_ADS_READ_ONLY=true`). Čte primary/serving status kampaně, ad_strength asset group (6727941248) a metriky za včera + 7 dní
+- **Cron:** denně **08:30** v `crontab` uživatele marty (`30 8 * * * /usr/bin/python3 /home/marty/google-ads-monitor/monitor.py >> .../daily-report.log 2>&1`)
+- **Výstupy:** `google-ads-monitor/multishoping-cz-sk.log` (CSV řádek/den = trend) + `daily-report.log` (čitelný snapshot)
+- **Alert:** skript končí non-zero (→ cron mail) při `serving_status≠SERVING` nebo neočekávaném `primary_status`; „0 impresí" jen loguje. E-mail alert zatím není nastaven
+- Pozn.: Rust MCP `run_gaql` má bug u DATE/DATE_TIME a některých bool/enum polí (vrací 400 / prázdné sloupce) — používat `format=json` a číst atributy jednotlivě
+
 ## Co NIKDY nedělat
 - Nikdy nevymýšlej hodnoty (API klíče, URL, názvy tabulek)
 - Nikdy neměň .env soubor
