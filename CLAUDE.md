@@ -164,6 +164,18 @@ Přes `PaymentsController` (`$client->getPaymentsController()`), metoda `refundC
 - Nikdy nelogovat `client_secret` ani access tokeny
 - Public client ID pro JS SDK brát přes `PayPalService::publicClientId()`
 
+## Google Ads MCP server
+
+- Server `google-ads-mcp` (z github googleads/google-ads-mcp) je nakonfigurovaný v `.mcp.json`
+- Spravovaný účet: **727-432-7807**, GCP projekt `multishoping-eu` (project number 40124736370)
+- **Autentizace jde VÝHRADNĚ přes gcloud Application Default Credentials** (`~/.config/gcloud/application_default_credentials.json`) — env klíč `GOOGLE_ADS_REFRESH_TOKEN` v `.mcp.json` server IGNORUJE
+- ADC musí mít scope `https://www.googleapis.com/auth/adwords`
+  - Chyba `ACCESS_TOKEN_SCOPE_INSUFFICIENT` = ADC nemá scope `adwords`
+  - Chyba „default credentials not found" = ADC soubor chybí
+- Univerzální obnova ADC: `gcloud auth application-default login --scopes=https://www.googleapis.com/auth/adwords,https://www.googleapis.com/auth/cloud-platform`
+- **Změna `.mcp.json` se projeví až po PLNÉM restartu Claude Code (exit) — `/mcp` reconnect nestačí** (drží env z okamžiku spuštění)
+- Pozn.: Laravel `app/Services/GoogleAdsService.php` (google-ads-php SDK) je samostatná cesta, nesouvisí s MCP serverem ani ADC
+
 ## Co NIKDY nedělat
 - Nikdy nevymýšlej hodnoty (API klíče, URL, názvy tabulek)
 - Nikdy neměň .env soubor
