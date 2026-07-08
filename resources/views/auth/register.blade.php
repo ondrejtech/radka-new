@@ -2,6 +2,8 @@
 
 @section('title', 'Registrace uživatele | ' . config('app.name'))
 
+@section('meta-robots', 'noindex, nofollow')
+
 @push('styles')
     <link href="{{ asset('assets/bundles/css/registration.css') }}" rel="stylesheet"/>
 @endpush

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('meta-robots', 'noindex, nofollow')
+
 @push('scripts')
     <script src="{{ asset('assets/bundles/js/productlist.js') }}"></script>
 @endpush

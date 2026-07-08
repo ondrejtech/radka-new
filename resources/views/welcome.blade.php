@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', config('app.name') . ' – internetový obchod se širokým sortimentem')
+@section('meta-description', config('app.name') . ' – nakupujte online snadno a výhodně. Široká nabídka zboží, rychlé dodání a spolehlivý zákaznický servis.')
+
 @section('content')
     <div class="page-content" role="main" aria-label="Hlavní obsah">
         <div class="contend">

@@ -14,7 +14,9 @@
 		})(window, document, 'script', '//www.heureka.cz/ocm/sdk.js?version=2&page=product_detail', 'heureka', 'cz');
 	</script>
 <!-- End Heureka.cz PRODUCT DETAIL script -->
-	<meta name="robots" content="noindex,nofollow" />
+	<meta name="robots" content="@yield('meta-robots', 'index, follow')" />
+	<link rel="canonical" href="{{ url()->current() }}" />
+	@include('partials.seo-jsonld')
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="format-detection" content="telephone=no" />
 
 	<!--[if IE]>
@@ -60,9 +62,7 @@
 	<link href="{{ asset('assets/bundles/css/default.css') }}" rel="stylesheet"/>
 
 	<script src="{{ asset('assets/bundles/js/default.js') }}"></script>
-<meta name="keywords" content="hardware, software, distributor, distribuce, prodej, mobility, digitální, elektronika, počítač, notebook, monitor, panel, switch, router, rack, server, fotoaparát, PDA, navigace, MP3, KVM, UPS" /><meta name="description" content="{{ config('app.name') }} - distributor hardware, software, PC komponent, mobilit a digitální techniky" /><title>
-	@yield('title', 'IT | eD SHOP - ' . config('app.name'))
-</title>
+<meta name="description" content="@yield('meta-description', config('app.name') . ' – internetový obchod se širokým sortimentem za výhodné ceny. Rychlé dodání a spolehlivý nákup.')" /><title>@yield('title', config('app.name') . ' – internetový obchod')</title>
 @livewireStyles
 @stack('styles')
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>

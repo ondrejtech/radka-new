@@ -10,10 +10,13 @@ use App\Http\Controllers\ProductFeed;
 use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
 Route::get('/', [CategoryController::class, 'home']);
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/product-feed/heureka.xml', [ProductFeed::class, 'heurekaFeed'])->name('product-feed.heureka');
 Route::get('/product-feed/google-merchant.xml', [ProductFeed::class, 'googleMerchantFeed'])->name('product-feed.google-merchant');

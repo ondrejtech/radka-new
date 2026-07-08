@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Disallow: /pages/basket
+Disallow: /pages/productcompare
+Disallow: /search
+Disallow: /profile
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://multishoping.eu/sitemap.xml
