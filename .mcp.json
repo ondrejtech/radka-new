@@ -6,6 +6,22 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "google-ads-mcp": {
+            "command": "pipx",
+            "args": [
+                "run",
+                "--spec",
+                "git+https://github.com/googleads/google-ads-mcp.git",
+                "google-ads-mcp"
+            ],
+            "env": {
+                "GOOGLE_PROJECT_ID": "multishoping-eu",
+                "GOOGLE_ADS_DEVELOPER_TOKEN": "AROFpEE5vnwGIiwJ-8hO8g",
+                "GOOGLE_ADS_CLIENT_ID": "REDACTED_CLIENT_ID",
+                "GOOGLE_ADS_CLIENT_SECRET": "REDACTED_CLIENT_SECRET",
+                "GOOGLE_ADS_REFRESH_TOKEN": "1//04dBvgkq2astjCgYIARAAGAQSNgF-L9Iru2HNrJoZgRsA3HnfIScZAlD2sbKKWVTahj8KQZXQUrlvjWrv_sgux00kzrqqFWTKdQ"
+            }
         }
     }
 }
