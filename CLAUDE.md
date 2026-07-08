@@ -166,15 +166,15 @@ Přes `PaymentsController` (`$client->getPaymentsController()`), metoda `refundC
 
 ## Google Ads MCP server
 
-- Server `google-ads-mcp` (z github googleads/google-ads-mcp) je nakonfigurovaný v `.mcp.json`
-- Spravovaný účet: **727-432-7807**, GCP projekt `multishoping-eu` (project number 40124736370)
-- **Autentizace jde VÝHRADNĚ přes gcloud Application Default Credentials** (`~/.config/gcloud/application_default_credentials.json`) — env klíč `GOOGLE_ADS_REFRESH_TOKEN` v `.mcp.json` server IGNORUJE
-- ADC musí mít scope `https://www.googleapis.com/auth/adwords`
-  - Chyba `ACCESS_TOKEN_SCOPE_INSUFFICIENT` = ADC nemá scope `adwords`
-  - Chyba „default credentials not found" = ADC soubor chybí
-- Univerzální obnova ADC: `gcloud auth application-default login --scopes=https://www.googleapis.com/auth/adwords,https://www.googleapis.com/auth/cloud-platform`
+- Server `google-ads-mcp` v `.mcp.json` = **Rust `mcp-google-ads` v0.6.0** (crate, nainstalováno přes `cargo install`, binárka `/home/marty/.cargo/bin/mcp-google-ads`). Nahradilo dřívější Python server (googleads/google-ads-mcp přes pipx + gcloud ADC)
+- Rust toolchain nainstalován přes rustup; `cargo` NENÍ v PATH (instalováno s `--no-modify-path`) — MCP volá binárku absolutní cestou. Pro ruční `cargo`: `. "$HOME/.cargo/env"`
+- Spravovaný účet: **727-432-7807** (Gastro ACS s.r.o.), přímý účet bez MCC → `login_customer_id` netřeba
+- **Autentizace NEjde přes gcloud ADC.** Server čte `credentials.json` ve formátu `authorized_user` (client_id + client_secret + refresh_token) z cesty v env `GOOGLE_ADS_CREDENTIALS_PATH` (`/home/marty/.mcp-google-ads/credentials.json`, chmod 600)
+- Env v `.mcp.json`: `GOOGLE_ADS_DEVELOPER_TOKEN`, `GOOGLE_ADS_CUSTOMER_ID=727-432-7807` (pomlčky server strippuje sám), `GOOGLE_ADS_CREDENTIALS_PATH`
+- **Bezpečnostní prvky (výchozí hodnoty):** `GOOGLE_ADS_REQUIRE_DRY_RUN=true`, `GOOGLE_ADS_MAX_DAILY_BUDGET=50`, `GOOGLE_ADS_MAX_BID_INCREASE_PCT=100`, `GOOGLE_ADS_READ_ONLY=false`, `GOOGLE_ADS_BLOCKED_OPS` (prázdné) — zápisové operace vyžadují dry-run + `confirm_and_apply`. Volitelně přenastavit přes env
+- **Dokumentace serveru je v NotebookLM notebooku „MCP server pro Google Ads s bezpečnostními prvky"** — při práci s tímhle serverem ji využívat (skill `/notebooklm`)
 - **Změna `.mcp.json` se projeví až po PLNÉM restartu Claude Code (exit) — `/mcp` reconnect nestačí** (drží env z okamžiku spuštění)
-- Pozn.: Laravel `app/Services/GoogleAdsService.php` (google-ads-php SDK) je samostatná cesta, nesouvisí s MCP serverem ani ADC
+- Pozn.: Laravel `app/Services/GoogleAdsService.php` (google-ads-php SDK) je samostatná cesta, nesouvisí s MCP serverem
 
 ## Co NIKDY nedělat
 - Nikdy nevymýšlej hodnoty (API klíče, URL, názvy tabulek)
