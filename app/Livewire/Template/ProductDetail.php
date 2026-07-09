@@ -27,7 +27,7 @@ class ProductDetail extends Component
     {
         $quantity = max(1, $quantity);
 
-        $product = Product::find($proId, ['ProId', 'Name', 'EndUserPrice']);
+        $product = Product::find($proId, ['ProId', 'Name', 'YourPrice']);
 
         if (! $product) {
             return;
@@ -36,11 +36,11 @@ class ProductDetail extends Component
         app(CartService::class)->addItem(
             $proId,
             $product->Name,
-            (float) $product->EndUserPrice,
+            (float) $product->YourPrice,
             $quantity
         );
 
-        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->EndUserPrice * $quantity, 2));
+        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->YourPrice * $quantity, 2));
 
         $this->dispatch('cart-updated')->to('template.cart-widget');
         $this->dispatch('message', [

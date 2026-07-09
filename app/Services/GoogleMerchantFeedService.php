@@ -35,7 +35,7 @@ class GoogleMerchantFeedService
 
             Product::query()
                 ->where('OnStock', true)
-                ->where('EndUserPrice', '>', 0)
+                ->where('YourPrice', '>', 0)
                 ->whereIn('CategoryCode', function ($query): void {
                     $query->select('CategoryCode')
                         ->from('ProductCategory')
@@ -46,7 +46,7 @@ class GoogleMerchantFeedService
                 })
                 ->select([
                     'ProId', 'Name', 'NameB2C', 'DescriptionShort',
-                    'EndUserPrice', 'ProducerName', 'EANCode',
+                    'YourPrice', 'ProducerName', 'EANCode',
                 ])
                 ->chunkById(500, function ($products) use ($writer): void {
                     foreach ($products as $product) {
@@ -76,7 +76,7 @@ class GoogleMerchantFeedService
         $writer->writeElement('g:link', $this->productUrl($product));
         $writer->writeElement('g:image_link', route('product-image', ['proId' => $product->ProId]));
         $writer->writeElement('g:availability', 'in_stock');
-        $writer->writeElement('g:price', $this->price((float) $product->EndUserPrice));
+        $writer->writeElement('g:price', $this->price((float) $product->YourPrice));
         $writer->writeElement('g:condition', 'new');
 
         if ($brand !== '') {

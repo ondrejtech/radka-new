@@ -49,30 +49,29 @@ class InvoiceService
             'delivery_address' => $this->buildDeliveryAddress($order),
             'prices' => [
                 'TotalWithoutVat' => (float) $order->total_without_vat,
-                'TotalWithVat' => (float) $order->total_with_vat,
-                'TotalVat' => round((float) $order->total_with_vat - (float) $order->total_without_vat, 2),
-                'TotalPaid' => (float) $order->total_with_vat,
+                'TotalWithVat' => (float) $order->total_without_vat,
+                'TotalVat' => 0.0,
+                'TotalPaid' => (float) $order->total_without_vat,
             ],
         ]);
 
         foreach ($order->items as $item) {
-            $totalWithoutVat = round((float) $item->price * $item->quantity, 2);
-            $totalWithVat = round($totalWithoutVat * 1.21, 2);
+            $totalPrice = round((float) $item->price * $item->quantity, 2);
 
             $invoice->items()->create([
                 'name' => $item->name,
                 'code' => (string) $item->pro_id,
                 'amount' => $item->quantity,
                 'price_type' => 1, // WithoutVat
-                'vat_rate' => 21.0,
-                'vat_rate_type' => 1, // Basic
+                'vat_rate' => 0.0,
+                'vat_rate_type' => 0, // None
                 'item_type' => 0, // Normal
                 'is_tax_movement' => false,
                 'prices' => [
                     'UnitPrice' => (float) $item->price,
-                    'TotalWithoutVat' => $totalWithoutVat,
-                    'TotalWithVat' => $totalWithVat,
-                    'TotalVat' => round($totalWithVat - $totalWithoutVat, 2),
+                    'TotalWithoutVat' => $totalPrice,
+                    'TotalWithVat' => $totalPrice,
+                    'TotalVat' => 0.0,
                 ],
             ]);
         }

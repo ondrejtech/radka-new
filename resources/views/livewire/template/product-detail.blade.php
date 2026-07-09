@@ -109,12 +109,11 @@
                                         <div class="pro-detail_your-price-info">
 
                                             {{-- Main price --}}
-                                            @if ($product->YourPriceWithFees && $product->Vat)
-                                            @php $vatMultiplier = 1 + ($product->Vat / 100); @endphp
+                                            @if ($product->YourPrice)
                                             <div class="pro-detail_your-price">
                                                 <span class="pro-detail_your-price-label">Vaše cena:</span>
                                                 <strong class="pro-detail_your-price-value">
-                                                    {{ number_format($product->YourPriceWithFees * $vatMultiplier, 2, ',', ' ') }}&nbsp;Kč
+                                                    {{ number_format($product->YourPrice, 2, ',', ' ') }}&nbsp;Kč
                                                 </strong>
                                             </div>
                                             @endif
@@ -173,8 +172,7 @@
                         <div class="pro-detail_prices-order-wrap_vertical-split"></div>
 
                         {{-- Price info panel --}}
-                        @if ($product->YourPrice || $product->EndUserPrice)
-                        @php $vatMultiplier = $vatMultiplier ?? (1 + ($product->Vat / 100)); @endphp
+                        @if ($product->YourPrice)
                         <div class="pro-detail_price-info">
                             <div class="panel-body">
                                 <div class="pro-detail_price-info_wrapper">
@@ -190,14 +188,6 @@
                                     @endif
 
                                     <ul class="list-items list-items--full">
-                                        @if ($product->EndUserPrice)
-                                        {{-- <li class="pro-detail_list-item">
-                                            <span class="list-items_item_label">Koncová cena pro klienta:</span>
-                                            <div class="list-items_item_value">
-                                                {{ number_format($product->EndUserPrice * $vatMultiplier, 2, ',', ' ') }}&nbsp;Kč
-                                            </div>
-                                        </li> --}}
-                                        @endif
                                         @if ($product->GarbageFee)
                                         <li class="pro-detail_list-item">
                                             <span class="list-items_item_label">SNC:</span>
@@ -214,14 +204,11 @@
                                             </div>
                                         </li>
                                         @endif
-                                        @if ($product->YourPriceWithFees && $product->Vat)
+                                        @if ($product->YourPrice)
                                         <li class="pro-detail_list-item">
-                                            <span class="list-items_item_label">
-                                                Vaše cena vč. DPH:
-                                                <i class="icon-info js-tooltip" title="Na produkt může být uplatněn Režim přenesení daňové povinnosti"></i>
-                                            </span>
+                                            <span class="list-items_item_label">Vaše cena celkem:</span>
                                             <div class="list-items_item_value">
-                                                {{ number_format($product->YourPriceWithFees * $vatMultiplier, 2, ',', ' ') }}&nbsp;Kč
+                                                {{ number_format($product->YourPrice, 2, ',', ' ') }}&nbsp;Kč
                                             </div>
                                         </li>
                                         @endif
@@ -438,7 +425,6 @@
                                                 <div class="pro-list_price">
                                                     <span class="pro-list_price-text pro-list_price-text--prepend">Vaše cena:</span>
                                                     <strong class="pro-list_price-value">{{ number_format($item->YourPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
-                                                    <span class="pro-list_price-text pro-list_price-text--append">bez DPH</span>
                                                 </div>
                                             @endif
                                         </div>

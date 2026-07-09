@@ -29,9 +29,9 @@ class ProductLayout extends Component
 
     /** @var array<string, array{column: string, direction: string}[]> */
     private const SORT_MAP = [
-        '8_desc' => [['column' => 'IsTop',        'direction' => 'desc'], ['column' => 'EndUserPrice', 'direction' => 'desc']],
-        '13_asc' => [['column' => 'EndUserPrice',  'direction' => 'asc']],
-        '13_desc' => [['column' => 'EndUserPrice',  'direction' => 'desc']],
+        '8_desc' => [['column' => 'IsTop',        'direction' => 'desc'], ['column' => 'YourPrice', 'direction' => 'desc']],
+        '13_asc' => [['column' => 'YourPrice',  'direction' => 'asc']],
+        '13_desc' => [['column' => 'YourPrice',  'direction' => 'desc']],
         '11_asc' => [['column' => 'IsTop',         'direction' => 'desc']],
         '12_asc' => [['column' => 'IndexOrder1',   'direction' => 'asc']],
         '14_asc' => [['column' => 'Name',          'direction' => 'asc']],
@@ -79,7 +79,7 @@ class ProductLayout extends Component
     {
         $quantity = max(1, $quantity);
 
-        $product = Product::find($proId, ['ProId', 'Name', 'EndUserPrice']);
+        $product = Product::find($proId, ['ProId', 'Name', 'YourPrice']);
 
         if (! $product) {
             return;
@@ -88,11 +88,11 @@ class ProductLayout extends Component
         app(CartService::class)->addItem(
             $proId,
             $product->Name,
-            (float) $product->EndUserPrice,
+            (float) $product->YourPrice,
             $quantity
         );
 
-        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->EndUserPrice * $quantity, 2));
+        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->YourPrice * $quantity, 2));
 
         $this->dispatch('cart-updated')->to('template.cart-widget');
         $this->dispatch('message', [
@@ -166,11 +166,11 @@ class ProductLayout extends Component
         }
 
         if (! empty($f['priceFrom']) && (int) $f['priceFrom'] > 0) {
-            $query->where('EndUserPrice', '>=', (int) $f['priceFrom']);
+            $query->where('YourPrice', '>=', (int) $f['priceFrom']);
         }
 
         if (! empty($f['priceTo']) && (int) $f['priceTo'] > 0) {
-            $query->where('EndUserPrice', '<=', (int) $f['priceTo']);
+            $query->where('YourPrice', '<=', (int) $f['priceTo']);
         }
 
         if (! empty($f['excludeSale'])) {

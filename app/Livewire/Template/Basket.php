@@ -20,16 +20,6 @@ class Basket extends Component
 
     public function mount(): void
     {
-        if (auth()->check()) {
-            $user = auth()->user();
-            $this->form->shipName = trim($user->first_name.' '.$user->last_name);
-            $this->form->shipStreet = $user->street ?? '';
-            $this->form->shipCity = $user->city ?? '';
-            $this->form->shipZip = $user->zip ?? '';
-            $this->form->shipPhone = $user->phone ?? '';
-            $this->form->shipEmail = $user->email ?? '';
-        }
-
         $items = app(CartService::class)->resolveCart()->items()->get(['pro_id', 'price', 'quantity']);
 
         if ($items->isNotEmpty()) {
@@ -105,7 +95,7 @@ class Basket extends Component
         app(CartService::class)->addItem(
             proId: $product->ProId,
             name: $product->Name,
-            price: (float) ($product->EndUserPrice ?? 0),
+            price: (float) ($product->YourPrice ?? 0),
             quantity: 1,
         );
 
@@ -166,6 +156,12 @@ class Basket extends Component
             return 0.0;
         }
 
+        $this->dispatch('message', [
+            'text' => 'Doprava byla úspěšně vybrána',
+            'type' => 'success',
+            'status' => '200',
+        ]);
+
         return (float) (Transportation::where('Code', (int) $this->form->transportId)->value('Price') ?? 0);
     }
 
@@ -181,7 +177,15 @@ class Basket extends Component
             return;
         }
 
-        $this->form->validate();
+        if (! $this->form->transportId) {
+            $this->dispatch('message', [
+                'text' => 'Prosím vyberte způsob dopravy',
+                'type' => 'error',
+                'status' => '400',
+            ]);
+
+            return;
+        }
 
         $cart = app(CartService::class)->resolveCart();
         $items = $cart->items()->orderBy('position')->get();
@@ -195,6 +199,30 @@ class Basket extends Component
 
             return;
         }
+
+        $requiredAddressFields = [
+            'shipName' => 'Název firmy/kontaktní osoba',
+            'shipStreet' => 'Ulice',
+            'shipCity' => 'Město',
+            'shipZip' => 'PSČ',
+            'shipCountry' => 'Stát',
+            'shipPhone' => 'Telefon osoby přebírající zásilku',
+            'shipEmail' => 'E-mail osoby přebírající zásilku',
+        ];
+
+        foreach ($requiredAddressFields as $field => $label) {
+            if (trim((string) $this->form->{$field}) === '') {
+                $this->dispatch('message', [
+                    'text' => 'Pole '.$label.' je povinné',
+                    'type' => 'error',
+                    'status' => '400',
+                ]);
+
+                return;
+            }
+        }
+
+        $this->form->validate();
 
         $shippingPrice = $this->shippingPrice();
         $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity) + $shippingPrice;
@@ -216,7 +244,7 @@ class Basket extends Component
             'ship_phone' => $this->form->shipPhone,
             'ship_email' => $this->form->shipEmail,
             'total_without_vat' => $totalWithoutVat,
-            'total_with_vat' => round($totalWithoutVat * 1.21, 2),
+            'total_with_vat' => $totalWithoutVat,
             'shipping_price' => $shippingPrice,
         ]);
 
@@ -270,7 +298,7 @@ class Basket extends Component
 
         $shippingPrice = $this->shippingPrice();
         $totalWithoutVat = $items->sum(fn ($i) => $i->price * $i->quantity) + $shippingPrice;
-        $totalWithVat = round($totalWithoutVat * 1.21, 2);
+        $totalWithVat = $totalWithoutVat;
 
         return view('livewire.template.basket', [
             'cart' => $cart,

@@ -32,9 +32,9 @@ class SearchLayout extends Component
 
     /** @var array<string, array{column: string, direction: string}[]> */
     private const SORT_MAP = [
-        '8_desc' => [['column' => 'IsTop', 'direction' => 'desc'], ['column' => 'EndUserPrice', 'direction' => 'desc']],
-        '13_asc' => [['column' => 'EndUserPrice', 'direction' => 'asc']],
-        '13_desc' => [['column' => 'EndUserPrice', 'direction' => 'desc']],
+        '8_desc' => [['column' => 'IsTop', 'direction' => 'desc'], ['column' => 'YourPrice', 'direction' => 'desc']],
+        '13_asc' => [['column' => 'YourPrice', 'direction' => 'asc']],
+        '13_desc' => [['column' => 'YourPrice', 'direction' => 'desc']],
         '11_asc' => [['column' => 'IsTop', 'direction' => 'desc']],
         '14_asc' => [['column' => 'Name', 'direction' => 'asc']],
         '14_desc' => [['column' => 'Name', 'direction' => 'desc']],
@@ -77,7 +77,7 @@ class SearchLayout extends Component
     {
         $quantity = max(1, $quantity);
 
-        $product = Product::find($proId, ['ProId', 'Name', 'EndUserPrice']);
+        $product = Product::find($proId, ['ProId', 'Name', 'YourPrice']);
 
         if (! $product) {
             return;
@@ -86,11 +86,11 @@ class SearchLayout extends Component
         app(CartService::class)->addItem(
             $proId,
             $product->Name,
-            (float) $product->EndUserPrice,
+            (float) $product->YourPrice,
             $quantity
         );
 
-        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->EndUserPrice * $quantity, 2));
+        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->YourPrice * $quantity, 2));
 
         $this->dispatch('cart-updated')->to('template.cart-widget');
         $this->dispatch('message', [
@@ -164,11 +164,11 @@ class SearchLayout extends Component
         }
 
         if ($this->priceFrom > 0) {
-            $query->where('EndUserPrice', '>=', $this->priceFrom);
+            $query->where('YourPrice', '>=', $this->priceFrom);
         }
 
         if ($this->priceTo > 0) {
-            $query->where('EndUserPrice', '<=', $this->priceTo);
+            $query->where('YourPrice', '<=', $this->priceTo);
         }
 
         if ($this->onStock) {

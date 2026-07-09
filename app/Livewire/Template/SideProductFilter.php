@@ -89,8 +89,8 @@ class SideProductFilter extends Component
     {
         $result = Product::query()
             ->where('CategoryCode', $catCode)
-            ->whereNotNull('EndUserPrice')
-            ->selectRaw('FLOOR(MIN(EndUserPrice)) as price_min, CEIL(MAX(EndUserPrice)) as price_max')
+            ->whereNotNull('YourPrice')
+            ->selectRaw('FLOOR(MIN(YourPrice)) as price_min, CEIL(MAX(YourPrice)) as price_max')
             ->first();
 
         return [(int) ($result->price_min ?? 0), (int) ($result->price_max ?? 0)];

@@ -107,7 +107,7 @@
                                 </div>
                                 <div class="document-heading_item">
                                     <span class="document-heading_label">Objednáno</span>
-                                    <strong class="document-heading_value">techDomov</strong>
+                                    <strong class="document-heading_value">{{ env('APP_NAME') }}</strong>
                                 </div>
 
                                 <div class="document-heading_item">
@@ -144,21 +144,13 @@
                         <div class="panel">
                             <div class="panel-body">
                                 <div class="document-heading_item">
-                                    <span class="document-heading_label">Cena bez SNC a DPH</span>
+                                    <span class="document-heading_label">Cena celkem</span>
                                     <strong class="document-heading_value document-heading_value--nowrap">{{ number_format($order->total_without_vat, 2, ',', ' ') }}&nbsp;Kč</strong>
-                                </div>
-                                <div class="document-heading_item">
-                                    <span class="document-heading_label">Cena bez DPH</span>
-                                    <strong class="document-heading_value document-heading_value--nowrap">{{ number_format($order->total_without_vat, 2, ',', ' ') }}&nbsp;Kč</strong>
-                                </div>
-                                <div class="document-heading_item">
-                                    <span class="document-heading_label">Cena s DPH</span>
-                                    <strong class="document-heading_value document-heading_value--nowrap">{{ number_format($order->total_with_vat, 2, ',', ' ') }}&nbsp;Kč</strong>
                                 </div>
 
                                 @if ($order->shipping_price > 0)
                                     <div class="document-heading_item">
-                                        <span class="document-heading_label">Doprava (bez DPH)</span>
+                                        <span class="document-heading_label">Doprava</span>
                                         <strong class="document-heading_value document-heading_value--nowrap">{{ number_format($order->shipping_price, 2, ',', ' ') }}&nbsp;Kč</strong>
                                     </div>
                                 @endif
@@ -501,7 +493,7 @@
                             <th class="table-head-cell table-col_name" data-touchtable-el="true">Název</th>
                             <th class="table-head-cell table-col_price">Cena bez SNC</th>
                             <th class="table-head-cell table-col_price">SNC*</th>
-                            <th class="table-head-cell table-col_price">Cena bez DPH</th>
+                            <th class="table-head-cell table-col_price">Cena celkem</th>
                             <th class="table-head-cell table-col_qty js-tooltip" data-title="tip_order_created"
                                 data-touchtable-el="true"><i class="icon-ordered"></i></th>
                             <th class="table-head-cell table-col_qty js-tooltip" data-title="tip_order_blocked"
@@ -527,7 +519,7 @@
                             </td>
                             <td data-th="Cena bez SNC" class="table-col_price">{{ number_format($item->price, 2, ',', ' ') }}&nbsp;Kč</td>
                             <td data-th="SNC*" class="table-col_price"></td>
-                            <td data-th="Cena bez DPH" class="table-col_price">{{ number_format($item->price * $item->quantity, 2, ',', ' ') }}&nbsp;Kč</td>
+                            <td data-th="Cena celkem" class="table-col_price">{{ number_format($item->price * $item->quantity, 2, ',', ' ') }}&nbsp;Kč</td>
                             <td data-th="Objednáno" class="table-col_qty js-tooltip" data-title="tip_order_created"
                                 data-touchtable-el="true">{{ $item->quantity }}</td>
                             <td data-th="Blokováno" class="table-col_qty js-tooltip" data-title="tip_order_blocked"

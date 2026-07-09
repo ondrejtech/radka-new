@@ -129,7 +129,25 @@
 										<a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14679">{{ config('app.name')}}</a>
 									</li>
 									<li role="menuitem" class="footer-menu_item">
-										<a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14681">{{ config('app.name') }} a datová výměna</a>
+										<a href="">{{ config('app.name') }} a datová výměna</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://elektronika.multishoping.eu" target="_blank">elektronika.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://domacnost.multishoping.eu" target="_blank">domacnost.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://body.multishoping.eu" target="_blank">body.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://sport.multishoping.eu" target="_blank">sport.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://hobby.multishoping.eu" target="_blank">hobby.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://bigshop.multishoping.eu" target="_blank">bigshop.multishoping.eu</a>
 									</li>
 									<li role="menuitem" class="footer-menu_item">
 										{{-- <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14683">Finanční služby</a> --}}
@@ -279,7 +297,25 @@
 										<a href="{{ route('pages.company-marketing') }}">{{ config('app.name')}}</a>
 									</li>
 									<li role="menuitem" class="footer-menu_item">
-										<a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14681">{{ config('app.name') }} a datová výměna</a>
+										<a href="">{{ config('app.name') }} a datová výměna</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://elektronika.multishoping.eu" target="_blank">elektronika.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://domacnost.multishoping.eu" target="_blank">domacnost.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://body.multishoping.eu" target="_blank">body.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://sport.multishoping.eu" target="_blank">sport.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://hobby.multishoping.eu" target="_blank">hobby.multishoping.eu</a>
+									</li>
+									<li role="menuitem" class="footer-menu_item">
+										<a href="https://bigshop.multishoping.eu" target="_blank">bigshop.multishoping.eu</a>
 									</li>
                                     {{-- <li role="menuitem" class="footer-menu_item">
                                         <a href="/pages/marketingcampaigndetailarticle.aspx?mct_id=14683">Finanční služby</a>

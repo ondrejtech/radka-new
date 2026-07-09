@@ -29,7 +29,7 @@ class HomepageCarousels extends Component
     {
         $quantity = max(1, $quantity);
 
-        $product = Product::find($proId, ['ProId', 'Name', 'EndUserPrice']);
+        $product = Product::find($proId, ['ProId', 'Name', 'YourPrice']);
 
         if (! $product) {
             return;
@@ -38,11 +38,11 @@ class HomepageCarousels extends Component
         app(CartService::class)->addItem(
             $proId,
             $product->Name,
-            (float) $product->EndUserPrice,
+            (float) $product->YourPrice,
             $quantity
         );
 
-        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->EndUserPrice * $quantity, 2));
+        $this->dispatch('meta-add-to-cart', id: $proId, value: round((float) $product->YourPrice * $quantity, 2));
 
         $this->dispatch('cart-updated');
         $this->dispatch('message', [
@@ -151,7 +151,7 @@ class HomepageCarousels extends Component
                 ->orderByDesc('IsTop')
                 ->orderByDesc('OnStock')
                 ->limit(self::PRODUCTS_PER_CAROUSEL)
-                ->get(['ProId', 'Name', 'EndUserPrice', 'OnStock', 'Status', 'DescriptionShort']);
+                ->get(['ProId', 'Name', 'YourPrice', 'OnStock', 'Status', 'DescriptionShort']);
         }
 
         // 1 batch query: all images for all carousel products at once
@@ -176,7 +176,7 @@ class HomepageCarousels extends Component
                     'ProId' => $p->ProId,
                     'Name' => $p->Name,
                     'slug' => Str::slug($p->Name),
-                    'EndUserPrice' => $p->EndUserPrice,
+                    'YourPrice' => $p->YourPrice,
                     'OnStock' => (bool) $p->OnStock,
                     'Status' => $p->Status,
                     'DescriptionShort' => $p->DescriptionShort,

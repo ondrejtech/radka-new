@@ -35,12 +35,10 @@
                                                     <span
                                                         class="pro-tile_price-text pro-tile_price-text--prepend">Vaše
                                                         cena:</span>
-                                                    @if ($product['EndUserPrice'])
+                                                    @if ($product['YourPrice'])
                                                         <strong
-                                                            class="pro-tile_price-value">{{ number_format($product['EndUserPrice'], 0, ',', ' ') }}&nbsp;Kč</strong>
+                                                            class="pro-tile_price-value">{{ number_format($product['YourPrice'], 0, ',', ' ') }}&nbsp;Kč</strong>
                                                     @endif
-                                                    <span class="pro-tile_price-text pro-tile_price-text--append">bez
-                                                        DPH</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -49,12 +47,10 @@
                                             <div class="pro-tile_price">
                                                 <span class="pro-tile_price-text pro-tile_price-text--prepend">Vaše
                                                     cena:</span>
-                                                @if ($product['EndUserPrice'])
+                                                @if ($product['YourPrice'])
                                                     <strong
-                                                        class="pro-tile_price-value">{{ number_format($product['EndUserPrice'], 0, ',', ' ') }}&nbsp;Kč</strong>
+                                                        class="pro-tile_price-value">{{ number_format($product['YourPrice'], 0, ',', ' ') }}&nbsp;Kč</strong>
                                                 @endif
-                                                <span class="pro-tile_price-text pro-tile_price-text--append">bez
-                                                    DPH</span>
                                             </div>
                                         </div>
 

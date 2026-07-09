@@ -126,13 +126,12 @@
                                     {{ $product->DescriptionShort }}
                                 </div>
                             </div>
-                            @if ($product->EndUserPrice)
+                            @if ($product->YourPrice)
                             <div class="pro-tile_prices">
                                 <div class="pro-tile_price">
 
                                     <span class="pro-tile_price-text pro-tile_price-text--prepend">Vaše cena:</span>
-                                    <strong class="pro-tile_price-value">{{ number_format($product->EndUserPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
-                                    <span class="pro-tile_price-text pro-tile_price-text--append">bez DPH</span>
+                                    <strong class="pro-tile_price-value">{{ number_format($product->YourPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
 
                                 </div>
                             </div>
@@ -142,13 +141,12 @@
                         <div class="pro-tile_attributes">
                         </div>
 
-                        @if ($product->EndUserPrice)
+                        @if ($product->YourPrice)
                         <div class="pro-tile_prices">
                             <div class="pro-tile_price">
 
                                 <span class="pro-tile_price-text pro-tile_price-text--prepend">Vaše cena:</span>
-                                <strong class="pro-tile_price-value">{{ number_format($product->EndUserPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
-                                <span class="pro-tile_price-text pro-tile_price-text--append">bez DPH</span>
+                                <strong class="pro-tile_price-value">{{ number_format($product->YourPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
 
                             </div>
                         </div>
@@ -299,11 +297,10 @@
                 </div>
 
                 <div class="pro-list_col pro-list_col--prices">
-                    @if ($product->EndUserPrice)
+                    @if ($product->YourPrice)
                     <div class="pro-list_price">
                         <span class="pro-list_price-text pro-list_price-text--prepend">Vaše cena:</span>
-                        <strong class="pro-list_price-value">{{ number_format($product->EndUserPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
-                        <span class="pro-list_price-text pro-list_price-text--append">bez DPH</span>
+                        <strong class="pro-list_price-value">{{ number_format($product->YourPrice, 0, ',', ' ') }}&nbsp;Kč</strong>
                     </div>
                     @endif
                 </div>
@@ -382,7 +379,7 @@
                         <a href="javascript:void(null)" class="pro-list_sort">Typ</a>
                     </div>
                     <div class="pro-list_col pro-list_col--prices">
-                        <a href="javascript:void(null)" class="pro-list_sort">Vaše cena<br>bez DPH</a>
+                        <a href="javascript:void(null)" class="pro-list_sort">Vaše cena</a>
                     </div>
                     <div class="pro-list_col pro-list_col--stock">
                         <a href="javascript:void(null)" class="pro-list_sort">Skladem</a>
@@ -438,11 +435,10 @@
                     </div>
 
                     <div class="pro-list_col pro-list_col--prices">
-                        @if ($product->EndUserPrice)
+                        @if ($product->YourPrice)
                         <div class="pro-list_price">
                             <strong class="pro-list_price-text pro-list_price-text--prepend">Vaše cena:</strong>
-                            <span class="pro-list_price-value">{{ number_format($product->EndUserPrice, 0, ',', ' ') }}&nbsp;Kč</span>
-                            <span class="pro-list_price-text pro-list_price-text--append">bez DPH</span>
+                            <span class="pro-list_price-value">{{ number_format($product->YourPrice, 0, ',', ' ') }}&nbsp;Kč</span>
                         </div>
                         @endif
                     </div>

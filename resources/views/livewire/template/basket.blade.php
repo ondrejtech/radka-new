@@ -424,36 +424,23 @@
                     </tbody>
                 </table>
                 @php
-                    $totalWithoutVat = $items->sum(fn($item) => $item->price * $item->quantity) + ($shippingPrice ?? 0);
-                    $totalWithVat = $totalWithoutVat * 1.21;
+                    $totalPrice = $items->sum(fn($item) => $item->price * $item->quantity) + ($shippingPrice ?? 0);
                 @endphp
                 <table class="table cart-tbl cart-tbl-items cart-tbl-sum">
                     <tfoot>
                         @if (($shippingPrice ?? 0) > 0)
                             <tr class="table-foot-row table-row--full-width">
-                                <td class="table-foot-cell table-foot-cell_label">
-                                    <span class="cart-tbl-sum_label">Doprava (bez DPH)</span>
-                                </td>
-                                <td class="table-foot-cell table-foot-cell_price table-col_price table-col_total-sum">
+                                <td class="table-foot-cell cart-tbl-sum_row" colspan="9">
+                                    <span class="cart-tbl-sum_label">Doprava</span>
                                     <span class="cart-tbl-sum_price">{{ number_format($shippingPrice, 2, ',', ' ') }}&nbsp;Kč</span>
                                 </td>
-                                <td class="table-foot-cell table-col_control table-col_control--append"></td>
                             </tr>
                         @endif
                         <tr class="table-foot-row table-row--full-width">
-                            <td class="table-foot-cell table-foot-cell_label">
-                                <span class="cart-tbl-sum_label">Cena bez DPH</span>
-                                <span class="cart-tbl-sum_label cart-tbl-sum_label--vat">Cena s DPH</span>
+                            <td class="table-foot-cell cart-tbl-sum_row" colspan="9">
+                                <span class="cart-tbl-sum_label">Cena celkem</span>
+                                <span class="cart-tbl-sum_price">{{ number_format($totalPrice, 2, ',', ' ') }}&nbsp;Kč</span>
                             </td>
-                            <td class="table-foot-cell table-foot-cell_price table-col_price table-col_total-sum">
-                                <span class="cart-tbl-sum_label">Celkem bez DPH</span>
-                                <span
-                                    class="cart-tbl-sum_price">{{ number_format($totalWithoutVat, 2, ',', ' ') }}&nbsp;Kč</span>
-                                <span class="cart-tbl-sum_label cart-tbl-sum_label--vat">Celkem s DPH</span>
-                                <span
-                                    class="cart-tbl-sum_price cart-tbl-sum_price--vat">{{ number_format($totalWithVat, 2, ',', ' ') }}&nbsp;Kč</span>
-                            </td>
-                            <td class="table-foot-cell table-col_control table-col_control--append"></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -582,195 +569,70 @@
                         <div class="panel">
                             <div class="panel-body">
                                 <h3 class="panel-title">Dodací adresa </h3>
-                                @if (auth()->check())
-                                    <div class="form-base">
-                                        <div class="form-base_item" wire:ignore>
-                                            <div class="form-group">
-                                                <label for="ddlShipAddresses" class="hide">Adresát</label>
-                                                <select name="ctl00$MainContent$ddlShipAddresses"
-                                                    id="ddlShipAddresses"
-                                                    title="Vyberte dodací adresu ze seznamu Vašich adres"
-                                                    class="form-control js-combo select2-hidden-accessible"
-                                                    data-container-css-class="cart-address-choose" tabindex="-1"
-                                                    aria-hidden="true">
-                                                    <option value="0">Ruční zadání dodací adresy</option>
-                                                    <option value="{{ auth()->user()->id }}" selected="selected">
-                                                        {{ auth()->user()->first_name . ', ' . auth()->user()->last_name . ', ' . auth()->user()->street . ', ' . auth()->user()->city . ', ' . auth()->user()->zip }}
-                                                    </option>
-                                                    @if ($currentUser)
-                                                        @foreach ($currentUser->deliveryAddresses as $address)
-                                                            <option value="{{ $address->id }}">
-                                                                {{ $address->first_name . ' ' . $address->last_name . ', ' . $address->street . ', ' . $address->city . ', ' . $address->zip }}
-                                                            </option>
-                                                        @endforeach
-                                                    @endif
-                                                </select>
-                                            </div>
+                                <div class="form-base">
+                                    <div class="form-base_item">
+                                        <div class="form-group">
+                                            <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
+                                            <input type="text" wire:model="form.shipName" maxlength="35"
+                                                id="txtShipAddrName" class="form-control is-required"><span class="form-control-validate-info"></span>
                                         </div>
-
+                                    </div>
+                                    <div class="form-base_item">
+                                        <div class="form-group">
+                                            <label for="txtShipAddrName2">Dovětek názvu</label>
+                                            <input type="text" maxlength="50" id="txtShipAddrName2" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-base_row">
                                         <div class="form-base_item">
                                             <div class="form-group">
-                                                <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
-                                                <input name="ctl00$MainContent$txtShipAddrName" type="text"
-                                                    wire:model="form.shipName"
-                                                    readonly maxlength="35" id="txtShipAddrName"
-                                                    class="form-control is-required" data-rule-required="true"><span class="form-control-validate-info"></span>
+                                                <label for="txtShipAddrStreet">Ulice</label>
+                                                <input type="text" wire:model="form.shipStreet" maxlength="35"
+                                                    id="txtShipAddrStreet" class="form-control is-required"><span class="form-control-validate-info"></span>
                                             </div>
                                         </div>
                                         <div class="form-base_item">
                                             <div class="form-group">
-                                                <label for="txtShipAddrName2">Dovětek názvu</label>
-                                                <input name="ctl00$MainContent$txtShipAddrName2" type="text"
-                                                    maxlength="50" id="txtShipAddrName2" class="form-control">
-                                            </div>
-                                        </div>
-                                        <div class="form-base_row">
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipAddrStreet">Ulice</label>
-                                                    <input name="ctl00$MainContent$txtShipAddrStreet" type="text"
-                                                        wire:model="form.shipStreet"
-                                                        readonly maxlength="35"
-                                                        id="txtShipAddrStreet" class="form-control is-required"
-                                                        data-rule-required="true"><span class="form-control-validate-info"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipAddrCity">Město</label>
-                                                    <input name="ctl00$MainContent$txtShipAddrCity" type="text"
-                                                        wire:model="form.shipCity"
-                                                        readonly maxlength="35"
-                                                        id="txtShipAddrCity" class="form-control is-required"
-                                                        data-rule-required="true"><span class="form-control-validate-info"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-base_row">
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipAddrZIP">PSČ</label>
-                                                    <input name="ctl00$MainContent$txtShipAddrZIP" type="text"
-                                                        wire:model="form.shipZip"
-                                                        readonly maxlength="6"
-                                                        id="txtShipAddrZIP" class="form-control is-required"
-                                                        data-rule-required="true"><span class="form-control-validate-info"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="ddlShipCountry">Stát</label>
-                                                    <div class="ux-combo">
-                                                        <select name="ctl00$MainContent$ddlShipCountry"
-                                                            id="ddlShipCountry" class="form-control ux-combo_field"
-                                                            disabled appenddatabounditem="false">
-                                                            <option selected="selected" value="52">Česká republika
-                                                            </option>
-                                                            <option value="199">Slovenská republika</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-base_row">
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
-                                                    <input name="ctl00$MainContent$txtShipPhone" type="text"
-                                                        wire:model="form.shipPhone"
-                                                        readonly maxlength="20"
-                                                        id="txtShipPhone" class="form-control"
-                                                        data-rule-phone="true">
-                                                </div>
-                                            </div>
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
-                                                    <input name="ctl00$MainContent$txtShipEmail" type="text"
-                                                        wire:model="form.shipEmail"
-                                                        readonly maxlength="50"
-                                                        id="txtShipEmail" class="form-control @error('form.shipEmail') error @enderror"
-                                                        data-rule-email="true">
-                                                    @error('form.shipEmail') <span class="field-error">{{ $message }}</span> @enderror
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-base_row" id="shipAddrSaveRow" style="display:none">
-                                            <div class="form-base_item">
-                                                <div class="buttons-area">
-                                                    <button class="btn cart-address_btn-save" type="button">
-                                                        <span class="btn_label">Uložit novou dodací adresu</span>
-                                                    </button>
-                                                </div>
+                                                <label for="txtShipAddrCity">Město</label>
+                                                <input type="text" wire:model="form.shipCity" maxlength="35"
+                                                    id="txtShipAddrCity" class="form-control is-required"><span class="form-control-validate-info"></span>
                                             </div>
                                         </div>
                                     </div>
-                                @else
-                                    <div class="form-base">
+                                    <div class="form-base_row">
                                         <div class="form-base_item">
                                             <div class="form-group">
-                                                <label for="txtShipAddrName">Název firmy/kontaktní osoba</label>
-                                                <input type="text" wire:model="form.shipName" maxlength="35"
-                                                    id="txtShipAddrName" class="form-control is-required"><span class="form-control-validate-info"></span>
+                                                <label for="txtShipAddrZIP">PSČ</label>
+                                                <input type="text" wire:model="form.shipZip" maxlength="10"
+                                                    id="txtShipAddrZIP" class="form-control is-required"><span class="form-control-validate-info"></span>
                                             </div>
                                         </div>
-                                        <div class="form-base_row">
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipAddrStreet">Ulice</label>
-                                                    <input type="text" wire:model="form.shipStreet" maxlength="35"
-                                                        id="txtShipAddrStreet" class="form-control is-required"><span class="form-control-validate-info"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipAddrCity">Město</label>
-                                                    <input type="text" wire:model="form.shipCity" maxlength="35"
-                                                        id="txtShipAddrCity" class="form-control is-required"><span class="form-control-validate-info"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-base_row">
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipAddrZIP">PSČ</label>
-                                                    <input type="text" wire:model="form.shipZip" maxlength="10"
-                                                        id="txtShipAddrZIP" class="form-control is-required"><span class="form-control-validate-info"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="ddlShipCountry">Stát</label>
-                                                    <div class="ux-combo">
-                                                        <select wire:model="form.shipCountry" id="ddlShipCountry"
-                                                            class="form-control ux-combo_field">
-                                                            <option value="Česká republika">Česká republika</option>
-                                                            <option value="Slovenská republika">Slovenská republika</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-base_row">
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
-                                                    <input type="text" wire:model="form.shipPhone" maxlength="20"
-                                                        id="txtShipPhone" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="form-base_item">
-                                                <div class="form-group">
-                                                    <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
-                                                    <input type="text" wire:model="form.shipEmail" maxlength="50"
-                                                        id="txtShipEmail" class="form-control @error('form.shipEmail') error @enderror">
-                                                    @error('form.shipEmail') <span class="field-error">{{ $message }}</span> @enderror
-                                                </div>
+                                        <div class="form-base_item">
+                                            <div class="form-group">
+                                                <label for="txtShipCountry">Stát</label>
+                                                <input type="text" wire:model="form.shipCountry" maxlength="50"
+                                                    id="txtShipCountry" class="form-control is-required"><span class="form-control-validate-info"></span>
                                             </div>
                                         </div>
                                     </div>
-                                @endif
+                                    <div class="form-base_row">
+                                        <div class="form-base_item">
+                                            <div class="form-group">
+                                                <label for="txtShipPhone">Telefon osoby přebírající zásilku</label>
+                                                <input type="text" wire:model="form.shipPhone" maxlength="20"
+                                                    id="txtShipPhone" class="form-control is-required"><span class="form-control-validate-info"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-base_item">
+                                            <div class="form-group">
+                                                <label for="txtShipEmail">E-mail osoby přebírající zásilku</label>
+                                                <input type="text" wire:model="form.shipEmail" maxlength="50"
+                                                    id="txtShipEmail" class="form-control is-required @error('form.shipEmail') error @enderror"><span class="form-control-validate-info"></span>
+                                                @error('form.shipEmail') <span class="field-error">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -866,66 +728,3 @@
     </div>
 </form>
 
-@script
-    <script>
-        var shipAddresses = @json($addressData);
-
-        function applyShipAddress(val) {
-            var editable = val === '0';
-            var addr = editable ? {} : (shipAddresses[val] || {});
-
-            $('#txtShipAddrName').val(addr.name || '').prop('readonly', !editable);
-            $('#txtShipAddrStreet').val(addr.street || '').prop('readonly', !editable);
-            $('#txtShipAddrCity').val(addr.city || '').prop('readonly', !editable);
-            $('#txtShipAddrZIP').val(addr.zip || '').prop('readonly', !editable);
-            $('#txtShipPhone').val(addr.phone || '').prop('readonly', !editable);
-            $('#txtShipEmail').val(addr.email || '').prop('readonly', !editable);
-            $('#ddlShipCountry').prop('disabled', !editable);
-            $('#shipAddrSaveRow').toggle(editable);
-
-            $wire.applyAddress(
-                addr.name    || '',
-                addr.street  || '',
-                addr.city    || '',
-                addr.zip     || '',
-                addr.phone   || '',
-                addr.email   || ''
-            );
-        }
-
-        // inicializuj shipping properties z výchozí hodnoty selectu
-        applyShipAddress($('#ddlShipAddresses').val() || @json(auth()->check() ? (string) auth()->id() : '0'));
-
-        $('#ddlShipAddresses').on('select2:select', function(e) {
-            applyShipAddress(String(e.params.data.id));
-        });
-
-        $('.cart-address_btn-save').on('click', function() {
-            $wire.saveDeliveryAddress(
-                $('#txtShipAddrName').val(),
-                $('#txtShipAddrStreet').val(),
-                $('#txtShipAddrCity').val(),
-                $('#txtShipAddrZIP').val(),
-                $('#txtShipPhone').val(),
-                $('#txtShipEmail').val()
-            );
-        });
-
-        $wire.on('address-saved', function(data) {
-            var a = data;
-            shipAddresses[String(a.id)] = {
-                name: a.name,
-                street: a.street,
-                city: a.city,
-                zip: a.zip,
-                phone: a.phone,
-                email: a.email
-            };
-
-            var newOption = new Option(a.label, a.id, true, true);
-            $('#ddlShipAddresses').append(newOption).trigger('change');
-
-            applyShipAddress(String(a.id));
-        });
-    </script>
-@endscript

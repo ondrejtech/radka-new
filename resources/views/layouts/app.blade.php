@@ -67,6 +67,11 @@
 @stack('styles')
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css"/>
+<style>
+    .alertify-notifier {
+        z-index: 2147483647 !important;
+    }
+</style>
 </head>
 <body class='@auth is-logged @endauth {{ $bodyClass ?? '' }}'>
 <input type="hidden" id="csrfToken" value="{{ csrf_token() }}" />

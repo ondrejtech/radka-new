@@ -1181,12 +1181,12 @@ a.cart-tbl-items_pro-name:hover {
 }
 
 .cart-tbl-sum td {
-    padding-top: 5px;
-    padding-top: .35714285714285715rem;
+    padding-top: 20px;
+    padding-top: 1.4285714285714286rem;
     padding-right: 10px;
     padding-right: .7142857142857143rem;
-    padding-bottom: 5px;
-    padding-bottom: .35714285714285715rem;
+    padding-bottom: 20px;
+    padding-bottom: 1.4285714285714286rem;
     padding-left: 10px;
     padding-left: .7142857142857143rem;
     font-weight: 500;
@@ -1250,6 +1250,42 @@ a.cart-tbl-items_pro-name:hover {
 .cart-tbl-sum_price {
     display: block;
     font-weight: 500
+}
+
+.cart-tbl-sum_label {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 18px;
+    font-size: 1.2857142857142858rem;
+    font-weight: 700;
+    color: #000
+}
+
+.cart-tbl-sum_price {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 18px;
+    font-size: 1.2857142857142858rem;
+    font-weight: 700;
+    color: #e21b52
+}
+
+.cart-tbl-sum .cart-tbl-sum_row {
+    text-align: right;
+    padding-top: 20px;
+    padding-top: 1.4285714285714286rem;
+    padding-bottom: 20px;
+    padding-bottom: 1.4285714285714286rem;
+    padding-right: 2%
+}
+
+.cart-tbl-sum .cart-tbl-sum_row .cart-tbl-sum_label,
+.cart-tbl-sum .cart-tbl-sum_row .cart-tbl-sum_price {
+    display: inline-block;
+    vertical-align: middle
+}
+
+.cart-tbl-sum .cart-tbl-sum_row .cart-tbl-sum_label {
+    margin-right: 12px;
+    margin-right: .8571428571428571rem
 }
 
 @media(max-width:767px) {

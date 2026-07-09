@@ -117,7 +117,7 @@
                                 <td class="pro-compare_attr pro-compare_cell--highlight">Cena</td>
                                 @foreach ($products as $product)
                                 <td class="pro-compare_value pro-compare_cell--highlight">
-                                    {{ $product->EndUserPrice ? number_format($product->EndUserPrice, 0, ',', '&nbsp;') . '&nbsp;Kč' : '--' }}
+                                    {{ $product->YourPrice ? number_format($product->YourPrice, 0, ',', '&nbsp;') . '&nbsp;Kč' : '--' }}
                                 </td>
                                 @endforeach
                                 <td class="pro-compare_size-correction pro-compare_cell--highlight"></td>
