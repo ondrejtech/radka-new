@@ -1,0 +1,57 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-prod
+  namespace: techdomov
+  labels:
+    app.kubernetes.io/name: techdomov
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: info@techdomov.eu
+    privateKeySecretRef:
+      name: letsencrypt-prod-key
+    solvers:
+      - http01:
+          ingress:
+            class: gce
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: techdomov-ingress
+  namespace: techdomov
+  labels:
+    app.kubernetes.io/name: techdomov
+  annotations:
+    kubernetes.io/ingress.class: gce
+    cert-manager.io/issuer: letsencrypt-prod
+    kubernetes.io/ingress.global-static-ip-name: techdomov-ip  # vytvořit předem: gcloud compute addresses create techdomov-ip --global
+spec:
+  tls:
+    - hosts:
+        - techdomov.eu
+        - www.techdomov.eu
+      secretName: techdomov-tls
+  rules:
+    - host: techdomov.eu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+    - host: www.techdomov.eu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80

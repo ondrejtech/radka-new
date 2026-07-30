@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: techdomov
+  labels:
+    app.kubernetes.io/name: techdomov
+    app.kubernetes.io/part-of: multishoping
