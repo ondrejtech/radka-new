@@ -85,7 +85,7 @@
 					<div class="page-header_item logo-box">
 						<div class="logo-box_in">
 							<a href="{{ url('/') }}" class="logo" title="Přejít na úvodní stránku">
-								<img itemprop="logo" src="{{ asset('Images/loga/td.jpg') }}" alt="{{ env('APP_NAME') }} [logo]" />
+								<img itemprop="logo" src="{{ asset('Images/loga/td.png') }}" alt="{{ env('APP_NAME') }} [logo]" />
 								<span itemprop="legalName" class="hide-common-user text-hidden-desc">{{ config('app.name') }}</span>
 							</a>
 						</div>
