@@ -33,6 +33,7 @@
 	<link media="all" rel="stylesheet" href="{{ asset('Styles/fonts/Gotham/kit.css') }}" />
 	<link media="all" rel="stylesheet" href="{{ asset('Styles/icons/style.css') }}?v=2" />
     <link rel="stylesheet" href="{{asset('Styles/icons/fonts/simple-line-icons.ttf') }}">
+	<link rel="stylesheet" href="{{ asset('assets/bundles/css/footer.css') }}">
 
 	<link href="{{ asset('assets/bundles/css/main.css') }}" rel="stylesheet"/>
     <style>[x-cloak] { display: none !important; }</style>

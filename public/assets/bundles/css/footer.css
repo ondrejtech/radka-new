@@ -1,0 +1,113 @@
+  :root{
+    --ink:#2b2622;
+    --ink-soft:#6b6259;
+    --cream:#faf6f1;
+    --cream-deep:#f2ebe2;
+    --gold:#b08d57;
+    --gold-soft:#d8c4a0;
+    --rose:#c94f7c;
+    --line:#e6ddd0;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    color:var(--ink);
+    background:var(--white);
+  }
+
+  /* --- header replica, for context only --- */
+  .site-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 48px;border-bottom:1px solid var(--line);
+  }
+  .logo-mark{font-family:'Playfair Display',serif;font-style:italic;font-size:26px;letter-spacing:.5px;color:var(--ink);}
+  .logo-mark span{display:block;font-family:'Poppins',sans-serif;font-style:normal;font-size:10px;letter-spacing:3px;color:var(--gold);text-align:center;}
+  .site-header nav{display:flex;gap:36px;font-size:13px;letter-spacing:.5px;color:var(--ink-soft);}
+  .page-placeholder{
+    padding:70px 48px;text-align:center;color:var(--ink-soft);font-size:13px;letter-spacing:1px;
+    border-bottom:1px dashed var(--line);
+  }
+
+  /* --- FOOTER --- */
+  footer{
+    background:var(--cream);
+    border-top:2px solid var(--gold);
+    padding:56px 48px 0;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr 1fr 1.2fr;
+    gap:40px;
+    max-width:1240px;
+    margin:0 auto;
+    padding-bottom:44px;
+  }
+  .f-brand .logo-mark{margin-bottom:14px;}
+  .f-brand p{
+    line-height:1.7;margin:0 0 20px;max-width:280px;color:var(--ink-soft);
+  }
+  .socials{display:flex;gap:10px;}
+  .socials a{
+    width:36px;height:36px;border-radius:50%;
+    border:1px solid var(--gold-soft);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold);text-decoration:none;
+    transition:background .2s ease,color .2s ease;
+    font-size:14px;
+  }
+  .socials a:hover{background:var(--gold);color:var(--white);}
+
+  footer h4{
+    font-family:'Playfair Display',serif;font-weight:600;font-size:15px;
+    color:var(--ink);margin:0 0 20px;position:relative;padding-bottom:10px;
+  }
+  footer h4::after{
+    content:"";position:absolute;left:0;bottom:0;width:26px;height:2px;background:var(--rose);
+  }
+  footer ul{list-style:none;margin:0;padding:0;}
+  footer ul li{margin-bottom:12px;}
+  footer ul a{
+    color:var(--ink-soft);text-decoration:none;font-size:13.5px;
+    transition:color .15s ease,padding-left .15s ease;
+  }
+  footer ul a:hover{color:var(--rose);padding-left:4px;}
+
+  .f-contact li{display:flex;gap:10px;align-items:flex-start;color:var(--ink-soft);font-size:13.5px;margin-bottom:14px;}
+  .f-contact i{color:var(--gold);width:16px;margin-top:2px;}
+
+  .f-news p{margin:0 0 16px;line-height:1.7;color:var(--ink-soft);}
+  .news-form{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--white);}
+  .news-form input{
+    flex:1;border:none;padding:11px 12px;font-family:'Poppins',sans-serif;font-size:13px;outline:none;color:var(--ink);
+  }
+  .news-form button{
+    border:none;background:var(--rose);color:var(--white);
+    padding:0 18px;font-size:15px;cursor:pointer;
+    transition:background .2s ease;
+  }
+  .news-form button:hover{background:#a83c66;}
+
+  .footer-bottom{
+    border-top:1px solid var(--line);
+    padding:20px 0;
+    max-width:1240px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:12px;
+    font-size:12.5px;color:var(--ink-soft);
+  }
+  .payment-icons{display:flex;gap:14px;font-size:22px;color:var(--ink-soft);}
+  .footer-bottom a{color:var(--ink-soft);text-decoration:none;}
+  .footer-bottom a:hover{color:var(--rose);}
+
+  @media (max-width:900px){
+    .footer-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:560px){
+    .site-header,.page-placeholder,footer{padding-left:20px;padding-right:20px;}
+    .footer-grid{grid-template-columns:1fr;}
+    .footer-bottom{flex-direction:column;align-items:flex-start;}
+  }
