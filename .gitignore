@@ -2,6 +2,8 @@
 .DS_Store
 .env
 .env.backup
+.env.production
+.env.production.bak
 .phpactor.json
 .phpunit.result.cache
 PRIVATEdoc.pdf
