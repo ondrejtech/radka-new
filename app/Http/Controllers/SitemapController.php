@@ -23,15 +23,9 @@ class SitemapController extends Controller
     {
         $urls = [url('/')];
 
-        foreach ($this->navigationService->getNavigation() as $level2) {
-            if (! empty($level2['url'])) {
-                $urls[] = url($level2['url']);
-            }
-
-            foreach ($level2['categories'] ?? [] as $category) {
-                if (! empty($category['url'])) {
-                    $urls[] = url($category['url']);
-                }
+        foreach ($this->navigationService->getNavigation() as $category) {
+            if (! empty($category['url'])) {
+                $urls[] = url($category['url']);
             }
         }
 

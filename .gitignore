@@ -25,6 +25,7 @@ PRIVATEdoc.pdf
 Homestead.json
 Homestead.yaml
 Thumbs.db
+*:Zone.Identifier
 public/IMGCACHE/
 deploy.sh
 .claude/

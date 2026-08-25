@@ -12,7 +12,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\URL;
 
 Route::get('/', [CategoryController::class, 'home']);
 
@@ -37,11 +36,9 @@ Route::get('/{slug}/product-{proId}', [PagesController::class, 'productDetail'])
     ->where('proId', '\d+')
     ->name('product.detail');
 
-// Category pages – URL pattern: /{seg1}/{seg2}/n-{superCatCode},{catCode},{extra}
-// Examples:
-//   /info/it/n-52,0,0            (level 1)
-//   /info-other/notebooky/n-521,0,0   (level 2)
-//   /notebooky/notebooky/n-521,12345,0 (level 3)
+// Category pages – single flat level: /{seg1}/{seg2}/n-{superCatCode},{catCode},{extra}
+// The category slug lives in seg2, superCatCode is always 0:
+//   /kategorie/pc-a-notebooky/n-0,11,0   (category product list)
 Route::get('/{seg1}/{seg2}/{nParam}', [CategoryController::class, 'index'])->where('nParam', 'n-[\w]+,\d+,\d+')->name('category.show');
 
 Route::get('/dashboard', function () {

@@ -5,7 +5,6 @@ namespace App\Livewire\Template;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductImage;
-use App\Models\ProductSuperCategory;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -15,15 +14,6 @@ use Livewire\Component;
 class HomepageCarousels extends Component
 {
     private const PRODUCTS_PER_CAROUSEL = 30;
-
-    public ?int $pscCode = null;
-
-    public bool $isL1 = false;
-
-    public function mount(): void
-    {
-        [$this->pscCode, $this->isL1] = $this->resolveCode();
-    }
 
     public function addToCart(int $proId, int $quantity): void
     {
@@ -54,75 +44,20 @@ class HomepageCarousels extends Component
 
     public function render(): View
     {
-        $carousels = $this->pscCode ? $this->loadCarousels($this->pscCode, $this->isL1) : [];
-
         return view('livewire.template.homepage-carousels', [
-            'carousels' => $carousels,
+            'carousels' => $this->loadCarousels(),
         ]);
     }
 
-    /**
-     * @return array{0: ?int, 1: bool}
-     */
-    private function resolveCode(): array
+    private function loadCarousels(): array
     {
-        if (! preg_match('/n-(\w+),(\d+),(\d+)/', request()->path(), $m)) {
-            return [null, false];
-        }
-
-        // Only render on L1/L2 pages — catCode must be 0
-        if ((int) $m[2] !== 0) {
-            return [null, false];
-        }
-
-        $code = (int) $m[1];
-        $isL1 = ProductSuperCategory::where('ParentSuperCategoryCode', $code)->exists();
-
-        // L2 must be a known PSC code
-        if (! $isL1 && ! ProductSuperCategory::where('SuperCategoryCode', $code)->exists()) {
-            return [null, false];
-        }
-
-        return [$code, $isL1];
+        return Cache::remember('homepage_carousels', 86400, fn (): array => $this->buildCarousels());
     }
 
-    private function loadCarousels(int $code, bool $isL1): array
+    private function buildCarousels(): array
     {
-        $key = $isL1 ? "homepage_carousels_l1_{$code}" : "homepage_carousels_l2_{$code}";
-
-        return Cache::remember($key, 86400, fn (): array => $isL1
-            ? $this->buildL1Carousels($code)
-            : $this->buildL2Carousels($code)
-        );
-    }
-
-    private function buildL1Carousels(int $l1Code): array
-    {
-        // 1 query: all L2 children with their categories eager-loaded
-        $l2Children = ProductSuperCategory::where('ParentSuperCategoryCode', $l1Code)
-            ->with('categories:SuperCategoryCode,CategoryCode,CategoryName')
-            ->orderBy('SuperCategoryCode')
-            ->get();
-
-        // Build map: L2 SuperCategoryCode → [CategoryCode, ...]
-        $l2CategoryMap = [];
-        foreach ($l2Children as $l2) {
-            $codes = $l2->categories->pluck('CategoryCode')->toArray();
-            if (! empty($codes)) {
-                $l2CategoryMap[$l2->SuperCategoryCode] = [
-                    'title' => $l2->SuperCategoryName,
-                    'categoryCodes' => $codes,
-                ];
-            }
-        }
-
-        return $this->buildCarouselsFromMap($l2CategoryMap);
-    }
-
-    private function buildL2Carousels(int $l2Code): array
-    {
-        // 1 query: all categories under this L2
-        $categories = ProductCategory::where('SuperCategoryCode', $l2Code)
+        // One carousel per category — categories are a single flat level.
+        $categories = ProductCategory::query()
             ->orderBy('CategoryCode')
             ->get(['CategoryCode', 'CategoryName']);
 

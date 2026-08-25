@@ -14,7 +14,7 @@ class CategoryController extends Controller
         $navigation = $navigationService->getNavigation();
         $firstUrl = $navigation[0]['url'] ?? null;
 
-        return redirect($firstUrl ?? route('category.show', ['seg1' => 'info', 'seg2' => 'it', 'nParam' => 'n-52,0,0']));
+        return redirect($firstUrl ?? route('products.search'));
     }
 
     public function index(string $seg1, string $seg2, string $nParam): View

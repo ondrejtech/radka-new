@@ -10,14 +10,9 @@ use XMLWriter;
 class GoogleMerchantFeedService
 {
     /**
-     * Only products under this super-category are exported (multishoping.eu catalog).
-     */
-    private const PARENT_SUPER_CATEGORY_CODE = 52;
-
-    /**
      * Stream the Google Merchant Center product feed (RSS 2.0).
      *
-     * Only in-stock products with a price and an image are included.
+     * Only products in a valid category, in stock, with a price and an image are included.
      */
     public function stream(): StreamedResponse
     {
@@ -38,8 +33,7 @@ class GoogleMerchantFeedService
                 ->where('YourPrice', '>', 0)
                 ->whereIn('CategoryCode', function ($query): void {
                     $query->select('CategoryCode')
-                        ->from('ProductCategory')
-                        ->where('ParentSuperCategoryCode', self::PARENT_SUPER_CATEGORY_CODE);
+                        ->from('ProductCategory');
                 })
                 ->whereIn('ProId', function ($query): void {
                     $query->select('ProId')->from('ProductImage');
