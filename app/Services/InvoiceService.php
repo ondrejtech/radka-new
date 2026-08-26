@@ -22,6 +22,9 @@ class InvoiceService
 
         $docNumber = now()->year.$order->id;
 
+        // Platba na dobírku: faktura se vytváří hned při objednávce, úhrada proběhne při převzetí zásilky.
+        $isCod = $order->payment_method === 'cod';
+
         $invoice = Invoice::create([
             'order_id' => $order->id,
             'currency_id' => 1,
@@ -32,13 +35,13 @@ class InvoiceService
             'order_number' => $docNumber,
             'date_of_issue' => $order->created_at->toDateString(),
             'date_of_maturity' => $order->created_at->toDateString(),
-            'date_of_payment' => now()->toDateString(),
+            'date_of_payment' => $isCod ? null : now()->toDateString(),
             'date_of_taxing' => now()->toDateString(),
             'date_of_accounting_event' => now()->toDateString(),
             'note' => $order->note,
-            'payment_option_id' => 9, // PayPal
+            'payment_option_id' => $isCod ? 6 : 9, // 6 = Dobírka, 9 = PayPal
             'discount_type' => 0, // None
-            'payment_status' => 1, // Paid
+            'payment_status' => $isCod ? 0 : 1, // 0 = Unpaid, 1 = Paid
             'exported' => 0, // NotExported
             'report_language' => 1, // Cz
             'vat_on_pay_status' => 0, // Disabled
@@ -51,7 +54,7 @@ class InvoiceService
                 'TotalWithoutVat' => (float) $order->total_without_vat,
                 'TotalWithVat' => (float) $order->total_without_vat,
                 'TotalVat' => 0.0,
-                'TotalPaid' => (float) $order->total_without_vat,
+                'TotalPaid' => $isCod ? 0.0 : (float) $order->total_without_vat,
             ],
         ]);
 

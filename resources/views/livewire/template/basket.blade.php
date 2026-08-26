@@ -639,53 +639,8 @@
                 </div>
             </div>
             <div class="alert alert-info">
-                <p><strong>Objednávku budete moci zaplatit online na detailu objednávky:</strong></p>
-
-                <img src="{{ asset('staticcontent/images/platby/visa.png') }}" alt="Visa"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <img src="{{ asset('staticcontent/images/platby/master_card.png') }}" alt="MasterCard"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <br>
-                <br>
-
-                <img src="{{ asset('staticcontent/images/platby/csas.png') }}" alt="Česká spořitelna"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <img src="{{ asset('staticcontent/images/platby/csob.png') }}" alt="ČSOB"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <img src="{{ asset('staticcontent/images/platby/kb.png') }}" alt="Komerční banka"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                {{-- <img src="{{ asset('staticcontent/images/platby/equa.png') }}" alt="Equa bank" style="border: 1px solid silver; margin: 5px; padding: 3px"> --}}
-
-                <img src="{{ asset('staticcontent/images/platby/fio.png') }}" alt="Fio"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <img src="{{ asset('staticcontent/images/platby/era.png') }}" alt="era"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <img src="{{ asset('staticcontent/images/platby/mbank.png') }}" alt="mBank"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <img src="{{ asset('staticcontent/images/platby/moneta.png') }}" alt="MONETA"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <img src="{{ asset('staticcontent/images/platby/rb.png') }}" alt="Raiffeisen BANK"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-
-                <img src="{{ asset('staticcontent/images/platby/unicredit.png') }}" alt="UniCredit"
-                    style="border: 1px solid silver; margin: 5px; padding: 3px">
-
-                <br>
-                <br>
-
-                <p style="color: red"><strong>K celkové částce k úhradě mohou být připočteny poplatky, jako je dopravné
-                        a balné.</strong></p>
-
+                <p><strong>Způsob platby: platba na dobírku.</strong> Objednávku uhradíte v hotovosti nebo platební kartou
+                    při převzetí zásilky.</p>
             </div>
             <div class="alert alert-info">
                 

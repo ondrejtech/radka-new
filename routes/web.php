@@ -5,7 +5,6 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\GoogleAdsAuthController;
 use App\Http\Controllers\PagesController;
-use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\ProductFeed;
 use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProfileController;
@@ -59,29 +58,8 @@ Route::get('/ares/lookup/{ico}', [AresController::class, 'lookup'])
     ->middleware('throttle:10,1')
     ->name('ares.lookup');
 
-// PayPal – přihlášení uživatelé
-Route::middleware('auth')->prefix('paypal')->name('paypal.')->group(function (): void {
-    Route::post('/order/{order}/create', [PayPalController::class, 'createOrder'])->name('order.create');
-    Route::post('/order/{order}/card/create', [PayPalController::class, 'createCardOrder'])->name('order.card.create');
-    Route::post('/order/{order}/card/capture', [PayPalController::class, 'captureCard'])->name('order.card.capture');
-    Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success');
-    Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
-});
-
-// PayPal – hosté
-Route::prefix('paypal/guest')->name('paypal.guest.')->group(function (): void {
-    Route::post('/order/{order}/create', [PayPalController::class, 'createOrder'])->name('order.create');
-    Route::post('/order/{order}/card/create', [PayPalController::class, 'createCardOrder'])->name('order.card.create');
-    Route::post('/order/{order}/card/capture', [PayPalController::class, 'captureCard'])->name('order.card.capture');
-    Route::get('/order/{order}/success', [PayPalController::class, 'success'])->name('order.success');
-    Route::get('/order/{order}/cancel', [PayPalController::class, 'cancel'])->name('order.cancel');
-});
-
 // Google Ads OAuth – dočasné routes pro získání Refresh Tokenu
 Route::get('/google/ads/auth', [GoogleAdsAuthController::class, 'redirect'])->name('google.ads.auth');
 Route::get('/google/ads/callback', [GoogleAdsAuthController::class, 'callback'])->name('google.ads.callback');
-
-// PayPal webhook – bez CSRF, bez auth
-Route::post('/paypal/webhook', [PayPalController::class, 'webhook'])->name('paypal.webhook');
 
 require __DIR__.'/auth.php';

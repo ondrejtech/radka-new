@@ -31,6 +31,7 @@ class Order extends Model
         'total_without_vat',
         'total_with_vat',
         'shipping_price',
+        'payment_method',
         'paypal_order_id',
         'paypal_capture_id',
         'payment_status',

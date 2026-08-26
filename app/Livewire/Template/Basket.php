@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Transportation;
 use App\Services\CartService;
+use App\Services\InvoiceService;
 use Illuminate\View\View;
 use Livewire\Attributes\Renderless;
 use Livewire\Component;
@@ -246,6 +247,7 @@ class Basket extends Component
             'total_without_vat' => $totalWithoutVat,
             'total_with_vat' => $totalWithoutVat,
             'shipping_price' => $shippingPrice,
+            'payment_method' => 'cod',
         ]);
 
         foreach ($items as $item) {
@@ -258,7 +260,11 @@ class Basket extends Component
             ]);
         }
 
-        // Košík se vyprázdní až po úspěšné platbě (viz PayPalController), ne při vytvoření objednávky.
+        app(InvoiceService::class)->createFromOrder($order);
+
+        app(CartService::class)->clear();
+
+        session()->flash('meta_purchase', $order->id);
 
         $this->redirectRoute('pages.documents.order', ['orderId' => $order->id]);
     }

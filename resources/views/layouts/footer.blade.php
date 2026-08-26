@@ -53,7 +53,7 @@
       <div class="payment-icons">
         <i class="fa-brands fa-cc-visa"></i>
         <i class="fa-brands fa-cc-mastercard"></i>
-        <i class="fa-brands fa-cc-paypal"></i>
+        <i class="fa-solid fa-money-bill-wave" title="Platba na dobírku"></i>
         <i class="fa-solid fa-money-bill-transfer"></i>
       </div>
       <a href="#">Mapa webu</a>
