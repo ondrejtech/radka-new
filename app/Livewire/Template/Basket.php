@@ -168,16 +168,6 @@ class Basket extends Component
 
     public function placeOrder(bool $isOpen): void
     {
-        if ($isOpen && ! auth()->check()) {
-            $this->dispatch('message', [
-                'text' => 'Otevřenou objednávku může vytvořit pouze přihlášený uživatel.',
-                'type' => 'error',
-                'status' => '403',
-            ]);
-
-            return;
-        }
-
         if (! $this->form->transportId) {
             $this->dispatch('message', [
                 'text' => 'Prosím vyberte způsob dopravy',

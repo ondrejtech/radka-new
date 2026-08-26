@@ -31,6 +31,9 @@ Route::get('/pages/documents/term-service', [DocumentController::class, 'termSer
 Route::get('/pages/document/claim-product', [DocumentController::class, 'claimProduct'])->name('pages.documents.claim-product');
 Route::get('/pages/document/claim-policy', [DocumentController::class, 'claimPolicy'])->name('pages.documents.claim-policy');
 
+Route::get('/pages/documents/orderlist', [DocumentController::class, 'order'])->name('pages.documents.orderlist');
+Route::get('/pages/documents/order-{orderId}', [DocumentController::class, 'orderItem'])->name('pages.documents.order');
+
 Route::get('/{slug}/product-{proId}', [PagesController::class, 'productDetail'])
     ->where('proId', '\d+')
     ->name('product.detail');
@@ -48,8 +51,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/pages/documents/orderlist', [DocumentController::class, 'order'])->name('pages.documents.orderlist');
-    Route::get('/pages/documents/order-{orderId}', [DocumentController::class, 'orderItem'])->name('pages.documents.order');
 });
 
 Route::get('/search', [SearchController::class, 'index'])->name('products.search');

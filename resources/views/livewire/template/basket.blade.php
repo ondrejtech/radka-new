@@ -654,11 +654,9 @@
                 </p>
             </div>
             <div class="buttons-area cart-send-area">
-                @if(auth()->check())
                 <button wire:click="placeOrder(true)" wire:loading.attr="disabled" class="btn" type="button">
                     <span class="btn_label">Vytvořit otevřenou objednávku</span>
                 </button>
-                @endif
                 <button wire:click="placeOrder(false)" wire:loading.attr="disabled" id="send_order" class="btn btn--primary" type="button">
                     <span class="btn_label">Odeslat objednávku</span>
                 </button>

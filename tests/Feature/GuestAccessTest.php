@@ -19,8 +19,8 @@ test('guest is redirected from profile to login', function () {
     $this->get('/profile')->assertRedirect(route('login'));
 });
 
-test('guest is redirected from order list to login', function () {
-    $this->get('/pages/documents/orderlist')->assertRedirect(route('login'));
+test('guest can access order list without login', function () {
+    $this->get('/pages/documents/orderlist')->assertSuccessful();
 });
 
 // --- Public pages ---
